@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31729.503
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Packing.Server", "Packing\Server\Packing.Server.csproj", "{337A0D24-9AF8-4730-9477-C0A8FE844539}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Packing.Server", "Packing\Server\Packing.Server.csproj", "{337A0D24-9AF8-4730-9477-C0A8FE844539}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Packing.Client", "Packing\Client\Packing.Client.csproj", "{3C560E6B-96E1-4803-BF7F-7356D688069C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Packing.Client", "Packing\Client\Packing.Client.csproj", "{3C560E6B-96E1-4803-BF7F-7356D688069C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Packing.Core", "Packing\Packing.Core\Packing.Core.csproj", "{DE8E223E-8F00-4549-AF94-D90E6CD14A46}"
 EndProject

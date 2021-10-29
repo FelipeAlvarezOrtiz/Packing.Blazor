@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
 using Microsoft.Extensions.Options;
 using Packing.Core.Empresas;
+using Packing.Core.Notificaciones;
 using Packing.Core.Pedidos;
 using Packing.Core.Productos;
 using Packing.Core.Usuarios;
@@ -25,6 +26,7 @@ namespace Packing.Persistencia
         public DbSet<UsuarioInterno> UsuariosInternos { get; set; }
         public DbSet<CargoInterno> CargosInternos { get; set; }
         public DbSet<DisponibilidadProducto> Disponibilidades { get; set; }
-       
+        public DbSet<Notificacion> Notificaciones { get; set; }
+
     }
 }

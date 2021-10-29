@@ -1,0 +1,45 @@
+﻿@if (Producto is null)
+{
+    <p>No hay información para ese producto </p>
+}
+else
+{
+    <div class="row m-2">
+        <div class="col-md-12 col-lg-12 col-xl-3">
+            <img class="card-img-top text-center" src="https://images.mein-mmo.de/magazin/medien/2015/10/BattleNet-Logo.jpg" alt="Card image cap" style="height: 18rem;">
+        </div>
+        <div class="col-md-12 col-lg-12 col-xl-9">
+            <br />
+            <div class="row">
+                <div class="col-12">
+                    <h5 class="card-title">Numero de producto : @Producto.IdProducto</h5>
+                    <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                    <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-md-12 col-lg-12 col-xl-6">
+                    <MudNumericField @bind-Value="CantidadProducto" Label="Outlined" Min="0" Variant="Variant.Outlined" Step="1" />
+                </div>
+                <div class="col-md-12 col-lg-12 col-xl-6 mt-4">
+                    <AuthorizeView Roles="Administrador">
+                        <MudButton Color="Color.Primary" Raised="true" OnClick="(() => AgregarAlCarro.InvokeAsync(Producto))">El boton</MudButton>
+                    </AuthorizeView>
+                    <AuthorizeView Roles="Cliente">
+                        <p>Comprar</p>
+                    </AuthorizeView>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr />
+    <br />
+}
+
+@code {
+    public int CantidadProducto { get; set; }
+    [Parameter] public Producto Producto { get; set; }
+    [Parameter] public EventCallback<Producto> AgregarAlCarro { get; set; }
+
+}

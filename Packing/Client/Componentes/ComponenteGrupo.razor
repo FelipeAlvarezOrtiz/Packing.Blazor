@@ -1,0 +1,107 @@
+﻿
+@if (Grupo is null)
+{
+    <p>No hay datos para el grupo</p>
+}
+else
+{
+    <br />
+    <div class="row">
+        <div class="col-md-12 col-lg-12 col-xl-3">
+            <img class="card-img-top text-center" src="/images/grupos/BROCOLI.png" alt="@Grupo.NombreGrupo" style="height: 18rem;">
+        </div>
+        <div class="col-md-12 col-lg-12 col-xl-9">
+            <br />
+            <div class="row">
+                <div class="col-12">
+                    <h5 class="card-title">Numero de producto : @Grupo.IdGrupo</h5>
+                    <p class="card-text">
+                        <MudSelect T="int" @bind-Value="FormatoIngresado" Label="Formato" Strict="true" Variant="Variant.Outlined" Format="F2" AnchorOrigin="Origin.BottomCenter">
+                            @foreach (var formato in FormatosDisponiblesEnGrupo)
+                            {
+                                <MudSelectItem T="int" Value="formato.IdFormato">@formato.NombreFormato</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </p>
+                    <p class="card-text">
+                        <MudSelect T="int" @bind-Value="PresentacionIngresada" Label="Presentación" Strict="true" Variant="Variant.Outlined" Format="F2" AnchorOrigin="Origin.BottomCenter">
+                            @foreach (var presentacion in PresentacionesDisponibles)
+                            {
+                                <MudSelectItem T="int" Value="presentacion.IdPresentacion">@presentacion.NombrePresentacion</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </p>
+                    @*<p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>*@
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-md-12 col-lg-12 col-xl-6">
+                    <MudNumericField @bind-Value="CantidadProducto" Label="Cantidad" Min="0" Variant="Variant.Outlined" Step="1"/>
+                </div>
+                <div class="col-md-12 col-lg-12 col-xl-6 mt-3">
+                    <div class="row">
+                        <div class="col-6 text-center">
+                            <MudFab Color="Color.Success" Icon="@Icons.Material.Filled.AddCircleOutline" OnClick="@(() => NotificacionExitosa.InvokeAsync(Grupo.IdGrupo))" Label="Agregar"></MudFab>
+                        </div>
+                        <div class="col-6 text-center">
+                            <MudFab Color="Color.Info" Icon="@Icons.Material.Filled.Loop" OnClick="@LimpiarSelecciones" Label="Limpiar"></MudFab>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr />
+    <br />
+}
+
+@code {
+    [Parameter] public GrupoProducto Grupo { get; set; }
+    [Parameter] public EventCallback<int> NotificacionExitosa{ get; set; }
+
+    public List<Presentacion> PresentacionesDisponibles = new()
+    {
+        new Presentacion()
+        {
+            IdPresentacion = 1,
+            NombrePresentacion = "Presentacion1"
+        },
+        new Presentacion()
+        {
+            IdPresentacion = 2,
+            NombrePresentacion = "Presentacion 2"
+        },
+        new Presentacion()
+        {
+            IdPresentacion = 3,
+            NombrePresentacion = "Presentacion 3"
+        }
+    };
+
+    protected int FormatoIngresado { get; set; }
+    protected int PresentacionIngresada { get; set; }
+    protected int CantidadProducto { get; set; }
+    
+    public List<Formato> FormatosDisponiblesEnGrupo = new()
+    {
+        new Formato()
+        {
+            NombreFormato = "Formato 1",
+            IdFormato = 1
+        },
+        new Formato()
+        {
+            NombreFormato = "Formato 2",
+            IdFormato = 2
+        },
+    };
+
+    protected void LimpiarSelecciones()
+    {
+        FormatoIngresado = 0;
+        PresentacionIngresada = 0;
+        CantidadProducto = 0;
+    }
+
+}

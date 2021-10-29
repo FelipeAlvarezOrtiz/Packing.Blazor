@@ -1,0 +1,53 @@
+﻿@page "/IngresarPedido"
+@inject ISnackbar Snackbar
+
+<MudTabs @ref="_tabGeneral" Elevation="5" Rounded="true" Centered="true">
+    <MudTabPanel @ref="_ingresoProductos" Icon="@Icons.Material.Filled.AddShoppingCart" Text="Ingreso de productos" BadgeColor="Color.Info">
+        <br />
+        @for (var i = 0; i < 15; i++)
+        {
+            var productoInterno = new GrupoProducto()
+            {
+                IdGrupo = i
+            };
+            <div class="col-12 p-1">
+                <ComponenteGrupo Grupo="productoInterno" NotificacionExitosa="NotificacionExitosa" />
+            </div>
+        }
+        <br/>
+        <MudFab Icon="@Icons.Outlined.ArrowForward" OnClick="(() => Activar(1))" Label="Avanzar"></MudFab>
+    </MudTabPanel>
+    <MudTabPanel @ref="_confirmacionProductos" Icon="@Icons.Material.Filled.AddTask" Text="Confirmación de productos">
+        <p>Panel de confirmación</p>
+        <MudFab Icon="@Icons.Outlined.ArrowForward" OnClick="(() => Activar(2))"></MudFab>
+    </MudTabPanel>
+    <MudTabPanel @ref="_datosPersonales" Icon="@Icons.Material.Filled.Assignment" Text="Datos personales" BadgeColor="Color.Secondary">
+        <p>Datos personales</p>
+        <MudFab Icon="@Icons.Outlined.ArrowForward" OnClick="(() => Activar(3))"></MudFab>
+    </MudTabPanel>
+    <MudTabPanel @ref="_confirmacion" Icon="@Icons.Custom.Uncategorized.AlertSuccess" Text="Finalización" BadgeDot="true" BadgeColor="Color.Success">
+        <p>Confirmar</p>
+        <MudFab Icon="@Icons.Outlined.ArrowBack" OnClick="(() => Activar(2))"></MudFab>
+    </MudTabPanel>
+</MudTabs>
+
+@code {
+    MudTabs _tabGeneral;
+    MudTabPanel _ingresoProductos;
+    MudTabPanel _confirmacionProductos;
+    MudTabPanel _datosPersonales;
+    MudTabPanel _confirmacion;
+
+    void Activar(int Index)
+    {
+        _tabGeneral.ActivatePanel(Index);
+    }
+
+    void NotificacionExitosa(int idProducto)
+    {
+        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomRight;
+        Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
+        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
+        Snackbar.Add($"Producto agregado {idProducto}", Severity.Success);
+    }
+}

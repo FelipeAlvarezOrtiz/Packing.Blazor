@@ -1,11 +1,22 @@
+<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
 <CascadingAuthenticationState>
     <Router AppAssembly="@typeof(Program).Assembly" PreferExactMatches="@true">
         <Found Context="routeData">
             <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                <Authorizing>
+                    <MudSkeleton />
+                    <MudSkeleton Animation="Animation.False" />
+                    <MudSkeleton Animation="Animation.Wave" />
+                    <div class="row col-12 text-center">
+                        <p>Validando credenciales</p>
+                    </div>
+                </Authorizing>
                 <NotAuthorized>
                     @if (!context.User.Identity.IsAuthenticated)
                     {
-                        <RedirectToLogin />
+                        <RedirectToLogin/>
                     }
                     else
                     {

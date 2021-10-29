@@ -1,13 +1,36 @@
 ﻿@page "/fetchdata"
 @inject HttpClient Http
 @attribute [Authorize]
+@inject ISnackbar Snackbar
 
 <h1>Weather forecast</h1>
 
 <p>This component demonstrates fetching data from the server.</p>
 
+@for (var i = 0; i < 10; i++)
+{
+    var productoInterno = new GrupoProducto()
+    {
+        IdGrupo = i
+    };
+    <div class="col-12">
+        <ComponenteGrupo Grupo="productoInterno" NotificacionExitosa="NotificacionExitosa" />
+    </div>
+}
 
 @code {
-    
+    protected List<Producto> ProductosEnPedido = new();
 
+    protected void AgregarAlCarro(Producto nuevoProducto)
+    {
+        ProductosEnPedido.Add(nuevoProducto);
+    }
+
+    void NotificacionExitosa(int idProducto)
+    {
+        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomRight;
+        Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
+        Snackbar.Configuration.MaxDisplayedSnackbars = 10;
+        Snackbar.Add($"Producto agregado {idProducto}", Severity.Success);
+    }
 }
