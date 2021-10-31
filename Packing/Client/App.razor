@@ -9,7 +9,7 @@
                     <MudSkeleton />
                     <MudSkeleton Animation="Animation.False" />
                     <MudSkeleton Animation="Animation.Wave" />
-                    <div class="row col-12 text-center">
+                    <div class="row text-center">
                         <p>Validando credenciales</p>
                     </div>
                 </Authorizing>
@@ -20,14 +20,14 @@
                     }
                     else
                     {
-                        <p>You are not authorized to access this resource.</p>
+                        <p>No estás autorizado para ver este recurso.</p>
                     }
                 </NotAuthorized>
             </AuthorizeRouteView>
         </Found>
         <NotFound>
             <LayoutView Layout="@typeof(MainLayout)">
-                <p>Sorry, there's nothing at this address.</p>
+                <p>404 recurso no encontrado.</p>
             </LayoutView>
         </NotFound>
     </Router>

@@ -6,8 +6,8 @@
 
 <AuthorizeView>
     <Authorized>
-        <a href="authentication/profile">Hello, @context.User.Identity.Name!</a>
-        <button class="nav-link btn btn-link" @onclick="BeginSignOut">Log out</button>
+        <a href="authentication/profile"><MudAvatar Color="Color.Primary">@context.User.Identity.Name.ToCharArray()[0].ToString().ToUpper()</MudAvatar></a>
+        <button class="nav-link btn btn-link" @onclick="BeginSignOut">Cerrar sesión &nbsp;<i class="fas fa-sign-out-alt"></i></button>
     </Authorized>
     <NotAuthorized>
         <a href="authentication/register">Register</a>

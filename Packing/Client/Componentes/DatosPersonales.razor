@@ -1,0 +1,27 @@
+﻿<br/>
+<h3><i class="fas fa-info"></i>&nbsp;Confirma tus datos</h3>
+<br/>
+<div class="row ml-1">
+    <!--Datos del usuario -->
+    <div class="col-md-12 col-lg-6 p-1">
+        <MudField Label="Nombre" Variant="Variant.Outlined">Felipe Alvarez</MudField>
+    </div>
+    <div class="col-md-12 col-lg-6 p-1">
+        <MudField Label="R.U.T" Variant="Variant.Outlined">18.823.970-6</MudField>
+    </div>
+    <div class="col-12 p-1">
+        <MudTextField Label="Dirección" Variant="Variant.Outlined" @bind-Value="Direccion"></MudTextField>
+    </div>
+</div>
+<br/>
+<hr />
+<div class="row">
+    <div class="col-12">
+        <MudTextField T="string" Label="Observaciones" Variant="Variant.Outlined" Text="@Observacion" Lines="6" />
+    </div>
+</div>
+
+@code {
+    protected string Observacion { get; set; }
+    public string Direccion { get; set; }
+}

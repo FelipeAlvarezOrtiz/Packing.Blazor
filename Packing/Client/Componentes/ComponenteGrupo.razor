@@ -1,17 +1,30 @@
-﻿
-@if (Grupo is null)
+﻿@inject HttpClient _cliente
+
+@if (Grupo is null || FormatosDisponiblesEnGrupo is null || PresentacionesDisponibles is null)
 {
-    <p>No hay datos para el grupo</p>
+    <MudCard Class="row">
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="200px"/>
+        <MudCardContent>
+            <MudSkeleton Width="30%" Height="42px;" />
+            <MudSkeleton Width="80%" />
+            <MudSkeleton Width="100%" />
+        </MudCardContent>
+        <MudCardActions>
+            <MudSkeleton Width="64px" Height="40px" Class="ml-2" />
+            <MudSkeleton Width="105px" Height="40px" Class="ml-3" />
+        </MudCardActions>
+    </MudCard>
+
 }
 else
 {
-    <br />
-    <div class="row">
+    <MudPaper Class="row" Elevation="3">
+        <br />
         <div class="col-md-12 col-lg-12 col-xl-3">
-            <img class="card-img-top text-center" src="/images/grupos/BROCOLI.png" alt="@Grupo.NombreGrupo" style="height: 18rem;">
+            <img class="card-img-top text-center p-1" src="/images/grupos/BROCOLI.png" alt="@Grupo.NombreGrupo" style="height: 18rem;">
         </div>
         <div class="col-md-12 col-lg-12 col-xl-9">
-            <br />
+            <br/>
             <div class="row">
                 <div class="col-12">
                     <h5 class="card-title">Numero de producto : @Grupo.IdGrupo</h5>
@@ -34,7 +47,7 @@ else
                     @*<p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>*@
                 </div>
             </div>
-            <br />
+            <br/>
             <div class="row">
                 <div class="col-md-12 col-lg-12 col-xl-6">
                     <MudNumericField @bind-Value="CantidadProducto" Label="Cantidad" Min="0" Variant="Variant.Outlined" Step="1"/>
@@ -50,9 +63,12 @@ else
                     </div>
                 </div>
             </div>
+            <div class="row mb-1">
+                <div class="col-md-12 col-lg-12 col-xl-6"></div>
+                <div class="col-md-12 col-lg-12 col-xl-6"></div>
+            </div>
         </div>
-    </div>
-    <hr />
+    </MudPaper>
     <br />
 }
 
@@ -60,48 +76,24 @@ else
     [Parameter] public GrupoProducto Grupo { get; set; }
     [Parameter] public EventCallback<int> NotificacionExitosa{ get; set; }
 
-    public List<Presentacion> PresentacionesDisponibles = new()
-    {
-        new Presentacion()
-        {
-            IdPresentacion = 1,
-            NombrePresentacion = "Presentacion1"
-        },
-        new Presentacion()
-        {
-            IdPresentacion = 2,
-            NombrePresentacion = "Presentacion 2"
-        },
-        new Presentacion()
-        {
-            IdPresentacion = 3,
-            NombrePresentacion = "Presentacion 3"
-        }
-    };
+    public List<Presentacion> PresentacionesDisponibles { get; set; }
+    public List<Formato> FormatosDisponiblesEnGrupo { get; set; }
 
     protected int FormatoIngresado { get; set; }
     protected int PresentacionIngresada { get; set; }
     protected int CantidadProducto { get; set; }
     
-    public List<Formato> FormatosDisponiblesEnGrupo = new()
-    {
-        new Formato()
-        {
-            NombreFormato = "Formato 1",
-            IdFormato = 1
-        },
-        new Formato()
-        {
-            NombreFormato = "Formato 2",
-            IdFormato = 2
-        },
-    };
-
     protected void LimpiarSelecciones()
     {
         FormatoIngresado = 0;
         PresentacionIngresada = 0;
         CantidadProducto = 0;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        FormatosDisponiblesEnGrupo = await _cliente.GetFromJsonAsync<List<Formato>>("api/Formatos/ObtenerFormatos");
+        PresentacionesDisponibles = await _cliente.GetFromJsonAsync<List<Presentacion>>("api/Presentaciones/ObtenerPresentaciones");
     }
 
 }

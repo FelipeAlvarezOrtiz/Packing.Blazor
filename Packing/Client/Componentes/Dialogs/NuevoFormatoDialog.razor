@@ -1,0 +1,43 @@
+﻿<MudDialog>
+    <DialogContent>
+        <div class="container-fluid">
+            <div class="row form-group">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label class="col-form-label" for="nuevoNombreFormato">Nombre</label>
+                        <MudTextField id="nuevoNombreFormato" Variant="Variant.Outlined" @bind-Value="NombreNuevoFormato"></MudTextField>
+                    </div>
+                </div>
+            </div>
+            <div class="row form-group">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label class="col-form-label" style="font-size: small;" for="nuevaUnidadPorFormato">Unidades por formato</label>
+                        <MudNumericField Min="0" Variant="Variant.Outlined" Step="1" id="nuevaUnidadPorFormato" @bind-Value="CantidadNuevoFormato" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code{
+
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    public string NombreNuevoFormato { get; set; }
+    public int CantidadNuevoFormato { get; set; }
+
+    protected void Submit()
+    {
+        //subir datos a formato y cerrar
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+
+    void Cancel() => MudDialog.Cancel();
+    
+}

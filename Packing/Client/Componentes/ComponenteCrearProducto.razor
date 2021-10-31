@@ -1,0 +1,120 @@
+﻿@using Packing.Client.Dtos.Productos
+@using Packing.Client.Componentes.Dialogs
+@inject HttpClient _cliente
+@inject IDialogService DialogService
+
+@if (Formatos is null || Grupos is null || Formatos is null)
+{
+    <MudCard Class="row" Elevation="2">
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="200px" />
+        <MudCardContent>
+            <MudSkeleton Width="30%" Height="42px;" />
+            <MudSkeleton Width="80%" />
+            <MudSkeleton Width="100%" />
+        </MudCardContent>
+        <MudCardActions>
+            <MudSkeleton Width="64px" Height="40px" Class="ml-2" />
+            <MudSkeleton Width="105px" Height="40px" Class="ml-3" />
+        </MudCardActions>
+    </MudCard>
+}
+else
+{
+    <EditForm Model="NuevoProducto" OnValidSubmit="AgregarProducto">
+        <DataAnnotationsValidator></DataAnnotationsValidator>
+        <div class="container-fluid">
+            <div class="row form-group">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label class="col-form-label">Nombre</label>
+                        <input type="text" class="form-control" id="nombreNuevoProducto" required maxlength="25" />
+                    </div>
+                </div>
+            </div>
+            <div class="row form-group">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <MudSelect T="int" @bind-Value="NuevoProducto.IdFormato" Label="Formato" Strict="true" Variant="Variant.Outlined" Format="F2" AnchorOrigin="Origin.BottomCenter">
+                                @foreach (var formato in Formatos)
+                                {
+                                    <MudSelectItem T="int" Value="formato.IdFormato">@formato.NombreFormato</MudSelectItem>
+                                }
+                            </MudSelect>&nbsp;
+                            <MudFab Class="mt-2" Color="Color.Primary" Size="Size.Medium" Icon="@Icons.Material.Filled.Add" OnClick="AbrirDialogFormato" aria-label="Agregar" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <MudSelect T="int" @bind-Value="NuevoProducto.IdGrupo" Label="Grupo" Strict="true" Variant="Variant.Outlined" Format="F2" AnchorOrigin="Origin.BottomCenter">
+                                @foreach (var grupo in Grupos)
+                                {
+                                    <MudSelectItem T="int" Value="grupo.IdGrupo">@grupo.NombreGrupo</MudSelectItem>
+                                }
+                            </MudSelect>&nbsp;
+                            <MudFab Class="mt-2" Color="Color.Primary" Size="Size.Medium" Icon="@Icons.Material.Filled.Add" aria-label="Agregar" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <MudSelect T="int" @bind-Value="NuevoProducto.IdPresentacion" Label="Presentación" Strict="true" Variant="Variant.Outlined" Format="F2" AnchorOrigin="Origin.BottomCenter">
+                                @foreach (var presentacion in Presentaciones)
+                                {
+                                    <MudSelectItem T="int" Value="presentacion.IdPresentacion">@presentacion.NombrePresentacion</MudSelectItem>
+                                }
+                            </MudSelect>&nbsp;
+                            <MudFab Class="mt-2" Color="Color.Primary" Size="Size.Medium" Icon="@Icons.Material.Filled.Add" aria-label="Agregar" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6 text-center">
+                <MudFab Color="Color.Success" Icon="@Icons.Material.Filled.AddCircleOutline" ButtonType="ButtonType.Submit" Label="Crear"></MudFab>
+            </div>
+            <div class="col-6 text-center">
+                <MudFab Color="Color.Info" Icon="@Icons.Material.Filled.Loop" OnClick="@LimpiarSelecciones" Label="Limpiar"></MudFab>
+            </div>
+        </div>
+    </EditForm>
+}
+
+
+
+@code {
+    protected List<Presentacion> Presentaciones { get; set; }
+    protected List<GrupoProducto> Grupos { get; set; }
+    protected List<Formato> Formatos { get; set; }
+    protected CrearProducto NuevoProducto = new();
+
+    protected DialogOptions maxWidth = new DialogOptions() { MaxWidth = MaxWidth.Medium, FullWidth = true };
+
+    protected override async Task OnInitializedAsync()
+    {
+        Presentaciones = await _cliente.GetFromJsonAsync<List<Presentacion>>("api/Presentaciones/ObtenerPresentaciones");
+        Grupos = await _cliente.GetFromJsonAsync<List<GrupoProducto>>("api/Grupos/ObtenerGrupos");
+        Formatos = await _cliente.GetFromJsonAsync<List<Formato>>("api/Formatos/ObtenerFormatos");
+    }
+
+    protected void AgregarProducto()
+    {
+
+    }
+
+    protected void LimpiarSelecciones()
+    {
+
+    }
+
+    protected void AbrirDialogFormato()
+    {
+        DialogService.Show<NuevoFormatoDialog>("Nuevo Formato", maxWidth);
+    }
+}
