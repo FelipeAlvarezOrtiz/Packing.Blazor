@@ -4,42 +4,51 @@
 }
 else
 {
-    <div class="row m-2">
-        <div class="col-md-12 col-lg-12 col-xl-3">
-            <img class="card-img-top text-center" src="https://images.mein-mmo.de/magazin/medien/2015/10/BattleNet-Logo.jpg" alt="Card image cap" style="height: 18rem;">
-        </div>
-        <div class="col-md-12 col-lg-12 col-xl-9">
-            <br />
-            <div class="row">
-                <div class="col-12">
-                    <h5 class="card-title">Numero de producto : @Producto.IdProducto</h5>
-                    <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                    <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+    <MudPaper Class="p-2" Elevation="3">
+        <div class="row m-2">
+            <div class="col-md-12 col-lg-12 col-xl-12">
+                <br />
+                <div class="row">
+                    <div class="col-sm-12 col-md-6 col-lg-6">
+                        <h5 class="card-title">Código de producto : @Producto.IdProducto</h5>
+                        <p class="card-text">@Producto.NombreParaBusqueda.</p>
+                        <p class="card-text"><small class="text-muted">Actualizado hace 1 minuto</small></p>
+                    </div>
+                    <div class="col-sm-12 col-md-6 col-lg-6">
+                        <img class="img-thumbnail rounded mx-auto d-block p-1" src="/images/grupos/@Producto.Grupo.Imagen" alt="@Producto.Grupo.NombreGrupo" style="height: 18rem;">
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-md-12 col-lg-12 col-xl-9">
+                        <MudNumericField @bind-Value="CantidadProducto" Label="Outlined" Min="0" Variant="Variant.Outlined" Step="1" />
+                    </div>
+                    <div class="col-md-12 col-lg-12 col-xl-3 mt-4">
+                        <AuthorizeView Roles="Administrador">
+                            <MudButton Color="Color.Primary" Variant="Variant.Filled" Raised="true" OnClick="(() => AgregarAlCarro.InvokeAsync(Producto))">Editar
+                            </MudButton>
+                        </AuthorizeView>
+                        <AuthorizeView Roles="Cliente">
+                            <p>Comprar</p>
+                        </AuthorizeView>
+                    </div>
                 </div>
             </div>
-            <br />
-            <div class="row">
-                <div class="col-md-12 col-lg-12 col-xl-6">
-                    <MudNumericField @bind-Value="CantidadProducto" Label="Outlined" Min="0" Variant="Variant.Outlined" Step="1" />
-                </div>
-                <div class="col-md-12 col-lg-12 col-xl-6 mt-4">
-                    <AuthorizeView Roles="Administrador">
-                        <MudButton Color="Color.Primary" Raised="true" OnClick="(() => AgregarAlCarro.InvokeAsync(Producto))">El boton</MudButton>
-                    </AuthorizeView>
-                    <AuthorizeView Roles="Cliente">
-                        <p>Comprar</p>
-                    </AuthorizeView>
-                </div>
-            </div>
         </div>
-    </div>
-    <hr />
-    <br />
+        <hr />
+        <br />
+    </MudPaper>
 }
 
 @code {
+    public bool Cargando = true;
     public int CantidadProducto { get; set; }
     [Parameter] public Producto Producto { get; set; }
     [Parameter] public EventCallback<Producto> AgregarAlCarro { get; set; }
 
+    protected override async Task OnInitializedAsync()
+    {
+        var random = new Random();
+        CantidadProducto = random.Next(1, 5);
+    }
 }

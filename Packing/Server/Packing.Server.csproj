@@ -28,7 +28,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\Productos\" />
     <Folder Include="Data\" />
     <Folder Include="Extensiones\" />
     <Folder Include="Models\" />

@@ -30,5 +30,18 @@ namespace Packing.Server.Controllers.Formatos
                 return BadRequest(error.Message);
             }
         }
+
+        [HttpPost("ObtenerFormatosDisponibles")]
+        public async Task<ActionResult<List<Formato>>> ObtenerFormatosDisponibles(ObtenerFormatosDelGrupo.Query request)
+        {
+            try
+            {
+                return await Mediator.Send(request);
+            }
+            catch (Exception error)
+            {
+                return BadRequest(error.Message);
+            }
+        }
     }
 }

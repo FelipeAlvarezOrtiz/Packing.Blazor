@@ -1,7 +1,15 @@
 ﻿@page "/"
 
-<h1>Hello, world!</h1>
 
-Welcome to your new app.
+@code
+{
+    protected void EliminarFormato(Formato format)
+    {
+        Console.WriteLine("Borrado");
+    }
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+    protected void NotificacionExitosa(int id)
+    {
+        Console.WriteLine(id);
+    }
+}

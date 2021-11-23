@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -25,6 +26,7 @@ namespace Packing.Negocio.Productos
             {
                 return await _context.Productos.Include(producto => producto.Formato)
                     .Include(producto => producto.Grupo).Include(producto => producto.Presentacion)
+                    .Take(3)
                     .ToListAsync(cancellationToken: cancellationToken);
             }
         }

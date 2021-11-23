@@ -5,7 +5,7 @@
                 <div class="col-md-12">
                     <div class="form-group">
                         <label class="col-form-label" for="nuevoNombreFormato">Nombre</label>
-                        <MudTextField id="nuevoNombreFormato" Variant="Variant.Outlined" @bind-Value="NombreNuevoFormato"></MudTextField>
+                        <MudTextField id="nuevoNombreFormato" Variant="Variant.Outlined" @bind-Value="NombreNuevoFormato" />
                     </div>
                 </div>
             </div>
@@ -34,10 +34,12 @@
 
     protected void Submit()
     {
-        //subir datos a formato y cerrar
         MudDialog.Close(DialogResult.Ok(true));
     }
 
-    void Cancel() => MudDialog.Cancel();
+    protected void Cancel()
+    {
+        MudDialog.Cancel();
+    } 
     
 }

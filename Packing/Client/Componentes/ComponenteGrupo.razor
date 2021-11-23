@@ -9,72 +9,115 @@
             <MudSkeleton Width="80%" />
             <MudSkeleton Width="100%" />
         </MudCardContent>
-        <MudCardActions>
-            <MudSkeleton Width="64px" Height="40px" Class="ml-2" />
-            <MudSkeleton Width="105px" Height="40px" Class="ml-3" />
-        </MudCardActions>
     </MudCard>
-
 }
 else
 {
-    <MudPaper Class="row" Elevation="3">
+    <MudPaper Elevation="3">
         <br />
-        <div class="col-md-12 col-lg-12 col-xl-3">
-            <img class="card-img-top text-center p-1" src="/images/grupos/BROCOLI.png" alt="@Grupo.NombreGrupo" style="height: 18rem;">
-        </div>
-        <div class="col-md-12 col-lg-12 col-xl-9">
-            <br/>
-            <div class="row">
-                <div class="col-12">
-                    <h5 class="card-title">Numero de producto : @Grupo.IdGrupo</h5>
-                    <p class="card-text">
-                        <MudSelect T="int" @bind-Value="FormatoIngresado" Label="Formato" Strict="true" Variant="Variant.Outlined" Format="F2" AnchorOrigin="Origin.BottomCenter">
-                            @foreach (var formato in FormatosDisponiblesEnGrupo)
-                            {
-                                <MudSelectItem T="int" Value="formato.IdFormato">@formato.NombreFormato</MudSelectItem>
-                            }
-                        </MudSelect>
-                    </p>
-                    <p class="card-text">
-                        <MudSelect T="int" @bind-Value="PresentacionIngresada" Label="Presentación" Strict="true" Variant="Variant.Outlined" Format="F2" AnchorOrigin="Origin.BottomCenter">
-                            @foreach (var presentacion in PresentacionesDisponibles)
-                            {
-                                <MudSelectItem T="int" Value="presentacion.IdPresentacion">@presentacion.NombrePresentacion</MudSelectItem>
-                            }
-                        </MudSelect>
-                    </p>
-                    @*<p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>*@
+        @if (FormatosDisponiblesEnGrupo is null)
+        {
+            <div class="col-12 text-center">
+                <div class="spinner-border" role="status">
+                    <span class="sr-only">...</span>
                 </div>
             </div>
-            <br/>
-            <div class="row">
-                <div class="col-md-12 col-lg-12 col-xl-6">
-                    <MudNumericField @bind-Value="CantidadProducto" Label="Cantidad" Min="0" Variant="Variant.Outlined" Step="1"/>
+        }
+        else
+        {
+            <div class="row p-2">
+                
+            <div class="col-sm-12 col-md-12 col-lg-12">
+                @*<img class="card-img-top text-center p-1" src="/images/grupos/@Grupo.Imagen" alt="@Grupo.NombreGrupo" style="height: 18rem;">*@
+                <img class="img-thumbnail rounded mx-auto d-block p-1" src="/images/grupos/@Grupo.Imagen" alt="@Grupo.NombreGrupo" style="height: 18rem;">
+            </div>
+            <div class="col-md-12 col-lg-12">
+                <br/>
+                <div class="row">
+                    <div class="col-12">
+                        <h5 class="card-title">&nbsp;@Grupo.NombreGrupo</h5>
+                        <p class="card-text">
+                            @if(FormatosDisponiblesEnGrupo.Count <= 0){
+                                <div class="alert alert-warning text-center" role="alert">
+                                  <h6>No existen formatos para este grupo.</h6>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <MudSelect T="int" @bind-Value="FormatoIngresado" Label="Formato" Strict="true" Variant="Variant.Outlined" Format="F2" AnchorOrigin="Origin.BottomCenter">
+                                        @foreach (var formato in FormatosDisponiblesEnGrupo)
+                                        {
+                                            <MudSelectItem T="int" Value="formato.IdFormato">@formato.NombreFormato</MudSelectItem>
+                                        }
+                                        </MudSelect>
+                                        <MudFab Class="mt-2 ml-3" Color="Color.Primary" Size="Size.Medium" Icon="@Icons.Material.Filled.Refresh" OnClick="BuscarPresentaciones" aria-label="Buscar" />
+                                    </div>
+                                </div>
+                            }
+                        </p>
+                        <p class="card-text">
+                            @if(PresentacionesDisponibles.Count <= 0 || PresentacionesDisponibles is null){
+                                <div class="alert alert-warning text-center" role="alert">
+                                  <h6>Seleccione un formato para revisar las presentaciones disponibles.</h6>
+                                </div>
+                            }
+                            else if (CargandoPresentaciones)
+                            {
+                                <div class="col-12 text-center">
+                                    <div class="spinner-border" role="status">
+                                        <span class="sr-only">Cargando ...</span>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <MudSelect T="int" @bind-Value="PresentacionIngresada" Label="Presentación" Strict="true" Variant="Variant.Outlined" Format="F2" AnchorOrigin="Origin.BottomCenter">
+                                @foreach (var presentacion in PresentacionesDisponibles)
+                                {
+                                    <MudSelectItem T="int" Value="presentacion.IdPresentacion">@presentacion.NombrePresentacion</MudSelectItem>
+                                }
+                                </MudSelect>
+                            }
+                        </p>
+                    </div>
                 </div>
-                <div class="col-md-12 col-lg-12 col-xl-6 mt-3">
-                    <div class="row">
-                        <div class="col-6 text-center">
-                            <MudFab Color="Color.Success" Icon="@Icons.Material.Filled.AddCircleOutline" OnClick="@(() => NotificacionExitosa.InvokeAsync(Grupo.IdGrupo))" Label="Agregar"></MudFab>
-                        </div>
-                        <div class="col-6 text-center">
-                            <MudFab Color="Color.Info" Icon="@Icons.Material.Filled.Loop" OnClick="@LimpiarSelecciones" Label="Limpiar"></MudFab>
+                <br/>
+                <div class="row">
+                    <div class="col-md-12 col-lg-12 col-xl-6">
+                        <MudNumericField @bind-Value="CantidadProducto" Label="Cantidad" Min="0" Variant="Variant.Outlined" Step="1"/>
+                    </div>
+                    <div class="col-md-12 col-lg-12 col-xl-6 mt-3">
+                        <div class="row">
+                            <div class="col-6 text-center">
+                                <MudFab Color="Color.Success" Icon="@Icons.Material.Filled.AddCircleOutline" OnClick="@AgregarProducto" Label="Agregar"></MudFab>
+                            </div>
+                            <div class="col-6 text-center">
+                                <MudFab Color="Color.Info" Icon="@Icons.Material.Filled.Loop" OnClick="@LimpiarSelecciones" Label="Limpiar"></MudFab>
+                            </div>
                         </div>
                     </div>
                 </div>
+                <div class="row mb-1">
+                    <div class="col-md-12 col-lg-12 col-xl-6"></div>
+                    <div class="col-md-12 col-lg-12 col-xl-6"></div>
+                </div>
+                <div class="row mb-1">
+                    <div class="col-md-12 col-lg-12 col-xl-6"></div>
+                    <div class="col-md-12 col-lg-12 col-xl-6"></div>
+                </div>
             </div>
-            <div class="row mb-1">
-                <div class="col-md-12 col-lg-12 col-xl-6"></div>
-                <div class="col-md-12 col-lg-12 col-xl-6"></div>
             </div>
-        </div>
+
+        }
     </MudPaper>
     <br />
 }
 
 @code {
     [Parameter] public GrupoProducto Grupo { get; set; }
-    [Parameter] public EventCallback<int> NotificacionExitosa{ get; set; }
+    [Parameter] public EventCallback<DetalleProductoEnCarro> NotificacionExitosa{ get; set; }
 
     public List<Presentacion> PresentacionesDisponibles { get; set; }
     public List<Formato> FormatosDisponiblesEnGrupo { get; set; }
@@ -82,7 +125,12 @@ else
     protected int FormatoIngresado { get; set; }
     protected int PresentacionIngresada { get; set; }
     protected int CantidadProducto { get; set; }
-    
+
+    protected RequestProductoPedido request = new();
+
+    protected FormatosDelGrupo FormatoRequest = new();
+    protected PresentacionDelGrupo PresentacionRequest = new();
+
     protected void LimpiarSelecciones()
     {
         FormatoIngresado = 0;
@@ -92,8 +140,53 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        FormatosDisponiblesEnGrupo = await _cliente.GetFromJsonAsync<List<Formato>>("api/Formatos/ObtenerFormatos");
-        PresentacionesDisponibles = await _cliente.GetFromJsonAsync<List<Presentacion>>("api/Presentaciones/ObtenerPresentaciones");
+        FormatoRequest = new FormatosDelGrupo { IdGrupo = Grupo.IdGrupo };
+        PresentacionesDisponibles = new();
+        var result = await _cliente.PostAsJsonAsync("api/Formatos/ObtenerFormatosDisponibles",FormatoRequest);
+        if (result.IsSuccessStatusCode)
+        {
+            FormatosDisponiblesEnGrupo = await result.Content.ReadFromJsonAsync<List<Formato>>();
+            StateHasChanged();
+        }
     }
 
+    protected async void BuscarPresentaciones()
+    {
+        CargandoPresentaciones = true;
+        StateHasChanged();
+        PresentacionRequest = new PresentacionDelGrupo{ IdFormato = FormatoIngresado,IdGrupo = Grupo.IdGrupo };
+        var result = await _cliente.PostAsJsonAsync("api/Presentaciones/ObtenerPresentacionesDelGrupo",PresentacionRequest);
+        if (result.IsSuccessStatusCode)
+        {
+            CargandoPresentaciones = false;
+            PresentacionesDisponibles = await result.Content.ReadFromJsonAsync<List<Presentacion>>();
+            StateHasChanged();
+        }
+    }
+
+    protected async void AgregarProducto()
+    {
+        request.IdFormato = FormatoIngresado;
+        request.IdGrupo = Grupo.IdGrupo;
+        request.IdPresentacion = PresentacionIngresada;
+        var result = await _cliente.PostAsJsonAsync("api/Productos/ObtenerProducto",request);
+        if (result.IsSuccessStatusCode)
+        {
+            var nuevoProducto = await result.Content.ReadFromJsonAsync<Producto>();
+            var nuevaRequestAgrega = new DetalleProductoEnCarro()
+                {
+                    Cantidad = CantidadProducto,
+                    ProductoIncorporado = nuevoProducto
+                };
+            await NotificacionExitosa.InvokeAsync(nuevaRequestAgrega);
+            LimpiarSelecciones();
+            StateHasChanged();
+        } 
+        else{
+            Console.WriteLine("Ha ocurrido un error");
+        }
+        
+    }
+
+    protected bool CargandoPresentaciones = false;
 }

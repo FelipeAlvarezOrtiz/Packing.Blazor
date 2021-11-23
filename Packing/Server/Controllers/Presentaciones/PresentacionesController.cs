@@ -30,5 +30,18 @@ namespace Packing.Server.Controllers.Presentaciones
                 return BadRequest(error.Message);
             }
         }
+
+        [HttpPost("ObtenerPresentacionesDelGrupo")]
+        public async Task<ActionResult<List<Presentacion>>> CrearPresentacion(ObtenerPresentacionDelFormato.Query request)
+        {
+            try
+            {
+                return await Mediator.Send(request);
+            }
+            catch (Exception error)
+            {
+                return BadRequest(error.Message);
+            }
+        }
     }
 }

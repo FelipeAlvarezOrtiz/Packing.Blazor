@@ -1,5 +1,6 @@
 ﻿@page "/IngresarPedido"
 @inject ISnackbar Snackbar
+@inject HttpClient _cliente
 
 <MudTabs @ref="_tabGeneral" HideSlider="true" Elevation="2" Rounded="true" Centered="true">
     <MudTabPanel @ref="_ingresoProductos" Icon="@Icons.Material.Filled.AddShoppingCart" Text="Ingreso de productos" BadgeColor="Color.Info">
@@ -7,48 +8,74 @@
         <div class="row">
             <div class="col-6 text-center"></div>
             <div class="col-6 text-center">
-                <MudFab Icon="@Icons.Outlined.ArrowForward" OnClick="(() => Activar(1))">Siguiente</MudFab>
+                <MudTooltip Text="Siguiente">
+                    <MudFab Icon="@Icons.Outlined.ArrowForward" OnClick="(() => Activar(1))">Siguiente</MudFab>
+                </MudTooltip>
             </div>
         </div>
         <br />
-        @for (var i = 0; i < 3; i++)
+        @if(Grupos is null)
         {
-            var productoInterno = new GrupoProducto()
-            {
-                IdGrupo = i
-            };
-            <div class="col-12 p-1">
-                <ComponenteGrupo Grupo="productoInterno" NotificacionExitosa="NotificacionExitosa" />
+            <div class="col">
+                <div class="row">
+                    <div class="col d-flex justify-content-center">
+                        <p>Cargando, espere por favor ...</p>
+                    </div>
+                </div>
+            </div>
+            <MudSkeleton/>
+            <MudSkeleton Animation="Animation.False"/>
+            <MudSkeleton Animation="Animation.Wave"/>
+            <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="m-7"/>
+        }
+        else
+        {
+            <div class="row">
+                @foreach(var grupo in Grupos)
+                {
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-4 p-1">
+                        <ComponenteGrupo Grupo="grupo" NotificacionExitosa="NotificacionExitosa" />
+                    </div>
+                }
             </div>
         }
         <br />
-
     </MudTabPanel>
     <MudTabPanel @ref="_confirmacionProductos" Icon="@Icons.Material.Filled.AddTask" Text="Confirmación de productos">
         <br />
         <div class="row">
             <div class="col-6 text-center">
-                <MudFab Icon="@Icons.Outlined.ArrowBack" OnClick="(() => Activar(0))">Atrás</MudFab>
+                <MudTooltip Text="Anterior">
+                    <MudFab Icon="@Icons.Outlined.ArrowBack" OnClick="(() => Activar(0))">Atrás</MudFab>
+                </MudTooltip>
             </div>
             <div class="col-6 text-center">
-                <MudFab Icon="@Icons.Outlined.ArrowForward" OnClick="(() => Activar(2))">Siguiente</MudFab>
+                <MudTooltip Text="Siguiente">
+                    <MudFab Icon="@Icons.Outlined.ArrowForward" OnClick="(() => Activar(2))">Siguiente</MudFab>
+                </MudTooltip>
             </div>
         </div>
         <hr />
-        <div class="row">
-            <div class="col-12">
-                <p>En Confirmación de productos</p>
+        @foreach (var detalle in ProductosEnCarro)
+        {
+            <div class="col-sm-12 col-md-6 col-lg-6 col-xl-4 p-1">
+                <ConfirmacionPedido Producto=detalle.Value.ProductoIncorporado CantidadProducto=detalle.Value.Cantidad 
+                    ActualizarCantidad="ActualizarCantidadProducto" />
             </div>
-        </div>
+        }
     </MudTabPanel>
     <MudTabPanel @ref="_datosPersonales" Icon="@Icons.Material.Filled.Assignment" Text="Datos personales" BadgeColor="Color.Secondary">
         <br />
         <div class="row">
             <div class="col-6 text-center">
-                <MudFab Icon="@Icons.Outlined.ArrowBack" OnClick="(() => Activar(1))">Atrás</MudFab>
+                <MudTooltip Text="Anterior">
+                    <MudFab Icon="@Icons.Outlined.ArrowBack" OnClick="(() => Activar(1))">Atrás</MudFab>
+                </MudTooltip>
             </div>
             <div class="col-6 text-center">
-                <MudFab Icon="@Icons.Outlined.ArrowForward" OnClick="(() => Activar(3))">Siguiente</MudFab>
+                <MudTooltip Text="Siguiente">
+                    <MudFab Icon="@Icons.Outlined.ArrowForward" OnClick="(() => Activar(3))">Siguiente</MudFab>
+                </MudTooltip>
             </div>
         </div>
         <hr />
@@ -62,7 +89,9 @@
         <br />
         <div class="row">
             <div class="col-6 text-center">
-                <MudFab Icon="@Icons.Outlined.ArrowBack" OnClick="(() => Activar(2))">Atrás</MudFab>
+                <MudTooltip Text="Anterior">
+                    <MudFab Icon="@Icons.Outlined.ArrowBack" OnClick="(() => Activar(2))">Atrás</MudFab>
+                </MudTooltip>
             </div>
             <div class="col-6 text-center"></div>
         </div>
@@ -73,22 +102,56 @@
 </MudTabs>
 
 @code {
-    MudTabs _tabGeneral;
-    MudTabPanel _ingresoProductos;
-    MudTabPanel _confirmacionProductos;
-    MudTabPanel _datosPersonales;
-    MudTabPanel _confirmacion;
+    protected MudTabs _tabGeneral;
+    protected MudTabPanel _ingresoProductos;
+    protected MudTabPanel _confirmacionProductos;
+    protected MudTabPanel _datosPersonales;
+    protected MudTabPanel _confirmacion;
+
+    protected List<GrupoProducto> Grupos;
+    protected Dictionary<int,DetalleProductoEnCarro> ProductosEnCarro = new();
+
+    protected bool ErrorHaOcurrido = false;
 
     void Activar(int Index)
     {
         _tabGeneral.ActivatePanel(Index);
     }
 
-    void NotificacionExitosa(int idProducto)
+    protected override async Task OnInitializedAsync()
     {
+        try
+        {
+            Grupos = await _cliente.GetFromJsonAsync<List<GrupoProducto>>("api/Grupos/ObtenerGrupos");
+        }
+        catch(Exception error){
+            Console.WriteLine(error.Message);
+        }
+    }
+
+    void NotificacionExitosa(DetalleProductoEnCarro productoAgregado)
+    {
+        ProductosEnCarro.Add(productoAgregado.ProductoIncorporado.IdProducto,productoAgregado);
         Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomRight;
         Snackbar.Configuration.SnackbarVariant = Variant.Outlined;
         Snackbar.Configuration.MaxDisplayedSnackbars = 10;
-        Snackbar.Add($"Producto agregado {idProducto}", Severity.Success);
+        Snackbar.Add($"{productoAgregado.ProductoIncorporado.NombreParaBusqueda} agregado al carro", Severity.Success);
+    }
+
+    void ActualizarCantidadProducto(Tuple<int,int> updateRequest)
+    {
+        if (!ProductosEnCarro.ContainsKey(updateRequest.Item1)){
+            Console.WriteLine("El producto no existe en el diccionario");
+        }
+        if(ProductosEnCarro.TryGetValue(updateRequest.Item1,out var productoIngresado))
+        {
+            productoIngresado.Cantidad = updateRequest.Item2;
+            ProductosEnCarro[updateRequest.Item1] = productoIngresado;
+            StateHasChanged();
+        }
+        else
+        {
+            Console.WriteLine("Ha ocurrido un error");
+        }
     }
 }

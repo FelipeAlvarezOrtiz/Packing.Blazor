@@ -50,7 +50,7 @@ namespace Packing.Negocio.Productos
                     Formato = formato,
                     Grupo = grupo,
                     Presentacion = presentacion,
-                    RutaImagen = request.RutaImagen,
+                    RutaImagen = grupo.Imagen,
                     MaxDiaVencimiento = request.MaxDiaVencimiento,
                     AfectoVencimiento = request.AfectaVencimiento,
                     MinDiaVencimiento = request.MinDiaVencimiento,

@@ -11,8 +11,6 @@ namespace Packing.Core.Pedidos
         public Guid GuidPedido { get; set; }
         [Required]
         public Empresa EmpresaMandante { get; set; }
-        [Required]
-        public EstadoPedido Estado { get; set; }
         public DateTime FechaPedido { get; set; }
         public DateTime FechaUltimaActualizacion { get; set; }
         [MaxLength(250, ErrorMessage = "Limite de carácteres sobrepasados.")]

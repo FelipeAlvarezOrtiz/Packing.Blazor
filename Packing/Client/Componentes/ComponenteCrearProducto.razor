@@ -1,22 +1,21 @@
-﻿@using Packing.Client.Dtos.Productos
-@using Packing.Client.Componentes.Dialogs
-@inject HttpClient _cliente
-@inject IDialogService DialogService
+﻿@using System.IO
+@using System.Threading
 
-@if (Formatos is null || Grupos is null || Formatos is null)
+@inject HttpClient _cliente
+
+<InputFile id="fileInput" OnChange="UploadFiles" hidden />
+
+@if (Formatos is null || Grupos is null || Presentaciones is null)
 {
-    <MudCard Class="row" Elevation="2">
-        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="200px" />
-        <MudCardContent>
-            <MudSkeleton Width="30%" Height="42px;" />
-            <MudSkeleton Width="80%" />
-            <MudSkeleton Width="100%" />
-        </MudCardContent>
-        <MudCardActions>
-            <MudSkeleton Width="64px" Height="40px" Class="ml-2" />
-            <MudSkeleton Width="105px" Height="40px" Class="ml-3" />
-        </MudCardActions>
-    </MudCard>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <MudSkeleton/>
+                <MudSkeleton Animation="Animation.False"/>
+                <MudSkeleton Animation="Animation.Wave"/>
+            </div>
+        </div>
+    </div>
 }
 else
 {
@@ -27,7 +26,8 @@ else
                 <div class="col-md-12">
                     <div class="form-group">
                         <label class="col-form-label">Nombre</label>
-                        <input type="text" class="form-control" id="nombreNuevoProducto" required maxlength="25" />
+                        <MudTextField Variant="Variant.Outlined" @bind-Value="NuevoProducto.NombreProducto" id="nombreNuevoProducto" />
+                        <ValidationMessage For="@(()=>NuevoProducto.NombreProducto)"></ValidationMessage>
                     </div>
                 </div>
             </div>
@@ -54,13 +54,13 @@ else
                                     <MudSelectItem T="int" Value="grupo.IdGrupo">@grupo.NombreGrupo</MudSelectItem>
                                 }
                             </MudSelect>&nbsp;
-                            <MudFab Class="mt-2" Color="Color.Primary" Size="Size.Medium" Icon="@Icons.Material.Filled.Add" aria-label="Agregar" />
+                            <MudFab Class="mt-2" Color="Color.Primary" Size="Size.Medium" Icon="@Icons.Material.Filled.Add" OnClick="AbrirDialogGrupo" aria-label="Agregar" />
                         </div>
                     </div>
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-12">
+                <div class="col-md-9">
                     <div class="form-group">
                         <div class="input-group">
                             <MudSelect T="int" @bind-Value="NuevoProducto.IdPresentacion" Label="Presentación" Strict="true" Variant="Variant.Outlined" Format="F2" AnchorOrigin="Origin.BottomCenter">
@@ -69,13 +69,24 @@ else
                                     <MudSelectItem T="int" Value="presentacion.IdPresentacion">@presentacion.NombrePresentacion</MudSelectItem>
                                 }
                             </MudSelect>&nbsp;
-                            <MudFab Class="mt-2" Color="Color.Primary" Size="Size.Medium" Icon="@Icons.Material.Filled.Add" aria-label="Agregar" />
+                            <MudFab Class="mt-2" Color="Color.Primary" Size="Size.Medium" Icon="@Icons.Material.Filled.Add" OnClick="AbrirDialogPresentacion" aria-label="Agregar" />
                         </div>
                     </div>
                 </div>
+                <div class="col-md-3">
+                    <MudCheckBox @bind-Checked="@NuevoProducto.AfectaVencimiento" Size="Size.Large" Color="Color.Tertiary">Afecta a vencimiento</MudCheckBox>
+                </div>
+            </div>
+            <div class="row mb-3" hidden="@(!NuevoProducto.AfectaVencimiento)">
+                <div class="col-md-6 mt-2">
+                    <MudNumericField Min="0" Variant="Variant.Outlined" Label="Cantidad de días mínimo de vencimiento" Step="1" id="minDiaVencimiento" @bind-Value="NuevoProducto.MinDiaVencimiento" />
+                </div>
+                <div class="col-md-6 mt-2">
+                    <MudNumericField Min="0" Variant="Variant.Outlined" Label="Cantidad de días máximo de vencimiento" Step="1" id="maxDiaVencimiento" @bind-Value="NuevoProducto.MaxDiaVencimiento" />
+                </div>
             </div>
         </div>
-        <div class="row">
+        <div class="row mt-1">
             <div class="col-6 text-center">
                 <MudFab Color="Color.Success" Icon="@Icons.Material.Filled.AddCircleOutline" ButtonType="ButtonType.Submit" Label="Crear"></MudFab>
             </div>
@@ -86,15 +97,106 @@ else
     </EditForm>
 }
 
+<MudDialog @bind-IsVisible="NuevoFormatoVisible">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-3" /> Nuevo formato
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <div class="container-fluid">
+            <div class="row form-group">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label class="col-form-label" for="nuevoNombreFormato">Nombre</label>
+                        <MudTextField id="nuevoNombreFormato" Variant="Variant.Outlined" @bind-Value="NuevoFormato.NombreFormato" />
+                    </div>
+                </div>
+            </div>
+            <div class="row form-group">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label class="col-form-label" style="font-size: small;" for="nuevaUnidadPorFormato">Unidades por formato</label>
+                        <MudNumericField Min="0" Variant="Variant.Outlined" Step="1" id="nuevaUnidadPorFormato" @bind-Value="NuevoFormato.CantidadPorFormato" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </DialogContent>
+    <DialogActions>
+        <MudFab Size="Size.Medium" Icon="@Icons.Material.Filled.Cancel" Label="Cerrar" OnClick="CerrarNuevoFormato"></MudFab>
+        <MudFab Size="Size.Medium" Icon="@Icons.Material.Filled.Save" Color="Color.Success" OnClick="GuardarFormato" Label="Guardar"></MudFab>
+    </DialogActions>
+</MudDialog>
 
+<MudDialog @bind-IsVisible="NuevaPresentacionVisible">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-3" /> Nueva presentación
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <div class="container-fluid">
+            <div class="row form-group">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label class="col-form-label" for="nuevoNombreFormato">Nombre</label>
+                        <MudTextField id="nuevoNombrePresentacion" Variant="Variant.Outlined" @bind-Value="NuevaPresentacion.NombrePresentacion" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </DialogContent>
+    <DialogActions>
+        <MudFab Size="Size.Medium" Icon="@Icons.Material.Filled.Cancel" Label="Cerrar" OnClick="CerrarNuevaPresentacion"></MudFab>
+        <MudFab Size="Size.Medium" Icon="@Icons.Material.Filled.Save" Color="Color.Success" OnClick="GuardarFormato" Label="Guardar"></MudFab>
+    </DialogActions>
+</MudDialog>
+
+<MudDialog @bind-IsVisible="NuevoGrupoVisible">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-3" /> Nuevo grupo
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <div class="container-fluid">
+            <div class="row form-group">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label class="col-form-label" for="nuevoNombreFormato">Nombre</label>
+                        <MudTextField id="nuevoNombreGrupo" Variant="Variant.Outlined" @bind-Value="NuevoGrupo.NombreGrupo" />
+                    </div>
+                </div>
+            </div>
+            <div class="row form-group">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <MudFab HtmlTag="label" Color="Color.Secondary" Icon="@Icons.Filled.Image" Label="Subir foto" for="fileInput" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </DialogContent>
+    <DialogActions>
+        <MudFab Size="Size.Medium" Icon="@Icons.Material.Filled.Cancel" Label="Cerrar" OnClick="CerrarNuevoGrupo"></MudFab>
+        <MudFab Size="Size.Medium" Icon="@Icons.Material.Filled.Save" Label="Guardar" Color="Color.Success" OnClick="SubirGrupo"></MudFab>
+    </DialogActions>
+</MudDialog>
 
 @code {
     protected List<Presentacion> Presentaciones { get; set; }
     protected List<GrupoProducto> Grupos { get; set; }
     protected List<Formato> Formatos { get; set; }
-    protected CrearProducto NuevoProducto = new();
 
-    protected DialogOptions maxWidth = new DialogOptions() { MaxWidth = MaxWidth.Medium, FullWidth = true };
+    protected bool NuevoFormatoVisible = false;
+    protected bool NuevaPresentacionVisible = false;
+    protected bool NuevoGrupoVisible = false;
+
+    protected CrearProducto NuevoProducto = new();
+    protected CrearFormato NuevoFormato = new();
+    protected CrearPresentacion NuevaPresentacion = new();
+    protected CrearGrupo NuevoGrupo = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -113,8 +215,52 @@ else
 
     }
 
-    protected void AbrirDialogFormato()
+    protected void AbrirDialogFormato() => NuevoFormatoVisible = true;
+    protected void AbrirDialogGrupo() => NuevoGrupoVisible = true;
+    protected void AbrirDialogPresentacion() => NuevaPresentacionVisible = true;
+
+    protected void CerrarNuevoFormato() => NuevoFormatoVisible = false;
+    protected void CerrarNuevoGrupo() => NuevoGrupoVisible = false;
+    protected void CerrarNuevaPresentacion() => NuevaPresentacionVisible = false;
+
+    protected void GuardarFormato()
     {
-        DialogService.Show<NuevoFormatoDialog>("Nuevo Formato", maxWidth);
+
     }
+
+    private async void UploadFiles(InputFileChangeEventArgs e)
+    {
+        foreach (var file in e.GetMultipleFiles())
+        {
+            var stream = file.OpenReadStream();
+            var ms = new MemoryStream();
+            await stream.CopyToAsync(ms);
+            stream.Close();
+            NuevoGrupo.FileName = file.Name;
+            NuevoGrupo.ArchivoStream = ms.ToArray();
+            ms.Close();
+        }
+    }
+
+    private async void SubirGrupo()
+    {
+        try
+        {
+
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/grupos/");
+            var fs = File.Create(Path.Combine(path, NuevoGrupo.FileName));
+
+            await fs.WriteAsync(NuevoGrupo.ArchivoStream.AsMemory(0, NuevoGrupo.ArchivoStream.Length), CancellationToken.None);
+
+            fs.Close();
+
+            //var result = await _cliente.PostAsJsonAsync<CrearGrupo>("api/Grupos/NuevoGrupo", NuevoGrupo);
+            this.StateHasChanged();
+        }
+        catch (Exception error)
+        {
+            Console.WriteLine(error.Message);
+        }
+    }
+
 }

@@ -11,5 +11,7 @@ namespace Packing.Core.Pedidos
         public Producto ProductoInterno { get; set; }
         public uint Cantidad { get; set; }
         public uint CantidadTotales { get; set; }
+        public EstadoPedido Estado { get; set; }
+        public DateTime FechaActualizacion { get; set; }
     }
 }

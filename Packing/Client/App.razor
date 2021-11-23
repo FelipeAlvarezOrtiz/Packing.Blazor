@@ -1,5 +1,10 @@
 <MudThemeProvider />
-<MudDialogProvider />
+<MudDialogProvider FullWidth="true" 
+                   MaxWidth="MaxWidth.Small" 
+                   CloseButton="true" 
+                   DisableBackdropClick="true" 
+                   NoHeader="false" 
+                   Position="DialogPosition.Center" />
 <MudSnackbarProvider />
 <CascadingAuthenticationState>
     <Router AppAssembly="@typeof(Program).Assembly" PreferExactMatches="@true">

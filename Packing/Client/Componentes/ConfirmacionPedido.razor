@@ -1,0 +1,66 @@
+﻿@inject HttpClient _cliente
+
+@if(Producto is null)
+{
+    <div class="row col-12 text-center">
+        <MudProgressCircular Color="Color.Success" Indeterminate="true" Size="Size.Large"/>
+    </div>
+}
+else
+{
+    <MudPaper Elevation="3">
+        <br />
+        <div class="col-md-12 col-lg-12">
+            <br/>
+            <div class="row">
+                <div class="col-12">
+                    <h5 class="card-title">&nbsp;@Producto.NombreParaBusqueda</h5>
+                </div>
+            </div>
+            <div class="row">
+                    <div class="col-md-12 col-lg-12 col-xl-6">
+                        <MudNumericField @bind-Value="CantidadProducto" Label="Cantidad" Min="0" Variant="Variant.Outlined" Step="1"/>
+                    </div>
+                    <div class="col-md-12 col-lg-12 col-xl-6 mt-3">
+                        <div class="row">
+                            <div class="col-6 text-center">
+                                <MudFab Color="Color.Success" Icon="@Icons.Material.Filled.Update" Size="Size.Medium"
+                                    OnClick="@(async () => await ActualizarCantidad.InvokeAsync(Tuple.Create(Producto.IdProducto,CantidadProducto)))" 
+                                        Label="Actualizar">
+                                </MudFab>
+                            </div>
+                            <div class="col-6 text-center">
+                                <MudFab Color="Color.Error" Icon="@Icons.Material.Filled.Delete" Size="Size.Medium"
+                                    OnClick="@(async () => await EliminarProducto.InvokeAsync(Producto.IdProducto))" Label="Borrar">
+                                </MudFab>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-1">
+                    <div class="col-md-12 col-lg-12 col-xl-6"></div>
+                    <div class="col-md-12 col-lg-12 col-xl-6"></div>
+                </div>
+                <div class="row mb-1">
+                    <div class="col-md-12 col-lg-12 col-xl-6"></div>
+                    <div class="col-md-12 col-lg-12 col-xl-6"></div>
+                </div>
+        </div>
+        <br/>
+    </MudPaper>
+}
+
+@code {
+    [Parameter] public Producto Producto{ get; set; }
+    [Parameter] public int CantidadProducto{ get; set; }
+    // ID PRODUCTO , PRODUCTO, CANTIDAD
+    [Parameter] public EventCallback<Tuple<int,int>> ActualizarCantidad{ get; set; }
+
+    [Parameter] public EventCallback<int> EliminarProducto{ get; set; }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        
+    }
+
+}

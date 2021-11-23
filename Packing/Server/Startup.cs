@@ -46,7 +46,6 @@ namespace Packing.Server
                 })
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
-
             services.AddIdentityServer()
                 .AddApiAuthorization<AppUser, ApplicationDbContext>(options =>
                 {
