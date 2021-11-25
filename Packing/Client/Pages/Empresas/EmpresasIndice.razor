@@ -1,0 +1,38 @@
+﻿@inject HttpClient Cliente
+@inject NavigationManager Navigation
+
+@page "/Empresas/Indice"
+
+<h3>Empresas en sistema</h3>
+<hr />
+@if (EmpresasEnSistema is null)
+{
+    <div class="text-center row col-12">
+        <MudProgressCircular Color="Color.Secondary" Indeterminate="true" />
+    </div>
+}
+else if (EmpresasEnSistema.Count == 0)
+{
+    <div class="text-center alert-info"><h4>No existen empresas en el sistema.</h4></div>
+}
+else
+{
+    <div class="row">
+        @foreach (var empresa in EmpresasEnSistema)
+        {
+            <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 p-1">
+                <ComponenteEmpresa EmpresaEntrante="empresa"></ComponenteEmpresa>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    protected List<Packing.Core.Empresas.Empresa> EmpresasEnSistema;
+
+    protected async override Task OnInitializedAsync()
+    {
+        EmpresasEnSistema = await Cliente.GetFromJsonAsync<List<Packing.Core.Empresas.Empresa>>("api/Empresas/ObtenerEmpresas");
+        StateHasChanged();
+    }
+}

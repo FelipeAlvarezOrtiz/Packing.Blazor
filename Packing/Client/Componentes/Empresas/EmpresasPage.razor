@@ -1,0 +1,34 @@
+﻿@inject HttpClient Cliente
+@inject NavigationManager Navigator
+@page "/Empresas/Editar/{Id:int}"
+@*  -- Buscamos la empresa con el id
+    -- Vemos la autorizacion y si es admin puede editar y actualizar datos
+*@
+<h3>Empresa</h3>
+@if (EmpresaEntrante is null)
+{
+    <div><h3> Cargando...</h3></div>
+}
+else
+{
+    
+}
+
+@code {
+
+    [Parameter] public int Id { get; set; }
+    protected Packing.Core.Empresas.Empresa EmpresaEntrante;
+
+    protected async override Task OnInitializedAsync()
+    {
+        //buscar la empresa
+        try
+        {
+            EmpresaEntrante = await Cliente.GetFromJsonAsync<Packing.Core.Empresas.Empresa>("api/Empresas/ObtenerEmpresa/"+Id);
+        }
+        catch (Exception error)
+        {
+
+        }
+    }
+}
