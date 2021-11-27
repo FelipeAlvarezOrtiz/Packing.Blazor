@@ -29,9 +29,9 @@ else
                 
             <div class="col-sm-12 col-md-12 col-lg-12">
                 @*<img class="card-img-top text-center p-1" src="/images/grupos/@Grupo.Imagen" alt="@Grupo.NombreGrupo" style="height: 18rem;">*@
-                <img class="img-thumbnail rounded mx-auto d-block p-1" src="/images/grupos/@Grupo.Imagen" alt="@Grupo.NombreGrupo" style="height: 18rem;">
+                <img class="img-thumbnail rounded mx-auto d-block p-1" src="/images/grupos/@Grupo.Imagen" alt="@Grupo.NombreGrupo" style="min-height:9rem; max-height: 18rem;">
             </div>
-            <div class="col-md-12 col-lg-12">
+            <div class="col-md-12 col-lg-12" style="min-height: 9rem; max-height: 18rem;">
                 <br/>
                 <div class="row">
                     <div class="col-12">
@@ -85,10 +85,12 @@ else
                 </div>
                 <br/>
                 <div class="row">
-                    <div class="col-md-12 col-lg-12 col-xl-6">
-                        <MudNumericField @bind-Value="CantidadProducto" Label="Cantidad" Min="0" Variant="Variant.Outlined" Step="1"/>
+                    <div class="col-md-12">
+                        <MudNumericField @bind-Value="CantidadProducto" Label="Cantidad" Min="0" Variant="Variant.Outlined" Step="1" />
                     </div>
-                    <div class="col-md-12 col-lg-12 col-xl-6 mt-3">
+                </div>
+                <div class="row">
+                    <div class="col-md-12 col-lg-12 mt-3">
                         <div class="row">
                             <div class="col-6 text-center">
                                 <MudFab Color="Color.Success" Icon="@Icons.Material.Filled.AddCircleOutline" OnClick="@AgregarProducto" Label="Agregar"></MudFab>
@@ -99,17 +101,11 @@ else
                         </div>
                     </div>
                 </div>
-                <div class="row mb-1">
-                    <div class="col-md-12 col-lg-12 col-xl-6"></div>
-                    <div class="col-md-12 col-lg-12 col-xl-6"></div>
-                </div>
-                <div class="row mb-1">
-                    <div class="col-md-12 col-lg-12 col-xl-6"></div>
-                    <div class="col-md-12 col-lg-12 col-xl-6"></div>
-                </div>
             </div>
             </div>
-
+            <br />
+            <br />
+            <br />
         }
     </MudPaper>
     <br />

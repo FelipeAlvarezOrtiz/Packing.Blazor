@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Packing.Core.Productos;
 
 namespace Packing.Core.Pedidos
@@ -13,5 +14,6 @@ namespace Packing.Core.Pedidos
         public uint CantidadTotales { get; set; }
         public EstadoPedido Estado { get; set; }
         public DateTime FechaActualizacion { get; set; }
+        public virtual Pedido PedidoCabecera { get; set; }
     }
 }

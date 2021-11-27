@@ -1,0 +1,99 @@
+﻿@page "/Empresas/Crear"
+
+<h4><i class="fas fa-user-plus"></i>&nbsp;Crear usuario</h4>
+<hr />
+
+@if (NuevoUsuario is not null && Roles is not null)
+{
+<EditForm Model="NuevoUsuario" OnValidSubmit="CrearUsuario">
+    <DataAnnotationsValidator></DataAnnotationsValidator>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <MudTextField Label="Nombre del usuario" Variant="Variant.Outlined" @bind-Value="NuevoUsuario.UserName" />
+                <ValidationMessage For="@(()=>NuevoUsuario.UserName)"></ValidationMessage>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <MudSelect T="string" @bind-Value="NuevoUsuario.RolUsuario" Label="Rol del usuario" Strict="true" Variant="Variant.Outlined" Format="F2" AnchorOrigin="Origin.BottomCenter">
+                    @foreach (var rol in Roles)
+                    {
+                        <MudSelectItem T="string" Value="rol">@rol</MudSelectItem>
+                    }
+                </MudSelect>
+                <ValidationMessage For="@(()=> NuevoUsuario.RolUsuario)"></ValidationMessage>
+            </div>
+        </div>
+    </div>
+    <br />
+    <h5><i class="far fa-building"></i>&nbsp;Datos de la empresa</h5>
+    <hr />
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <MudTextField id="nuevoRutEmpresa" Label="Rut de la empresa" Variant="Variant.Outlined" @bind-Value="NuevoUsuario.Empresa.RutEmpresa" />
+                <ValidationMessage For="@(()=> NuevoUsuario.Empresa.RutEmpresa)"></ValidationMessage>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <MudTextField Label="Nombre de la empresa" Variant="Variant.Outlined" @bind-Value="NuevoUsuario.Empresa.NombreEmpresa" />
+                <ValidationMessage For="@(()=> NuevoUsuario.Empresa.NombreEmpresa)"></ValidationMessage>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <MudTextField Label="Persona de contacto" Variant="Variant.Outlined" @bind-Value="NuevoUsuario.Empresa.PersonaContacto" />
+                <ValidationMessage For="@(()=> NuevoUsuario.Empresa.PersonaContacto)"></ValidationMessage>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <MudTextField Label="Razón social" Variant="Variant.Outlined" @bind-Value="NuevoUsuario.Empresa.RazonSocial" />
+                <ValidationMessage For="@(()=> NuevoUsuario.Empresa.RazonSocial)"></ValidationMessage>
+            </div>
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <MudTextField Label="Dirección" Variant="Variant.Outlined" @bind-Value="NuevoUsuario.Empresa.Direccion" />
+                <ValidationMessage For="@(()=> NuevoUsuario.Empresa.Direccion)"></ValidationMessage>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <MudTextField Label="Email" Variant="Variant.Outlined" @bind-Value="NuevoUsuario.Email" />
+                <ValidationMessage For="@(()=> NuevoUsuario.Email)"></ValidationMessage>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <MudTextField Label="Número teléfonico" Variant="Variant.Outlined" @bind-Value="NuevoUsuario.PhoneNumber" />
+                <ValidationMessage For="@(()=> NuevoUsuario.PhoneNumber)"></ValidationMessage>
+            </div>
+        </div>
+    </div>
+    <div class="row col-12 text-center">
+        <MudFab Icon="@Icons.Material.Filled.Navigation" Color="Color.Success" ButtonType="ButtonType.Submit" Size="Size.Medium" Label="Guardar" />
+    </div>
+    <hr />
+</EditForm>
+}
+
+@code {
+    protected AppUser NuevoUsuario = new();
+
+    protected List<string> Roles = new();
+
+    protected void CrearUsuario()
+    {
+
+    }
+}

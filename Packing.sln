@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Packing.Persistencia", "Pac
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Packing.Negocio", "Packing\Packing.Negocio\Packing.Negocio.csproj", "{DDEBEA50-AC6B-405E-85E6-878C32344590}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Packing.Shared", "Packing\Shared\Packing.Shared.csproj", "{D1DCCDB9-5C97-48FA-BDB4-70F6F82FB664}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{DDEBEA50-AC6B-405E-85E6-878C32344590}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DDEBEA50-AC6B-405E-85E6-878C32344590}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DDEBEA50-AC6B-405E-85E6-878C32344590}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1DCCDB9-5C97-48FA-BDB4-70F6F82FB664}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1DCCDB9-5C97-48FA-BDB4-70F6F82FB664}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1DCCDB9-5C97-48FA-BDB4-70F6F82FB664}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1DCCDB9-5C97-48FA-BDB4-70F6F82FB664}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

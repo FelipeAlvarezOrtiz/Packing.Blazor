@@ -11,5 +11,7 @@ namespace Packing.Core.Empresas
         public Producto Producto { get; set; }
         [Range(0,999999999)]
         public int Cantidad { get; set; }
+        [ForeignKey("EmpresaCabeceraId")]
+        public virtual Empresa Empresa { get; set; }
     }
 }

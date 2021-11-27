@@ -8,25 +8,13 @@ using Microsoft.EntityFrameworkCore;
 using Packing.Core.Empresas;
 using Packing.Core.Usuarios;
 using Packing.Persistencia;
+using Packing.Shared.EmpresaDto;
 
 namespace Packing.Negocio.Empresas
 {
     public class CrearEmpresa
     {
-        public record Command : IRequest
-        {
-            public string NombreEmpresa { get; set; }
-            public string RazonSocial { get; set; }
-            public string RutEmpresa { get; set; }
-            public string Direccion { get; set; }
-            public string PersonaContacto { get; set; }
-            public string NombreUsuario { get; set; }
-            public string RolUsuario { get; set; }
-            public string EmailUsuario { get; set; }
-            public string Telefono { get; set; }
-        }
-
-        public class Handler : IRequestHandler<Command>
+        public class Handler : IRequestHandler<CrearEmpresaCommand>
         {
             private readonly ApplicationDbContext _context;
             private readonly UserManager<AppUser> _userManager;
@@ -39,7 +27,7 @@ namespace Packing.Negocio.Empresas
                 _roleManager = roleManager;
             }
 
-            public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<Unit> Handle(CrearEmpresaCommand request, CancellationToken cancellationToken)
             {
                 var resultUsuario = await _userManager.FindByEmailAsync(request.EmailUsuario);
                 if (resultUsuario is not null) throw new Exception("Ese correo ya esta asociado a un usuario");
@@ -78,6 +66,7 @@ namespace Packing.Negocio.Empresas
                     await _userManager.AddToRoleAsync(resultUsuarioConsulta, request.RolUsuario);
                 return Unit.Value;
             }
+
         }
     }
 }

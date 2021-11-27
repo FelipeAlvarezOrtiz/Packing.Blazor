@@ -24,4 +24,6 @@
 @code {
     protected string Observacion { get; set; }
     public string Direccion { get; set; }
+
+    [Parameter]public EventCallback<Tuple<string,string>> GuardarDatos{ get; set; } 
 }

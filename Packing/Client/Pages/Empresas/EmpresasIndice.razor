@@ -1,9 +1,9 @@
 ﻿@inject HttpClient Cliente
-@inject NavigationManager Navigation
+@inject NavigationManager Navigator
 
 @page "/Empresas/Indice"
 
-<h3>Empresas en sistema</h3>
+<h3><i class="far fa-building"></i>&nbsp;Empresas en sistema</h3>
 <hr />
 @if (EmpresasEnSistema is null)
 {
@@ -20,11 +20,22 @@ else
     <div class="row">
         @foreach (var empresa in EmpresasEnSistema)
         {
-            <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 p-1">
+            <div class="col-sm-12 col-md-6 col-lg-4 col-xl-4 p-1">
                 <ComponenteEmpresa EmpresaEntrante="empresa"></ComponenteEmpresa>
             </div>
         }
     </div>
+    <hr />
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <MudFab Color="Color.Success" Size="Size.Medium" OnClick="CrearUsuarioEvent" aria-label="Nueva Empresa"
+                    Icon="@Icons.Material.Filled.Add" Label="Nueva empresa"></MudFab>
+        </div>
+    </div>
+    <br />
+    <br />
+    <br />
+    <br />
 }
 
 @code {
@@ -34,5 +45,9 @@ else
     {
         EmpresasEnSistema = await Cliente.GetFromJsonAsync<List<Packing.Core.Empresas.Empresa>>("api/Empresas/ObtenerEmpresas");
         StateHasChanged();
+    }
+
+    protected void CrearUsuarioEvent() {
+        Navigator.NavigateTo("/Empresas/Crear"); 
     }
 }

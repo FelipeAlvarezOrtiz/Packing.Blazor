@@ -1,0 +1,56 @@
+﻿@attribute [Authorize]
+@inject ISnackbar Snackbar
+@inject HttpClient _cliente
+@using Blazorise
+@page "/Pedidos/Crear"
+
+@if (Grupos is null)
+{
+    <div class="col">
+        <div class="row">
+            <div class="col d-flex justify-content-center">
+                <p>Cargando, espere por favor ...</p>
+            </div>
+        </div>
+    </div>
+    <MudSkeleton />
+    <MudSkeleton Animation="Animation.False" />
+    <MudSkeleton Animation="Animation.Wave" />
+    <MudProgressLinear Color="MudBlazor.Color.Primary" Indeterminate="true" Class="m-7" />
+}
+else
+{
+    <h3>Crear pedido</h3>
+    <hr />
+    <Carousel Autoplay="false" AutoRepeat="true" ShowControls="true" ShowIndicators="true" Style="height:auto;">
+        @foreach (var grupo in Grupos)
+        {
+            <CarouselSlide Class="text-center p-3" Name="@grupo.NombreGrupo" Position="Blazorise.Position.Static">
+                <ComponenteGrupo Grupo="grupo" NotificacionExitosa="NotificacionExitosa"></ComponenteGrupo>
+            </CarouselSlide>
+        }
+</Carousel>
+    <br />
+
+}
+@code {
+    protected List<GrupoProducto> Grupos;
+    protected MudCarousel<GrupoProducto> Carrusel;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Grupos = await _cliente.GetFromJsonAsync<List<GrupoProducto>>("api/Grupos/ObtenerGrupos");
+        }
+        catch (Exception error)
+        {
+            Console.WriteLine(error.Message);
+        }
+    }
+
+    protected void NotificacionExitosa()
+    {
+
+    }
+}

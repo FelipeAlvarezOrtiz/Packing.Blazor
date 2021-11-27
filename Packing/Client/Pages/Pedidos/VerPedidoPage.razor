@@ -1,0 +1,35 @@
+﻿@inject HttpClient Cliente
+@inject NavigationManager Navigator
+@attribute [Authorize]
+
+@page "/Pedidos/Ver/{IdPedido}"
+
+@if (string.IsNullOrEmpty(IdPedido.ToString()))
+{
+    Navigator.NavigateTo("/Pedidos");
+}
+else if (PedidoInterno is null)
+{
+    <div class="row">
+        <div class="col-12 text-center">
+            <MudAlert Class="m-2" Severity="Severity.Warning" Variant="Variant.Filled">Este producto ha sidos acado del pedido, se actualizará su lista una vez recargue la página.</MudAlert>
+        </div>
+    </div>
+}
+else
+{
+    <MudPaper>
+
+    </MudPaper>
+}
+
+@code {
+    [Parameter] public Guid IdPedido { get; set; }
+    protected Pedido PedidoInterno { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        PedidoInterno = await Cliente.GetFromJsonAsync<Pedido>("");
+    }
+
+}

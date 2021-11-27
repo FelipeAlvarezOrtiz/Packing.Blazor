@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Packing.Persistencia\Packing.Persistencia.csproj" />
+    <ProjectReference Include="..\Shared\Packing.Shared.csproj" />
   </ItemGroup>
 
 </Project>

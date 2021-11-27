@@ -2,29 +2,31 @@
 
 @if (EmpresaEntrante is not null)
 {
-    <MudPaper Elevation="3" Class="p-2" Style="height: 14rem;">
-        <hr />
-        <div class="row" style="height: 8rem;">
-            <div class="col-sm-12 col-md-9 col-lg-9">
-                <div class="col-sm-4 col-md-4 col-lg-4">
+<MudPaper Elevation="3" Class="p-2">
+    <hr />
+    <div class="row">
+        <div class="col-sm-12 col-md-9 col-lg-9">
+            <div class="row">
+                <div class="col-sm-12 col-md-4 col-lg-4">
                     <p class="text-muted">Nombre:<b>&nbsp;@EmpresaEntrante.NombreEmpresa</b></p>
                 </div>
-                <div class="col-sm-4 col-md-4 col-lg-4">
+                <div class="col-sm-12 col-md-4 col-lg-4">
                     <p class="text-muted">Razón Social:<b>&nbsp;@EmpresaEntrante.RazonSocial</b></p>
                 </div>
-                <div class="col-sm-4 col-md-4 col-lg-4">
+                <div class="col-sm-12 col-md-4 col-lg-4">
                     <p class="text-muted">R.U.T:<b>&nbsp;@EmpresaEntrante.RutEmpresa</b></p>
                 </div>
             </div>
-            <div class="col-sm-12 col-md-3 col-lg-3">
-                <MudFab Class="mt-1 ml-2" Color="Color.Primary" Size="Size.Large"
-                        Icon="@Icons.Material.Filled.NavigateNext" Label="Editar" OnClick="EditarEmpresa" aria-label="Buscar">
-                </MudFab>
-            </div>
         </div>
-        <hr />
-        <br />
-    </MudPaper>
+        <div class="col-sm-12 col-md-3 col-lg-3 text-center">
+            <MudFab Class="mt-1 ml-2" Color="Color.Primary" Size="Size.Medium"
+                    Icon="@Icons.Material.Filled.NavigateNext" Label="Editar" OnClick="EditarEmpresa" aria-label="Buscar">
+            </MudFab>
+        </div>
+    </div>
+    <hr />
+    <br />
+</MudPaper>
 }
 
 

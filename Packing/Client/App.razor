@@ -14,8 +14,12 @@
                     <MudSkeleton />
                     <MudSkeleton Animation="Animation.False" />
                     <MudSkeleton Animation="Animation.Wave" />
-                    <div class="row text-center">
-                        <p>Validando credenciales</p>
+                    <div class="col">
+                        <div class="row">
+                            <div class="col d-flex justify-content-center">
+                                <p>Validando sus credenciales, espere por favor ...</p>
+                            </div>
+                        </div>
                     </div>
                 </Authorizing>
                 <NotAuthorized>
@@ -25,14 +29,26 @@
                     }
                     else
                     {
-                        <p>No estás autorizado para ver este recurso.</p>
+                        <div class="col">
+                            <div class="row">
+                                <div class="col d-flex justify-content-center">
+                                    <p>No estás autorizado para ver ese recurso.</p>
+                                </div>
+                            </div>
+                        </div>
                     }
                 </NotAuthorized>
             </AuthorizeRouteView>
         </Found>
         <NotFound>
             <LayoutView Layout="@typeof(MainLayout)">
-                <p>404 recurso no encontrado.</p>
+                <div class="col">
+                    <div class="row">
+                        <div class="col d-flex justify-content-center">
+                            <h2>Recurso no encontrado.</h2>
+                        </div>
+                    </div>
+                </div>
             </LayoutView>
         </NotFound>
     </Router>
