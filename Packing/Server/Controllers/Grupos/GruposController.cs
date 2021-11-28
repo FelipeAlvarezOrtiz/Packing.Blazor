@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Packing.Core.Productos;
 using Packing.Negocio.Grupos;
+using Packing.Shared.GruposDto;
 
 namespace Packing.Server.Controllers.Grupos
 {
@@ -19,7 +20,7 @@ namespace Packing.Server.Controllers.Grupos
         }
 
         [HttpPost("NuevoGrupo")]
-        public async Task<ActionResult<Unit>> NuevoGrupo(CrearGrupo.Command request)
+        public async Task<ActionResult<Unit>> NuevoGrupo(CrearGrupoCommand request)
         {
             try
             {

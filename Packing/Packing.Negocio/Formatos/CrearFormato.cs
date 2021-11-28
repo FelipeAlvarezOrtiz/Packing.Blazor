@@ -6,18 +6,13 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Packing.Core.Productos;
 using Packing.Persistencia;
+using Packing.Shared.FormatosDto;
 
 namespace Packing.Negocio.Formatos
 {
     public class CrearFormato
     {
-        public record Command : IRequest
-        {
-            public string NombreFormato { get; set; }
-            public int CantidadPorFormato { get; set; }
-        }
-
-        public class Handler : IRequestHandler<Command>
+        public class Handler : IRequestHandler<CrearFormatoCommand>
         {
             private readonly ApplicationDbContext _context;
 
@@ -26,7 +21,7 @@ namespace Packing.Negocio.Formatos
                 _context = context;
             }
 
-            public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<Unit> Handle(CrearFormatoCommand request, CancellationToken cancellationToken)
             {
                 var nuevoNombre = request.NombreFormato;
                 if (await _context.Formatos.Where(formato => formato.NombreFormato.Equals(nuevoNombre))

@@ -3,19 +3,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Packing.Persistencia;
+using Packing.Shared.FormatosDto;
 
 namespace Packing.Negocio.Formatos
 {
     public class ActualizarFormato
     {
-        public record Command : IRequest
-        {
-            public int IdFormato { get; set; }
-            public int CantidadPorFormato { get; set; }
-            public string NombreFormato { get; set; }
-        }
-
-        public class Handler : IRequestHandler<Command>
+        public class Handler : IRequestHandler<ActualizarFormatoCommand>
         {
             private readonly ApplicationDbContext _context;
             private readonly IMediator _mediator;
@@ -26,7 +20,7 @@ namespace Packing.Negocio.Formatos
                 _mediator = mediator;
             }
 
-            public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<Unit> Handle(ActualizarFormatoCommand request, CancellationToken cancellationToken)
             {
                 if(await _mediator.Send(new ObtenerFormato.Command{IdFormato = request.IdFormato}, cancellationToken) is null)
                     throw new Exception("No existe ese formato");

@@ -8,19 +8,13 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
+using Packing.Shared.GruposDto;
 
 namespace Packing.Negocio.Grupos
 {
     public class CrearGrupo
     {
-        public record Command : IRequest
-        {
-            public string NombreGrupo { get; set; }
-            public string FileName { get; set; }
-            public byte[] ArchivoStream { get; set; }
-        }
-
-        public class Handler : IRequestHandler<Command>
+        public class Handler : IRequestHandler<CrearGrupoCommand>
         {
             private readonly ApplicationDbContext _context;
             private readonly IWebHostEnvironment _env;
@@ -30,7 +24,7 @@ namespace Packing.Negocio.Grupos
                 _env = env;
             }
 
-            public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<Unit> Handle(CrearGrupoCommand request, CancellationToken cancellationToken)
             {
                 if (await _context.Grupos.Where(grupo => grupo.NombreGrupo.Equals(request.NombreGrupo))
                     .FirstOrDefaultAsync(cancellationToken) is not null)

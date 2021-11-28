@@ -13,9 +13,10 @@ namespace Packing.Core.Productos
         public Presentacion Presentacion { get; set; }
         public Formato Formato { get; set; }
         public GrupoProducto Grupo { get; set; }
+        [MaxLength(500)]
         public string NombreParaBusqueda { get; set; }
-     
-        public bool AfectoVencimiento { get; set; }
+        public bool Disponible { get; set; } = true;
+        public bool AfectoVencimiento { get; set; } = false;
         public int MinDiaVencimiento { get; set; }
         public int MaxDiaVencimiento { get; set; }
     }

@@ -7,6 +7,7 @@ using Packing.Core.Notificaciones;
 using Packing.Core.Pedidos;
 using Packing.Core.Productos;
 using Packing.Core.Usuarios;
+using Packing.Core.Log;
 
 namespace Packing.Persistencia
 {
@@ -27,6 +28,6 @@ namespace Packing.Persistencia
         public DbSet<CargoInterno> CargosInternos { get; set; }
         public DbSet<DisponibilidadProducto> Disponibilidades { get; set; }
         public DbSet<Notificacion> Notificaciones { get; set; }
-
+        public DbSet<LogSoftware> Logs { get; set; }
     }
 }

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Packing.Core.Productos;
 using Packing.Negocio.Formatos;
+using Packing.Shared.FormatosDto;
 
 namespace Packing.Server.Controllers.Formatos
 {
@@ -19,7 +20,7 @@ namespace Packing.Server.Controllers.Formatos
         }
 
         [HttpPost("Crear"),Authorize(Roles="Administrador")]
-        public async Task<ActionResult<Unit>> CrearFormato(CrearFormato.Command request)
+        public async Task<ActionResult<Unit>> CrearFormato(CrearFormatoCommand request)
         {
             try
             {

@@ -7,24 +7,13 @@ using Packing.Negocio.Formatos;
 using Packing.Negocio.Grupos;
 using Packing.Negocio.Presentaciones;
 using Packing.Persistencia;
+using Packing.Shared.Productos;
 
 namespace Packing.Negocio.Productos
 {
     public class CrearProducto
     {
-        public record Command : IRequest
-        {
-            public string NombreProducto { get; set; }
-            public string RutaImagen { get; set; }
-            public int IdPresentacion { get; set; }
-            public int IdFormato { get; set; }
-            public int IdGrupo { get; set; }
-            public bool AfectaVencimiento { get; set; }
-            public int MinDiaVencimiento { get; set; }
-            public int MaxDiaVencimiento { get; set; }
-        }
-
-        public class Handler : IRequestHandler<Command>
+        public class Handler : IRequestHandler<CrearProductoCommand>
         {
             private readonly ApplicationDbContext _context;
             private readonly IMediator _mediator;
@@ -35,7 +24,7 @@ namespace Packing.Negocio.Productos
                 _mediator = mediator;
             }
 
-            public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<Unit> Handle(CrearProductoCommand request, CancellationToken cancellationToken)
             {
                 var grupo = await _mediator.Send(new ObtenerGrupo.Command { IdGrupo = request.IdGrupo }, cancellationToken);
                 var formato = await _mediator.Send(new ObtenerFormato.Command { IdFormato = request.IdFormato }, cancellationToken);
@@ -57,7 +46,9 @@ namespace Packing.Negocio.Productos
                     NombreParaBusqueda = nombreBusqueda
                 },cancellationToken);
 
-                return await _context.SaveChangesAsync(cancellationToken) > 0 ? Unit.Value : throw new Exception("Ha ocurrido un problema al guardar el producto.");
+                return await _context.SaveChangesAsync(cancellationToken) > 0 
+                    ? Unit.Value : 
+                    throw new Exception("Ha ocurrido un problema al guardar el producto.");
             }
         }
 
