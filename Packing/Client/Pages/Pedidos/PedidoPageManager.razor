@@ -1,0 +1,45 @@
+﻿@page "/Pedidos/CrearPedido"
+@inject HttpClient Cliente
+@inject NavigationManager Navigator
+@attribute [Authorize]
+
+<div class="container-fluid">
+
+</div>
+
+@code {
+    //id producto - cantidad
+    protected Dictionary<int, int> ProductosEnCarro = new();
+    protected List<GrupoProducto> GruposProducto;
+
+    protected MudTabs _tabGeneral;
+    protected MudTabPanel _ingresoProductos, _confirmacionProductos, _datosPersonales, _confirmacion;
+
+    protected AppUser UserLoggeado;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            GruposProducto = await Cliente.GetFromJsonAsync<List<GrupoProducto>>("api/Grupos/ObtenerGrupos");
+
+        }
+        catch (Exception error)
+        {
+            Console.WriteLine(error.Message);
+        }
+    }
+
+    protected void EliminarProductoDelCarro(int idProducto)
+    {
+        ProductosEnCarro.Remove(idProducto);
+    }
+
+    protected void ActualizarCantidadDelCarro(int idProducto, int nuevaCantidad)
+    {
+        if (ProductosEnCarro.TryGetValue(idProducto, out var cantidad))
+        {
+            ProductosEnCarro[idProducto] = nuevaCantidad;
+        }
+    }
+}

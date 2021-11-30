@@ -1,0 +1,59 @@
+﻿@page "/MisPedidos/{int:IdEmpresa}"
+@inject HttpClient client
+@inject NavigationManager navigation
+@attribute [Authorize]
+
+<h3>Mis Pedidos</h3>
+<hr />
+@if (Pedidos is null)
+{
+    <div class="row">
+        <div class="col-12 text-center">
+            <p>Cargando ...</p>
+        </div>
+    </div>
+}
+else if (Pedidos.Count <= 0)
+{
+    <div class="row">
+        <div class="col-12 text-center">
+            <p>&nbsp;No tiene pedidos ingresados.</p>
+        </div>
+    </div>
+}
+else
+{
+    <div class="container-fluid">
+        <div class="row">
+            @foreach (var pedido in Pedidos)
+            {
+                <div class="col-sm-12 col-md-4">
+                    <DetallePedidoComponent PedidoBlock="pedido" VerPedido="VerPedido"></DetallePedidoComponent>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public int IdEmpresa { get; set; }
+
+    protected List<Pedido> Pedidos;
+    protected Empresa EmpresaBlock;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Pedidos = await client.GetFromJsonAsync<List<Pedido>>("" + IdEmpresa);
+            EmpresaBlock = await client.GetFromJsonAsync<Empresa>("" + IdEmpresa);
+            StateHasChanged();
+        }
+        catch (Exception error)
+        {
+            Console.WriteLine(error.Message);
+        }
+    }
+
+    protected void VerPedido(string urlPedido) => navigation.NavigateTo(urlPedido);
+}

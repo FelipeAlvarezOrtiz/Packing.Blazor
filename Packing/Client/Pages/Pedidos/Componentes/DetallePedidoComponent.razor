@@ -1,0 +1,33 @@
+﻿
+<MudPaper Elevation="3">
+    <div class="row p-1">
+        <div class="col-sm-12 col-md-6 col-lg-4 col-xl-3">
+            <p class="text-muted">ID pedido:</p><b>&nbsp;@PedidoBlock.GuidPedido</b>
+        </div>
+        <div class="col-sm-12 col-md-6 col-lg-4 col-xl-3">
+            <p class="text-muted">Fecha:</p><b>&nbsp;@PedidoBlock.FechaPedido</b>
+        </div>
+        <div class="col-sm-12 col-md-6 col-lg-4 col-xl-3">
+            <p class="text-muted">Observación:</p><b>&nbsp;@PedidoBlock.Observacion</b>
+        </div>
+        <div class="col-sm-12 col-md-6 col-lg-4 col-xl-3">
+            <MudFab Label="Ver" Icon="@Icons.Material.Filled.Details" Color="Color.Primary" OnClick="@( async() => await VerPedido.InvokeAsync(UrlVista))"></MudFab>
+        </div>
+    </div>
+</MudPaper>
+
+@code {
+    [Parameter]public Pedido PedidoBlock { get; set; }
+    [Parameter]public EventCallback<string> VerPedido { get; set; }
+
+    protected string UrlVista = string.Empty;
+
+    protected override Task OnInitializedAsync()
+    {
+        if(PedidoBlock is not null)
+        {
+            UrlVista = "/Pedidos/Ver/" + PedidoBlock.GuidPedido;
+        }
+        return base.OnInitializedAsync();
+    }
+}
