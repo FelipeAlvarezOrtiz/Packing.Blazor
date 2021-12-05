@@ -13,10 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Usuarios\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Packing.Core\Packing.Core.csproj" />
   </ItemGroup>
 </Project>

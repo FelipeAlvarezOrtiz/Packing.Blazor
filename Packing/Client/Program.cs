@@ -7,9 +7,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using MudBlazor.Services;
 using Packing.Client.Servicios;
-using Blazorise;
-using Blazorise.Bootstrap;
-using Blazorise.Icons.FontAwesome;
 
 namespace Packing.Client
 {
@@ -43,10 +40,6 @@ namespace Packing.Client
 
         private static void ConfigurarServicios(IServiceCollection services)
         {
-            services.AddBlazorise(options =>
-            {
-                options.ChangeTextOnKeyPress = true;
-            }).AddBootstrapProviders().AddFontAwesomeIcons();
             services.AddSingleton<EnviadorCorreos>();
             services.AddMudServices();
         }

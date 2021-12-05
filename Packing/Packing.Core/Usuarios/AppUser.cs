@@ -12,5 +12,7 @@ namespace Packing.Core.Usuarios
         public Empresa Empresa { get; set; }
         [Required,MaxLength(50),MinLength(4)]
         public string RolUsuario { get; set; }
+        [Required,MaxLength(150)]
+        public string NombreUsuario { get; set; }
     }
 }

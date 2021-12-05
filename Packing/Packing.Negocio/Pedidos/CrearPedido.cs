@@ -26,7 +26,12 @@ namespace Packing.Negocio.Pedidos
         {
             if (request.ProductosEnPedido.Count <= 0)
                 throw new Exception("No puedes ingresar un pedido sin productos.");
-            var empresaMandante = await _context.Empresas.FindAsync(request.IdEmpresa);
+            var usuario = await _context.Usuarios.Where(user => user.Email.Equals(request.NombreUsuario))
+                .Include(x => x.Empresa).FirstOrDefaultAsync(cancellationToken);
+            if (usuario is null) throw new Exception("El usuario no existe.");
+
+            var empresaMandante = await _context.Empresas.FindAsync(usuario.Empresa.IdEmpresa);
+            
             if (empresaMandante is null)
                 throw new Exception("Empresa no existe");
             var cabeceraPedido = Guid.NewGuid();

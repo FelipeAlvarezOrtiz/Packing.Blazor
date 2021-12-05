@@ -19,5 +19,6 @@ namespace Packing.Core.Empresas
         [MinLength(10, ErrorMessage = "No cumple con la cantidad mínima de carácteres"), MaxLength(50, ErrorMessage = "Cantidad de carácteres máximos excedidos"), Required(ErrorMessage = "El dato es requerido.")]
         public string PersonaContacto { get; set; }
         public List<DisponibilidadProducto> ProductosVisibles { get; set; }
+        [Required] public bool EmpresaActiva { get; set; } = true;
     }
 }

@@ -1,7 +1,13 @@
 ﻿@using System.IO
 @using System.Threading
+@using Packing.Shared.FormatosDto
+@using Packing.Shared.GruposDto
+@using Packing.Shared.Presentaciones
+@using Packing.Shared.Productos
 
 @inject HttpClient _cliente
+@inject IJSRuntime JsRuntime
+@page "/Productos/Crear"
 
 <InputFile id="fileInput" OnChange="UploadFiles" hidden />
 
@@ -25,8 +31,7 @@ else
             <div class="row form-group">
                 <div class="col-md-12">
                     <div class="form-group">
-                        <label class="col-form-label">Nombre</label>
-                        <MudTextField Variant="Variant.Outlined" @bind-Value="NuevoProducto.NombreProducto" id="nombreNuevoProducto" />
+                        <MudTextField Label="Nombre" Variant="Variant.Outlined" @bind-Value="NuevoProducto.NombreProducto" id="nombreNuevoProducto" />
                         <ValidationMessage For="@(()=>NuevoProducto.NombreProducto)"></ValidationMessage>
                     </div>
                 </div>
@@ -104,24 +109,30 @@ else
         </MudText>
     </TitleContent>
     <DialogContent>
-        <div class="container-fluid">
-            <div class="row form-group">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <label class="col-form-label" for="nuevoNombreFormato">Nombre</label>
-                        <MudTextField id="nuevoNombreFormato" Variant="Variant.Outlined" @bind-Value="NuevoFormato.NombreFormato" />
+        <EditForm Model="NuevoFormato" OnValidSubmit="GuardarFormato">
+            <DataAnnotationsValidator>
+                <div class="container-fluid">
+                    <div class="row form-group">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="col-form-label" for="nuevoNombreFormato">Nombre</label>
+                                <MudTextField id="nuevoNombreFormato" Variant="Variant.Outlined" @bind-Value="NuevoFormato.NombreFormato" />
+                                <ValidationMessage For="@(()=>NuevoFormato.NombreFormato)"></ValidationMessage>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="col-form-label" style="font-size: small;" for="nuevaUnidadPorFormato">Unidades por formato</label>
+                                <MudNumericField Min="0" Variant="Variant.Outlined" Step="1" id="nuevaUnidadPorFormato" @bind-Value="NuevoFormato.CantidadPorFormato" />
+                                <ValidationMessage For="@(()=>NuevoFormato.CantidadPorFormato)"></ValidationMessage>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="row form-group">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <label class="col-form-label" style="font-size: small;" for="nuevaUnidadPorFormato">Unidades por formato</label>
-                        <MudNumericField Min="0" Variant="Variant.Outlined" Step="1" id="nuevaUnidadPorFormato" @bind-Value="NuevoFormato.CantidadPorFormato" />
-                    </div>
-                </div>
-            </div>
-        </div>
+            </DataAnnotationsValidator>
+        </EditForm>
     </DialogContent>
     <DialogActions>
         <MudFab Size="Size.Medium" Icon="@Icons.Material.Filled.Cancel" Label="Cerrar" OnClick="CerrarNuevoFormato"></MudFab>
@@ -136,16 +147,21 @@ else
         </MudText>
     </TitleContent>
     <DialogContent>
-        <div class="container-fluid">
-            <div class="row form-group">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <label class="col-form-label" for="nuevoNombreFormato">Nombre</label>
-                        <MudTextField id="nuevoNombrePresentacion" Variant="Variant.Outlined" @bind-Value="NuevaPresentacion.NombrePresentacion" />
+        <EditForm Model="NuevaPresentacion" OnValidSubmit="GuardarPresentacion">
+            <DataAnnotationsValidator>
+                <div class="container-fluid">
+                    <div class="row form-group">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="col-form-label" for="nuevoNombreFormato">Nombre</label>
+                                <MudTextField id="nuevoNombrePresentacion" Variant="Variant.Outlined" @bind-Value="NuevaPresentacion.NombrePresentacion" />
+                                <ValidationMessage For="@(()=>NuevaPresentacion.NombrePresentacion)"></ValidationMessage>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            </DataAnnotationsValidator>
+        </EditForm>
     </DialogContent>
     <DialogActions>
         <MudFab Size="Size.Medium" Icon="@Icons.Material.Filled.Cancel" Label="Cerrar" OnClick="CerrarNuevaPresentacion"></MudFab>
@@ -160,23 +176,28 @@ else
         </MudText>
     </TitleContent>
     <DialogContent>
-        <div class="container-fluid">
-            <div class="row form-group">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <label class="col-form-label" for="nuevoNombreFormato">Nombre</label>
-                        <MudTextField id="nuevoNombreGrupo" Variant="Variant.Outlined" @bind-Value="NuevoGrupo.NombreGrupo" />
+        <EditForm Model="NuevoGrupo" OnValidSubmit="SubirGrupo">
+            <DataAnnotationsValidator>
+                <div class="container-fluid">
+                    <div class="row form-group">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="col-form-label" for="nuevoNombreFormato">Nombre</label>
+                                <MudTextField id="nuevoNombreGrupo" Variant="Variant.Outlined" @bind-Value="NuevoGrupo.NombreGrupo" />
+                                <ValidationMessage For="@(()=>NuevoGrupo.NombreGrupo)"></ValidationMessage>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <MudFab HtmlTag="label" Color="Color.Secondary" Icon="@Icons.Filled.Image" Label="Subir foto" for="fileInput" />
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="row form-group">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <MudFab HtmlTag="label" Color="Color.Secondary" Icon="@Icons.Filled.Image" Label="Subir foto" for="fileInput" />
-                    </div>
-                </div>
-            </div>
-        </div>
+            </DataAnnotationsValidator>
+        </EditForm>
     </DialogContent>
     <DialogActions>
         <MudFab Size="Size.Medium" Icon="@Icons.Material.Filled.Cancel" Label="Cerrar" OnClick="CerrarNuevoGrupo"></MudFab>
@@ -193,10 +214,12 @@ else
     protected bool NuevaPresentacionVisible = false;
     protected bool NuevoGrupoVisible = false;
 
-    protected CrearProducto NuevoProducto = new();
-    protected CrearFormato NuevoFormato = new();
-    protected CrearPresentacion NuevaPresentacion = new();
-    protected CrearGrupo NuevoGrupo = new();
+    protected CrearProductoCommand NuevoProducto = new();
+    protected CrearFormatoCommand NuevoFormato = new();
+    protected CrearPresentacionCommand NuevaPresentacion = new();
+    protected CrearGrupoCommand NuevoGrupo = new();
+
+    protected IJSObjectReference Modulo;
 
     protected override async Task OnInitializedAsync()
     {
@@ -205,16 +228,32 @@ else
         Formatos = await _cliente.GetFromJsonAsync<List<Formato>>("api/Formatos/ObtenerFormatos");
     }
 
-    protected void AgregarProducto()
+    protected async void AgregarProducto()
     {
-
+        try
+        {
+            Modulo = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utilidades.js");
+            var result = await _cliente.PostAsJsonAsync("api/Productos/CrearProducto", NuevoProducto);
+            if (result.IsSuccessStatusCode)
+            {
+                await Modulo.InvokeVoidAsync("Exito");
+                LimpiarUi();
+                StateHasChanged();
+            }
+            else
+            {
+                await Modulo.InvokeVoidAsync("Error");
+            }
+        }
+        catch (Exception error)
+        {
+            await Modulo.InvokeVoidAsync("Error");
+            Console.WriteLine(error.Message);
+        }
     }
 
-    protected void LimpiarSelecciones()
-    {
-
-    }
-
+    protected void LimpiarUi() => NuevoProducto = new();
+    
     protected void AbrirDialogFormato() => NuevoFormatoVisible = true;
     protected void AbrirDialogGrupo() => NuevoGrupoVisible = true;
     protected void AbrirDialogPresentacion() => NuevaPresentacionVisible = true;
@@ -223,9 +262,32 @@ else
     protected void CerrarNuevoGrupo() => NuevoGrupoVisible = false;
     protected void CerrarNuevaPresentacion() => NuevaPresentacionVisible = false;
 
-    protected void GuardarFormato()
+    protected async void GuardarFormato()
     {
+        try
+        {
+            Modulo = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utilidades.js");
+            await Modulo.InvokeVoidAsync("Exito");
+        }
+        catch (Exception error)
+        {
+            Console.WriteLine(error.Message);
+            await Modulo.InvokeVoidAsync("Error");
+        }
+    }
 
+    protected async void GuardarPresentacion()
+    {
+        try
+        {
+            Modulo = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utilidades.js");
+            await Modulo.InvokeVoidAsync("Exito");
+        }
+        catch (Exception error)
+        {
+            Console.WriteLine(error.Message);
+            await Modulo.InvokeVoidAsync("Error");
+        }
     }
 
     private async void UploadFiles(InputFileChangeEventArgs e)
@@ -246,19 +308,20 @@ else
     {
         try
         {
-
+            Modulo = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utilidades.js");
             var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/grupos/");
             var fs = File.Create(Path.Combine(path, NuevoGrupo.FileName));
 
             await fs.WriteAsync(NuevoGrupo.ArchivoStream.AsMemory(0, NuevoGrupo.ArchivoStream.Length), CancellationToken.None);
 
             fs.Close();
-
+            await Modulo.InvokeVoidAsync("Exito");
             //var result = await _cliente.PostAsJsonAsync<CrearGrupo>("api/Grupos/NuevoGrupo", NuevoGrupo);
             this.StateHasChanged();
         }
         catch (Exception error)
         {
+            await Modulo.InvokeVoidAsync("Error");
             Console.WriteLine(error.Message);
         }
     }

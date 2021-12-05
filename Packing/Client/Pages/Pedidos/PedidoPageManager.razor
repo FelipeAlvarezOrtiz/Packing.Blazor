@@ -1,45 +1,191 @@
 ﻿@page "/Pedidos/CrearPedido"
 @inject HttpClient Cliente
 @inject NavigationManager Navigator
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IJSRuntime JsRuntime
 @attribute [Authorize]
 
 <div class="container-fluid">
-
+    <MudTabs @ref="TabGeneral" HideSlider="true" Elevation="2" Rounded="true" Centered="true">
+        <MudTabPanel @ref="IngresoProductos">
+            <MudTimeline TimelineOrientation="TimelineOrientation.Horizontal">
+                <MudTimelineItem Size="Size.Medium" Color="Color.Success"></MudTimelineItem>
+                <MudTimelineItem Size="Size.Small"></MudTimelineItem>
+                <MudTimelineItem Size="Size.Small"></MudTimelineItem>
+                <MudTimelineItem Size="Size.Small"></MudTimelineItem>
+            </MudTimeline>
+            <div class="row">
+                <div class="col-6 text-center"></div>
+                <div class="col-6 text-center">
+                    <MudTooltip Text="Siguiente">
+                        <MudFab Icon="@Icons.Outlined.ArrowForward" OnClick="(() => Activar(1))"></MudFab>
+                    </MudTooltip>
+                </div>
+            </div>
+            <hr />
+            @if (GruposProducto is null)
+            {
+                <MudSkeleton />
+                <MudSkeleton Animation="Animation.False" />
+                <MudSkeleton Animation="Animation.Wave" />
+                <div class="row">
+                    <div class="col d-flex justify-content-center">
+                        <p>Cargando productos, espere por favor ...</p>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="row">
+                    @foreach (var grupos in GruposProducto)
+                    {
+                        <div class="col-sm-12 col-md-6 col-lg-6 col-xl-4">
+                            <GrupoVerComponent GrupoBlock="grupos" AgregarAlCarro="AgregarAlCarro"></GrupoVerComponent>
+                        </div>
+                    }
+                </div>
+            }
+        </MudTabPanel>
+        <MudTabPanel @ref="ConfirmacionProductos">
+            <MudTimeline TimelineOrientation="TimelineOrientation.Horizontal">
+                <MudTimelineItem Size="Size.Small"></MudTimelineItem>
+                <MudTimelineItem Size="Size.Medium" Color="Color.Success"></MudTimelineItem>
+                <MudTimelineItem Size="Size.Small"></MudTimelineItem>
+                <MudTimelineItem Size="Size.Small"></MudTimelineItem>
+            </MudTimeline>
+            <div class="row">
+                <div class="col-6 text-center">
+                    <MudTooltip Text="Anterior">
+                        <MudFab Icon="@Icons.Outlined.ArrowBack" OnClick="(() => Activar(0))"></MudFab>
+                    </MudTooltip>
+                </div>
+                <div class="col-6 text-center">
+                    <MudTooltip Text="Siguiente">
+                        <MudFab Icon="@Icons.Outlined.ArrowForward" OnClick="(() => Activar(2))"></MudFab>
+                    </MudTooltip>
+                </div>
+            </div>
+            <hr />
+            @if (CarroPedido.Count > 0)
+            {
+                @foreach (var detalle in CarroPedido)
+                {
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-4 p-1">
+                        <ConfirmacionPedido Producto=detalle.Value.ProductoIncorporado CantidadProducto=detalle.Value.Cantidad
+                                            ActualizarCantidad="ActualizarCantidadProducto" />
+                    </div>
+                }
+            }
+            else
+            {
+                <br />
+                <div class="col">
+                    <div class="row alert alert-info">
+                        <div class="col d-flex justify-content-center">
+                            <h5><i class="fas fa-info-circle"></i>&nbsp;No hay productos agregados en el carro.</h5>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+            }
+        </MudTabPanel>
+        <MudTabPanel @ref="ConfirmacionDatos">
+            <MudTimeline TimelineOrientation="TimelineOrientation.Horizontal">
+                <MudTimelineItem Size="Size.Small"></MudTimelineItem>
+                <MudTimelineItem Size="Size.Small"></MudTimelineItem>
+                <MudTimelineItem Size="Size.Medium" Color="Color.Success"></MudTimelineItem>
+                <MudTimelineItem Size="Size.Small"></MudTimelineItem>
+            </MudTimeline>
+            <div class="row">
+                <div class="col-6 text-center">
+                    <MudTooltip Text="Anterior">
+                        <MudFab Icon="@Icons.Outlined.ArrowBack" OnClick="(() => Activar(1))">Atrás</MudFab>
+                    </MudTooltip>
+                </div>
+                <div class="col-6 text-center">
+                    <MudTooltip Text="Siguiente">
+                        <MudFab Icon="@Icons.Outlined.ArrowForward" OnClick="(() => Activar(3))">Siguiente</MudFab>
+                    </MudTooltip>
+                </div>
+            </div>
+            <hr />
+            <div class="row">
+                <div class="col-12">
+                    <DatosPersonales />
+                </div>
+            </div>
+        </MudTabPanel>
+        <MudTabPanel @ref="ConfirmacionPedido">
+            <MudTimeline TimelineOrientation="TimelineOrientation.Horizontal">
+                <MudTimelineItem Size="Size.Small"></MudTimelineItem>
+                <MudTimelineItem Size="Size.Small"></MudTimelineItem>
+                <MudTimelineItem Size="Size.Small"></MudTimelineItem>
+                <MudTimelineItem Size="Size.Medium" Color="Color.Success"></MudTimelineItem>
+            </MudTimeline>
+            <div class="row">
+                <div class="col-6 text-center">
+                    <MudTooltip Text="Anterior">
+                        <MudFab Icon="@Icons.Outlined.ArrowBack" OnClick="(() => Activar(2))">Atrás</MudFab>
+                    </MudTooltip>
+                </div>
+                <div class="col-6 text-center"></div>
+            </div>
+            <hr />
+            <br />
+            <p>Confirmar</p>
+        </MudTabPanel>
+    </MudTabs>
 </div>
 
 @code {
-    //id producto - cantidad
-    protected Dictionary<int, int> ProductosEnCarro = new();
     protected List<GrupoProducto> GruposProducto;
-
-    protected MudTabs _tabGeneral;
-    protected MudTabPanel _ingresoProductos, _confirmacionProductos, _datosPersonales, _confirmacion;
-
-    protected AppUser UserLoggeado;
+    protected MudTabs TabGeneral;
+    protected MudTabPanel IngresoProductos, ConfirmacionProductos, ConfirmacionDatos, ConfirmacionPedido;
+    protected Dictionary<int, DetalleProductoEnCarro> CarroPedido = new();
+    protected string emailUsuario = string.Empty;
+    protected IJSObjectReference Modulo;
 
     protected override async Task OnInitializedAsync()
     {
+        Modulo = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utilidades.js");
         try
         {
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            if (authState.User.Identity != null) emailUsuario = authState.User.Identity.Name;
             GruposProducto = await Cliente.GetFromJsonAsync<List<GrupoProducto>>("api/Grupos/ObtenerGrupos");
-
         }
         catch (Exception error)
         {
+            await Modulo.InvokeVoidAsync("Error");
             Console.WriteLine(error.Message);
         }
     }
 
-    protected void EliminarProductoDelCarro(int idProducto)
+    protected void AgregarAlCarro(DetalleProductoEnCarro nuevoItem)
     {
-        ProductosEnCarro.Remove(idProducto);
+
     }
 
-    protected void ActualizarCantidadDelCarro(int idProducto, int nuevaCantidad)
+    void Activar(int Index)
     {
-        if (ProductosEnCarro.TryGetValue(idProducto, out var cantidad))
+        TabGeneral.ActivatePanel(Index);
+    }
+
+    protected void ActualizarCantidadProducto(Tuple<int, int> updateRequest)
+    {
+        if (!CarroPedido.ContainsKey(updateRequest.Item1))
         {
-            ProductosEnCarro[idProducto] = nuevaCantidad;
+            Console.WriteLine("El producto no existe en el diccionario");
+        }
+        if (CarroPedido.TryGetValue(updateRequest.Item1, out var productoIngresado))
+        {
+            productoIngresado.Cantidad = updateRequest.Item2;
+            CarroPedido[updateRequest.Item1] = productoIngresado;
+            StateHasChanged();
+        }
+        else
+        {
+            Console.WriteLine("Ha ocurrido un error");
         }
     }
 }

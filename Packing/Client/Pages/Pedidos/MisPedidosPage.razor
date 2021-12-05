@@ -1,4 +1,4 @@
-﻿@page "/MisPedidos/{int:IdEmpresa}"
+﻿@page "/MisPedidos/{IdEmpresa}"
 @inject HttpClient client
 @inject NavigationManager navigation
 @attribute [Authorize]
@@ -14,7 +14,7 @@
     </div>
 }
 else if (Pedidos.Count <= 0)
-{
+{ 
     <div class="row">
         <div class="col-12 text-center">
             <p>&nbsp;No tiene pedidos ingresados.</p>

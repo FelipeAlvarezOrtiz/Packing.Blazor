@@ -73,7 +73,7 @@ else
                             }
                             else
                             {
-                                <MudSelect T="int" @bind-Value="PresentacionIngresada" Label="Presentación" Strict="true" Variant="Variant.Outlined" Format="F2" AnchorOrigin="Origin.BottomCenter">
+                                <MudSelect IconSize="Size.Small" T="int" @bind-Value="PresentacionIngresada" Label="Presentación" Strict="true" Variant="Variant.Outlined" Format="F2" AnchorOrigin="Origin.BottomCenter">
                                 @foreach (var presentacion in PresentacionesDisponibles)
                                 {
                                     <MudSelectItem T="int" Value="presentacion.IdPresentacion">@presentacion.NombrePresentacion</MudSelectItem>

@@ -1,99 +1,158 @@
 ﻿@page "/Empresas/Crear"
+@using Microsoft.AspNetCore.Components
+@using Packing.Shared.Usuarios
+@inject NavigationManager navigator
+@inject HttpClient cliente
+@inject IJSRuntime JsRuntime
+@attribute [Authorize(Roles = "Administrador")]
 
 <h4><i class="fas fa-user-plus"></i>&nbsp;Crear usuario</h4>
 <hr />
 
 @if (NuevoUsuario is not null && Roles is not null)
 {
-<EditForm Model="NuevoUsuario" OnValidSubmit="CrearUsuario">
-    <DataAnnotationsValidator></DataAnnotationsValidator>
+    <EditForm Model="NuevoUsuario" OnValidSubmit="CrearUsuario">
+        <DataAnnotationsValidator></DataAnnotationsValidator>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <MudTextField Label="Nombre del usuario" Variant="Variant.Outlined" @bind-Value="NuevoUsuario.NombreUsuario" />
+                    <ValidationMessage For="@(()=>NuevoUsuario.NombreUsuario)"></ValidationMessage>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <MudTextField Label="Email del usuario" Variant="Variant.Outlined" @bind-Value="NuevoUsuario.EmailUsuario" Placeholder="Con este dato se iniciará sesión" />
+                    <ValidationMessage For="@(()=>NuevoUsuario.EmailUsuario)"></ValidationMessage>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <MudSelect T="string" @bind-Value="NuevoUsuario.RolUsuario" Label="Rol del usuario" Strict="true" Variant="Variant.Outlined" Format="F2" AnchorOrigin="Origin.BottomCenter">
+                        @foreach (var rol in Roles)
+                        {
+                            <MudSelectItem T="string" Value="rol">@rol</MudSelectItem>
+                        }
+                    </MudSelect>
+                    <ValidationMessage For="@(()=> NuevoUsuario.RolUsuario)"></ValidationMessage>
+                </div>
+            </div>
+        </div>
+        <br />
+        <h5><i class="far fa-building"></i>&nbsp;Datos de la empresa</h5>
+        <hr />
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <div class="input-group">
+                        <MudTextField id="nuevoRutEmpresa" Label="Rut de la empresa" Variant="Variant.Outlined" @bind-Value="NuevoUsuario.RutEmpresa" />
+                        <MudTooltip Text="Buscar">
+                            <MudFab Class="mt-3 ml-3" Color="Color.Primary" Size="Size.Small" Icon="@Icons.Material.Filled.Search" />
+                        </MudTooltip>
+                        <ValidationMessage For="@(() => NuevoUsuario.RutEmpresa)"></ValidationMessage>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <MudTextField Label="Nombre de la empresa" Variant="Variant.Outlined" @bind-Value="NuevoUsuario.NombreEmpresa" />
+                    <ValidationMessage For="@(()=> NuevoUsuario.NombreEmpresa)"></ValidationMessage>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <MudTextField Label="Persona de contacto" Variant="Variant.Outlined" @bind-Value="NuevoUsuario.PersonaContacto" />
+                    <ValidationMessage For="@(()=> NuevoUsuario.PersonaContacto)"></ValidationMessage>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <MudTextField Label="Razón social" Variant="Variant.Outlined" @bind-Value="NuevoUsuario.RazonSocial" />
+                    <ValidationMessage For="@(()=> NuevoUsuario.RazonSocial)"></ValidationMessage>
+                </div>
+            </div>
+        </div>
+        <hr />
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <MudTextField Label="Dirección" Variant="Variant.Outlined" @bind-Value="NuevoUsuario.Direccion" />
+                    <ValidationMessage For="@(()=> NuevoUsuario.Direccion)"></ValidationMessage>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <MudTextField Label="Email" Variant="Variant.Outlined" @bind-Value="NuevoUsuario.EmailEmpresa" />
+                    <ValidationMessage For="@(()=> NuevoUsuario.EmailEmpresa)"></ValidationMessage>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <MudTextField Label="Número teléfonico" Variant="Variant.Outlined" @bind-Value="NuevoUsuario.Telefono" />
+                    <ValidationMessage For="@(()=> NuevoUsuario.Telefono)"></ValidationMessage>
+                </div>
+            </div>
+        </div>
+        <hr />
+        <div class="row d-flex align-content-center">
+            <div class="col-sm-6 col-md-6 col-lg-6 mt-1 text-center">
+                <MudFab Icon="@Icons.Material.Filled.AddCircleOutline" Color="Color.Success" ButtonType="ButtonType.Submit" Size="Size.Medium" Label="Guardar" />
+            </div>
+            <div class="col-sm-6 col-md-6 col-lg-6 mt-1 text-center">
+                <MudFab Icon="@Icons.Material.Filled.ArrowBack" Color="Color.Info" ButtonType="ButtonType.Button" OnClick="VolverAtras" Size="Size.Medium" Label="Atrás" />
+            </div>
+        </div>
+        <hr />
+    </EditForm>
+}
+else
+{
     <div class="row">
-        <div class="col-md-6">
-            <div class="form-group">
-                <MudTextField Label="Nombre del usuario" Variant="Variant.Outlined" @bind-Value="NuevoUsuario.UserName" />
-                <ValidationMessage For="@(()=>NuevoUsuario.UserName)"></ValidationMessage>
+        <div class="col">
+            <div class="row">
+                <div class="col d-flex justify-content-center">
+                    <p>Cargando, espere por favor ...</p>
+                </div>
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="form-group">
-                <MudSelect T="string" @bind-Value="NuevoUsuario.RolUsuario" Label="Rol del usuario" Strict="true" Variant="Variant.Outlined" Format="F2" AnchorOrigin="Origin.BottomCenter">
-                    @foreach (var rol in Roles)
-                    {
-                        <MudSelectItem T="string" Value="rol">@rol</MudSelectItem>
-                    }
-                </MudSelect>
-                <ValidationMessage For="@(()=> NuevoUsuario.RolUsuario)"></ValidationMessage>
-            </div>
-        </div>
+        <MudSkeleton />
+        <MudSkeleton Animation="Animation.False" />
+        <MudSkeleton Animation="Animation.Wave" />
+        <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="m-7" />
     </div>
-    <br />
-    <h5><i class="far fa-building"></i>&nbsp;Datos de la empresa</h5>
-    <hr />
-    <div class="row">
-        <div class="col-md-6">
-            <div class="form-group">
-                <MudTextField id="nuevoRutEmpresa" Label="Rut de la empresa" Variant="Variant.Outlined" @bind-Value="NuevoUsuario.Empresa.RutEmpresa" />
-                <ValidationMessage For="@(()=> NuevoUsuario.Empresa.RutEmpresa)"></ValidationMessage>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="form-group">
-                <MudTextField Label="Nombre de la empresa" Variant="Variant.Outlined" @bind-Value="NuevoUsuario.Empresa.NombreEmpresa" />
-                <ValidationMessage For="@(()=> NuevoUsuario.Empresa.NombreEmpresa)"></ValidationMessage>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-6">
-            <div class="form-group">
-                <MudTextField Label="Persona de contacto" Variant="Variant.Outlined" @bind-Value="NuevoUsuario.Empresa.PersonaContacto" />
-                <ValidationMessage For="@(()=> NuevoUsuario.Empresa.PersonaContacto)"></ValidationMessage>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="form-group">
-                <MudTextField Label="Razón social" Variant="Variant.Outlined" @bind-Value="NuevoUsuario.Empresa.RazonSocial" />
-                <ValidationMessage For="@(()=> NuevoUsuario.Empresa.RazonSocial)"></ValidationMessage>
-            </div>
-        </div>
-    </div>
-    <hr />
-    <div class="row">
-        <div class="col-md-12">
-            <div class="form-group">
-                <MudTextField Label="Dirección" Variant="Variant.Outlined" @bind-Value="NuevoUsuario.Empresa.Direccion" />
-                <ValidationMessage For="@(()=> NuevoUsuario.Empresa.Direccion)"></ValidationMessage>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-6">
-            <div class="form-group">
-                <MudTextField Label="Email" Variant="Variant.Outlined" @bind-Value="NuevoUsuario.Email" />
-                <ValidationMessage For="@(()=> NuevoUsuario.Email)"></ValidationMessage>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="form-group">
-                <MudTextField Label="Número teléfonico" Variant="Variant.Outlined" @bind-Value="NuevoUsuario.PhoneNumber" />
-                <ValidationMessage For="@(()=> NuevoUsuario.PhoneNumber)"></ValidationMessage>
-            </div>
-        </div>
-    </div>
-    <div class="row col-12 text-center">
-        <MudFab Icon="@Icons.Material.Filled.Navigation" Color="Color.Success" ButtonType="ButtonType.Submit" Size="Size.Medium" Label="Guardar" />
-    </div>
-    <hr />
-</EditForm>
 }
 
+
 @code {
-    protected AppUser NuevoUsuario = new();
+    protected CrearUsuarioRequestDto NuevoUsuario = new();
+    protected List<string> Roles = new() { "Administrador", "Cliente" };
+    protected IJSObjectReference Modulo;
 
-    protected List<string> Roles = new();
-
-    protected void CrearUsuario()
+    protected async void CrearUsuario()
     {
-
+        Modulo = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utilidades.js");
+        var result = await cliente.PostAsJsonAsync("api/Usuarios/CrearUsuario", NuevoUsuario);
+        if (result.IsSuccessStatusCode)
+        {
+            await Modulo.InvokeVoidAsync("Exito");
+            LimpiarUi();
+        }
+        else
+        {
+            await Modulo.InvokeVoidAsync("Error");
+            Console.WriteLine("Error ha ocurrido con " + result.ReasonPhrase);
+        }
     }
+
+    protected void LimpiarUi()
+    {
+        NuevoUsuario = new();
+        StateHasChanged();
+    }
+
+    protected void VolverAtras() => navigator.NavigateTo("/Empresas/Indice");
 }

@@ -9,12 +9,13 @@ using Packing.Core.Empresas;
 using Packing.Core.Usuarios;
 using Packing.Persistencia;
 using Packing.Shared.EmpresaDto;
+using Packing.Shared.Usuarios;
 
 namespace Packing.Negocio.Empresas
 {
     public class CrearEmpresa
     {
-        public class Handler : IRequestHandler<CrearEmpresaCommand>
+        public class Handler : IRequestHandler<CrearUsuarioRequestDto>
         {
             private readonly ApplicationDbContext _context;
             private readonly UserManager<AppUser> _userManager;
@@ -27,7 +28,7 @@ namespace Packing.Negocio.Empresas
                 _roleManager = roleManager;
             }
 
-            public async Task<Unit> Handle(CrearEmpresaCommand request, CancellationToken cancellationToken)
+            public async Task<Unit> Handle(CrearUsuarioRequestDto request, CancellationToken cancellationToken)
             {
                 var resultUsuario = await _userManager.FindByEmailAsync(request.EmailUsuario);
                 if (resultUsuario is not null) throw new Exception("Ese correo ya esta asociado a un usuario");
@@ -47,6 +48,8 @@ namespace Packing.Negocio.Empresas
                     var resultGuardado = await _context.SaveChangesAsync(cancellationToken);
                     if (resultGuardado == 0) throw new Exception("Ha ocurrido un error al procesar la solicitud");
                 }
+                resultEmpresa = await _context.Empresas.Where(x => x.RutEmpresa.Equals(request.RutEmpresa.Replace(".", "")))
+                    .FirstOrDefaultAsync(cancellationToken: cancellationToken);
                 var nuevoUsuario = new AppUser()
                 {
                     Empresa = resultEmpresa,
@@ -55,12 +58,15 @@ namespace Packing.Negocio.Empresas
                     UserName = request.EmailUsuario,
                     PhoneNumber = request.Telefono,
                     PhoneNumberConfirmed = true,
-                    EmailConfirmed = true
+                    EmailConfirmed = true,
+                    NombreUsuario = request.NombreUsuario,
+                    RolUsuario = request.RolUsuario
                 };
+                
                 var resultadoCreacion = await _userManager.CreateAsync(nuevoUsuario, "Packing01-");
                 if (!resultadoCreacion.Succeeded)
                     throw new Exception(
-                        $"Ha ocurrido un error al intentar crear al usuario con mensaje {resultadoCreacion.Errors.ToString()}");
+                        $"Ha ocurrido un error al intentar crear al usuario con mensaje {resultadoCreacion.Errors}");
                 var resultUsuarioConsulta = await _userManager.FindByEmailAsync(nuevoUsuario.Email);
                 if (resultUsuarioConsulta is not null)
                     await _userManager.AddToRoleAsync(resultUsuarioConsulta, request.RolUsuario);

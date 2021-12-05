@@ -46,9 +46,4 @@ else
     [Parameter] public Producto Producto { get; set; }
     [Parameter] public EventCallback<Producto> AgregarAlCarro { get; set; }
 
-    protected override async Task OnInitializedAsync()
-    {
-        var random = new Random();
-        CantidadProducto = random.Next(1, 5);
-    }
 }

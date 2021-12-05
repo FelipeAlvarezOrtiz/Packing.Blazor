@@ -74,6 +74,10 @@ namespace Packing.Server
                 app.UseHsts();
             }
 
+            app.UseDeveloperExceptionPage();
+            app.UseMigrationsEndPoint();
+            app.UseWebAssemblyDebugging();
+
             app.UseHttpsRedirection();
             app.UseBlazorFrameworkFiles();
             app.UseStaticFiles();

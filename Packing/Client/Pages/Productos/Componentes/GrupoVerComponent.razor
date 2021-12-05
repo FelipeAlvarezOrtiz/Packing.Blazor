@@ -1,0 +1,107 @@
+﻿@inject HttpClient cliente
+
+@if (GrupoBlock is null || FormatosDisponiblesEnGrupo is null || PresentacionesDisponibles is null)
+{
+    <p>Cargando ...</p>
+}
+else
+{
+    <MudCard Elevation="3" Class="p-1 mt-3">
+        <MudCardMedia Image="@PathImagen" Height="250"/>
+        <MudCardContent>
+            <div class="row">
+                <div class="col-12">
+                    <h5 class="card-title text-sm-center text-md-left">&nbsp;@GrupoBlock.NombreGrupo</h5>
+                    <p class="card-text">
+                        @if (FormatosDisponiblesEnGrupo.Count <= 0)
+                        {
+                            <div class="alert alert-warning text-center" role="alert">
+                                <h7>No existen formatos para este grupo.</h7>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <MudSelect T="int" @bind-Value="FormatoIngresado" Label="Formato" Strict="true" Variant="Variant.Outlined" Format="F2" AnchorOrigin="Origin.BottomCenter">
+                                        @foreach (var formato in FormatosDisponiblesEnGrupo)
+                                        {
+                                            <MudSelectItem T="int" Value="formato.IdFormato">@formato.NombreFormato</MudSelectItem>
+                                        }
+                                    </MudSelect>
+                                    <MudFab Class="mt-2 ml-3" Color="Color.Primary" Size="Size.Medium" Icon="@Icons.Material.Filled.Search"/>
+                                </div>
+                            </div>
+                        }
+                    </p>
+                    <p class="card-text">
+                        @if (PresentacionesDisponibles.Count <= 0 || PresentacionesDisponibles is null)
+                        {
+                            <div class="alert alert-warning text-center" role="alert">
+                                <h7>Seleccione un formato para revisar las presentaciones disponibles.</h7>
+                            </div>
+                        }
+                        else
+                        {
+                            <MudSelect T="int" @bind-Value="PresentacionIngresada" Label="Presentación" Strict="true" Variant="Variant.Outlined" Format="F2" AnchorOrigin="Origin.BottomCenter">
+                                @foreach (var presentacion in PresentacionesDisponibles)
+                                {
+                                    <MudSelectItem T="int" Value="presentacion.IdPresentacion">@presentacion.NombrePresentacion</MudSelectItem>
+                                }
+                            </MudSelect>
+                        }
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <MudNumericField @bind-Value="CantidadProducto" Label="Cantidad" Min="0" Variant="Variant.Outlined" Step="1"/>
+            </div>
+        </MudCardContent>
+        <MudCardActions>
+            <div class="row text-center d-flex align-content-center">
+                <div class="col-6 mt-2">
+                    <MudFab Class="mt-1 ml-2" Color="Color.Info" Size="Size.Small"
+                            Icon="@Icons.Material.Filled.Refresh" Label="Limpiar" OnClick="LimpiarUI">
+                    </MudFab>
+                </div>
+                <div class="col-6 mt-2">
+                    <MudFab Class="mt-1 ml-2" Color="Color.Success" Size="Size.Small"
+                            Icon="@Icons.Material.Filled.Add" Label="Agregar" OnClick="(() => AgregarAlCarro.InvokeAsync(ItemPedido))">
+                    </MudFab>
+                </div>
+            </div>
+        </MudCardActions>
+    </MudCard>
+}
+
+@code {
+    [Parameter] public GrupoProducto GrupoBlock { get; set; }
+    [Parameter] public EventCallback<DetalleProductoEnCarro> AgregarAlCarro { get; set; }
+
+    public List<Presentacion> PresentacionesDisponibles { get; set; }
+    public List<Formato> FormatosDisponiblesEnGrupo { get; set; }
+
+    protected int FormatoIngresado { get; set; }
+    protected int PresentacionIngresada { get; set; }
+    protected int CantidadProducto { get; set; }
+    protected string PathImagen = string.Empty;
+    protected DetalleProductoEnCarro ItemPedido = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var formatoRequest = new FormatosDelGrupo { IdGrupo = GrupoBlock.IdGrupo };
+        PresentacionesDisponibles = new List<Presentacion>();
+        PathImagen = "/images/grupos/" + GrupoBlock.Imagen;
+        var result = await cliente.PostAsJsonAsync("api/Formatos/ObtenerFormatosDisponibles", formatoRequest);
+        if (result.IsSuccessStatusCode)
+        {
+            FormatosDisponiblesEnGrupo = await result.Content.ReadFromJsonAsync<List<Formato>>();
+        }
+        StateHasChanged();
+    }
+
+    protected void LimpiarUI()
+    {
+
+    }
+}
