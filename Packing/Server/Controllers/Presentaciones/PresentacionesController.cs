@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Packing.Core.Productos;
 using Packing.Negocio.Presentaciones;
+using Packing.Shared.Presentaciones;
 
 namespace Packing.Server.Controllers.Presentaciones
 {
@@ -32,7 +33,7 @@ namespace Packing.Server.Controllers.Presentaciones
         }
 
         [HttpPost("ObtenerPresentacionesDelGrupo")]
-        public async Task<ActionResult<List<Presentacion>>> CrearPresentacion(ObtenerPresentacionDelFormato.Query request)
+        public async Task<ActionResult<List<Presentacion>>> ObtenerPresentacionesDelGrupo(BuscarPresentacionesDelFormatoGrupo request)
         {
             try
             {

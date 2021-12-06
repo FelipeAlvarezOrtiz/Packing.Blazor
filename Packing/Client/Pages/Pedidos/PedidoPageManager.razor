@@ -1,8 +1,11 @@
 ﻿@page "/Pedidos/CrearPedido"
+@using Packing.Shared.Usuarios
+@using Packing.Shared.Pedidos
 @inject HttpClient Cliente
 @inject NavigationManager Navigator
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IJSRuntime JsRuntime
+@inject ISnackbar Snackbar
 @attribute [Authorize]
 
 <div class="container-fluid">
@@ -68,13 +71,15 @@
             <hr />
             @if (CarroPedido.Count > 0)
             {
-                @foreach (var detalle in CarroPedido)
-                {
-                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-4 p-1">
-                        <ConfirmacionPedido Producto=detalle.Value.ProductoIncorporado CantidadProducto=detalle.Value.Cantidad
-                                            ActualizarCantidad="ActualizarCantidadProducto" />
-                    </div>
-                }
+                <div class="row">
+                    @foreach (var detalle in CarroPedido)
+                    {
+                        <div class="col-sm-12 col-md-6 col-lg-6 col-xl-4 p-1">
+                            <ConfirmacionPedido Producto=detalle.Value.ProductoIncorporado CantidadProducto=detalle.Value.Cantidad
+                                                ActualizarCantidad="ActualizarCantidadProducto" />
+                        </div>
+                    }
+                </div>
             }
             else
             {
@@ -132,7 +137,7 @@
             </div>
             <hr />
             <br />
-            <p>Confirmar</p>
+            <MudFab OnClick="IngresarPedido" Label="Enviar Pedido"></MudFab>
         </MudTabPanel>
     </MudTabs>
 </div>
@@ -144,6 +149,9 @@
     protected Dictionary<int, DetalleProductoEnCarro> CarroPedido = new();
     protected string emailUsuario = string.Empty;
     protected IJSObjectReference Modulo;
+    protected ObtenerInfoUsuarioDto requestInfoUsuario;
+    protected AppUser InfoUsuario = new();
+    protected PedidoRequestDto PedidoRequest;
 
     protected override async Task OnInitializedAsync()
     {
@@ -152,6 +160,16 @@
         {
             var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
             if (authState.User.Identity != null) emailUsuario = authState.User.Identity.Name;
+            requestInfoUsuario = new ObtenerInfoUsuarioDto()
+            {
+                EmailUsuarioBuscado = emailUsuario,
+                UsuarioSolicitante = emailUsuario
+            };
+            var resultInfo = await Cliente.PostAsJsonAsync("api/Usuarios/ObtenerUsuario", requestInfoUsuario);
+            if (resultInfo.IsSuccessStatusCode)
+            {
+                InfoUsuario = await resultInfo.Content.ReadFromJsonAsync<AppUser>();
+            }
             GruposProducto = await Cliente.GetFromJsonAsync<List<GrupoProducto>>("api/Grupos/ObtenerGrupos");
         }
         catch (Exception error)
@@ -163,16 +181,26 @@
 
     protected void AgregarAlCarro(DetalleProductoEnCarro nuevoItem)
     {
-
+        if (CarroPedido.TryGetValue(nuevoItem.ProductoIncorporado.IdProducto, out var detalle))
+        {
+            var nuevaCantidad = detalle.Cantidad + nuevoItem.Cantidad;
+            detalle.Cantidad = nuevaCantidad;
+            CarroPedido[nuevoItem.ProductoIncorporado.IdProducto] = detalle;
+        }
+        else
+        {
+            CarroPedido.Add(nuevoItem.ProductoIncorporado.IdProducto, nuevoItem);
+        }
     }
 
-    void Activar(int Index)
+    protected void Activar(int index)
     {
-        TabGeneral.ActivatePanel(Index);
+        TabGeneral.ActivatePanel(index);
     }
 
-    protected void ActualizarCantidadProducto(Tuple<int, int> updateRequest)
+    protected async void ActualizarCantidadProducto(Tuple<int, int> updateRequest)
     {
+        Modulo = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utilidades.js");
         if (!CarroPedido.ContainsKey(updateRequest.Item1))
         {
             Console.WriteLine("El producto no existe en el diccionario");
@@ -181,11 +209,54 @@
         {
             productoIngresado.Cantidad = updateRequest.Item2;
             CarroPedido[updateRequest.Item1] = productoIngresado;
+            Snackbar.Clear();
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomCenter;
+            Snackbar.Add("Actualizado.", Severity.Success, config =>
+            {
+                config.Icon = Icons.Outlined.Check;
+
+            });
             StateHasChanged();
         }
         else
         {
+            await Modulo.InvokeVoidAsync("Error");
             Console.WriteLine("Ha ocurrido un error");
         }
     }
+
+    protected async void IngresarPedido()
+    {
+        var listaProductos = CarroPedido.Select(key => new DetallePedidoDto()
+        {
+            Cantidad = key.Value.Cantidad, IdProducto = key.Key
+        }).ToList();
+
+        PedidoRequest = new PedidoRequestDto()
+        {
+            NombreUsuario = emailUsuario,
+            Observacion = string.Empty,
+            ProductosEnPedido = listaProductos
+        };
+        try
+        {
+            var result = await Cliente.PostAsJsonAsync("api/Pedidos/IngresarPedido", PedidoRequest);
+            if (result.IsSuccessStatusCode)
+            {
+                //todo correcto
+                CarroPedido.Clear();
+                StateHasChanged();
+                Navigator.NavigateTo("/");
+            }
+            else
+            {
+                Console.WriteLine("Error");
+            }
+        }
+        catch (Exception error)
+        {
+            Console.WriteLine(error.Message);
+        }
+    }
+
 }

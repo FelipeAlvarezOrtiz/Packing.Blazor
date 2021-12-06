@@ -43,7 +43,8 @@ namespace Packing.Negocio.Productos
                     MaxDiaVencimiento = request.MaxDiaVencimiento,
                     AfectoVencimiento = request.AfectaVencimiento,
                     MinDiaVencimiento = request.MinDiaVencimiento,
-                    NombreParaBusqueda = nombreBusqueda
+                    NombreParaBusqueda = nombreBusqueda,
+                    Disponible = true
                 },cancellationToken);
 
                 return await _context.SaveChangesAsync(cancellationToken) > 0 

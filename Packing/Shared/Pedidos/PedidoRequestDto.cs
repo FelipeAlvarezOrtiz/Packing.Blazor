@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace Packing.Shared.Pedidos
@@ -8,7 +7,13 @@ namespace Packing.Shared.Pedidos
     {
         public string NombreUsuario { get; set; }
         //id producto -- cantidad
-        public ICollection ProductosEnPedido { get; set; } = new Dictionary<int, int>();
+        public List<DetallePedidoDto> ProductosEnPedido { get; set; }
         public string Observacion { get; set; }
+    }
+
+    public record DetallePedidoDto
+    {
+        public int IdProducto { get; set; }
+        public int Cantidad { get; set; }
     }
 }

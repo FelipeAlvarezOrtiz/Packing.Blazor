@@ -28,7 +28,8 @@ namespace Packing.Negocio.Formatos
             public async Task<List<Formato>> Handle(Query request, CancellationToken cancellationToken)
             {
                 var productosConEseFormato = await _context.Productos.Include(producto => producto.Grupo)
-                    .Where(producto => producto.Grupo.IdGrupo == request.IdGrupo).Select(producto => producto.Formato)
+                    .Where(producto => producto.Grupo.IdGrupo == request.IdGrupo && producto.Disponible)
+                    .Select(producto => producto.Formato)
                     .Distinct()
                     .ToListAsync(cancellationToken: cancellationToken);
                 return productosConEseFormato;

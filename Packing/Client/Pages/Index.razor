@@ -10,7 +10,6 @@
     <h3>&nbsp;Accesos rápidos</h3>
     <hr />
     <div class="container-fluid">
-
         @if (PedidosPendientes is not null)
         {
             @if (PedidosPendientes.Count > 0)
@@ -18,7 +17,7 @@
                 <div class="row">
                     @foreach (var pedido in PedidosPendientes)
                     {
-                        <div class="col-md-4">
+                        <div class="col-sm-12 col-md-4 col-lg-4">
                             <DetallePedidoComponent PedidoBlock="pedido" VerPedido="VerPedido"></DetallePedidoComponent>
                         </div>
                     }
@@ -28,6 +27,7 @@
             {
                 <div class="col-12 text-center alert alert-info"><h4><i class="fas fa-info-circle"></i>&nbsp;Ningún cliente ha ingresado pedidos en el sistema.</h4></div>
             }
+            <br />
             <div class="row">
                 <div class="col-12 text-center">
                     <MudFab IconSize="Size.Medium" Label="Ver mas" OnClick="VerMasPedidos" Color="Color.Info" Icon="@Icons.Material.Filled.Search"></MudFab>
@@ -36,11 +36,21 @@
         }
         else
         {
-            <div class="col-12 text-center"><p>Cargando ...</p></div>
+            <MudSkeleton />
+            <MudSkeleton Animation="Animation.False" />
+            <MudSkeleton Animation="Animation.Wave" />
+            <div class="row">
+                <div class="col d-flex justify-content-center">
+                    <p>Cargando información, espere por favor ...</p>
+                </div>
+            </div>
         }
         <hr />
+        <div>
 
+        </div>
     </div>
+
 </AuthorizeView>
 <AuthorizeView Roles="Cliente">
     <h3>&nbsp;Accesos rápidos</h3>
@@ -99,6 +109,7 @@
             try
             {
                 PedidosPendientes = await resultRequest.Content.ReadFromJsonAsync<List<Pedido>>();
+                StateHasChanged();
             }
             catch (Exception)
             {

@@ -11,7 +11,7 @@ namespace Packing.Server.Controllers.Usuarios
     [Authorize]
     public class UsuariosController : BaseController
     {
-        [HttpGet("ObtenerUsuario")]
+        [HttpPost("ObtenerUsuario")]
         public async Task<AppUser> ObtenerUsuario(ObtenerInfoUsuarioDto request)
         {
             return await Mediator.Send(request);

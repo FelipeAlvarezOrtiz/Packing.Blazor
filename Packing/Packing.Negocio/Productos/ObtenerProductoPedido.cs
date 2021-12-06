@@ -5,19 +5,13 @@ using Packing.Persistencia;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Packing.Shared.Pedidos;
 
 namespace Packing.Negocio.Productos
 {
     public class ObtenerProductoPedido
     {
-        public record Query : IRequest<Producto>
-        {
-            public int IdFormato { get; set; }
-            public int IdPresentacion { get; set; }
-            public int IdGrupo { get; set; }
-        }
-
-        public class Handler : IRequestHandler<Query, Producto>
+        public class Handler : IRequestHandler<ObtenerProductoParaPedido, Producto>
         {
             private readonly ApplicationDbContext _context;
 
@@ -26,7 +20,7 @@ namespace Packing.Negocio.Productos
                 _context = context;
             }
 
-            public async Task<Producto> Handle(Query request, CancellationToken cancellationToken)
+            public async Task<Producto> Handle(ObtenerProductoParaPedido request, CancellationToken cancellationToken)
             {
                 return await _context.Productos.Include(producto => producto.Presentacion)
                     .Include(x => x.Grupo).Include(x => x.Formato).Where(producto => 

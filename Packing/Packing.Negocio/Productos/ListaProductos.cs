@@ -24,9 +24,9 @@ namespace Packing.Negocio.Productos
 
             public async Task<List<Producto>> Handle(Query request, CancellationToken cancellationToken)
             {
-                return await _context.Productos.Include(producto => producto.Formato)
+                return await _context.Productos.Where(producto => producto.Disponible)
+                    .Include(producto => producto.Formato)
                     .Include(producto => producto.Grupo).Include(producto => producto.Presentacion)
-                    .Take(3)
                     .ToListAsync(cancellationToken: cancellationToken);
             }
         }

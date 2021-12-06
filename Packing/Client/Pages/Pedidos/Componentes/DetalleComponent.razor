@@ -1,0 +1,64 @@
+﻿@using Packing.Shared.Pedidos
+
+<MudCard Outlined="true" Elevation="3">
+    <MudCardContent>
+        <div class="row">
+            <div class="col-md-12">
+                <p>Producto: <b>&nbsp;@Detalle.ProductoInterno.NombreParaBusqueda</b>.</p>
+                <p>Formato: <b>&nbsp;@Detalle.ProductoInterno.Formato.IdFormato</b>.</p>
+                <p>Grupos: <b>&nbsp;@Detalle.ProductoInterno.Grupo.NombreGrupo</b>.</p>
+                <p>Presentación: <b>&nbsp;@Detalle.ProductoInterno.Presentacion.NombrePresentacion</b>.</p>
+            </div>
+            <div class="col-md-12">
+                <select id="estados" class="form-control" @bind="IdEstadoSeleccionado">
+                    @foreach (var estado in ListaEstados)
+                    {
+                        @if (estado.IdEstadoPedido == Detalle.Estado.IdEstadoPedido)
+                        {
+                            <option value="@estado.IdEstadoPedido" selected>@estado.NombreEstado</option>
+                        }
+                        else
+                        {
+                            <option value="@estado.IdEstadoPedido">@estado.NombreEstado</option>
+                        }
+                    }
+                </select>
+            </div>
+        </div>
+        <MudDivider></MudDivider>
+    </MudCardContent>
+    <MudCardActions>
+        <div class="row">
+            <div class="col-sm-12 col-md-6 mt-2">
+                <MudFab Label="Eliminar" Icon="@Icons.Outlined.Delete" Size="Size.Medium" Color="Color.Error"
+                        OnClick="(async () => await BorrarDetalle.InvokeAsync(Detalle.IdDetalle))"></MudFab>
+            </div>
+            <div class="col-sm-12 col-md-6 mt-2">
+                <MudFab Label="Actualizar" Icon="@Icons.Outlined.Update" Size="Size.Medium" Color="Color.Info"
+                        OnClick="(async () => await ActualizarEstado.InvokeAsync(Tuple.Create(CabeceraId, Detalle.IdDetalle, IdEstadoSeleccionado)))"></MudFab>
+            </div>
+        </div>
+        
+    </MudCardActions>
+</MudCard>
+
+@code {
+    protected int IdEstadoSeleccionado { get; set; }
+    [Parameter]
+    public DetallePedido Detalle { get; set; }
+    [Parameter]
+    public Guid CabeceraId { get; set; }
+    [Parameter]
+    public List<EstadoPedido> ListaEstados { get; set; }
+    [Parameter]
+    public EventCallback<Tuple<Guid,Guid,int>> ActualizarEstado { get; set; }
+    [Parameter]
+    public EventCallback<Guid> BorrarDetalle { get; set; }
+
+    protected override Task OnInitializedAsync()
+    {
+        IdEstadoSeleccionado = Detalle.Estado.IdEstadoPedido;
+        return base.OnInitializedAsync();
+    }
+
+}

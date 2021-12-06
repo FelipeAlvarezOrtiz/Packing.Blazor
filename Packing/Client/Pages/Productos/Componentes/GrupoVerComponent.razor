@@ -1,8 +1,18 @@
-﻿@inject HttpClient cliente
+﻿@using Packing.Shared.Presentaciones
+@using Packing.Shared.Pedidos
+@inject HttpClient cliente
+@inject IJSRuntime JsRuntime
 
 @if (GrupoBlock is null || FormatosDisponiblesEnGrupo is null || PresentacionesDisponibles is null)
 {
-    <p>Cargando ...</p>
+    <MudSkeleton />
+    <MudSkeleton Animation="Animation.False" />
+    <MudSkeleton Animation="Animation.Wave" />
+    <div class="row">
+        <div class="col d-flex justify-content-center">
+            <p>Cargando productos, espere por favor ...</p>
+        </div>
+    </div>
 }
 else
 {
@@ -29,7 +39,9 @@ else
                                             <MudSelectItem T="int" Value="formato.IdFormato">@formato.NombreFormato</MudSelectItem>
                                         }
                                     </MudSelect>
-                                    <MudFab Class="mt-2 ml-3" Color="Color.Primary" Size="Size.Medium" Icon="@Icons.Material.Filled.Search"/>
+                                    <MudTooltip Text="Buscar presentaciones">
+                                        <MudFab Class="mt-2 ml-3" Color="Color.Primary" Size="Size.Medium" Icon="@Icons.Material.Filled.Search" OnClick="BuscarPresentacionesDeFormato" />
+                                    </MudTooltip>
                                 </div>
                             </div>
                         }
@@ -53,20 +65,21 @@ else
                     </p>
                 </div>
             </div>
+            <hr />
             <div class="col-md-12">
                 <MudNumericField @bind-Value="CantidadProducto" Label="Cantidad" Min="0" Variant="Variant.Outlined" Step="1"/>
             </div>
         </MudCardContent>
-        <MudCardActions>
+        <MudCardActions Class="row">
             <div class="row text-center d-flex align-content-center">
                 <div class="col-6 mt-2">
                     <MudFab Class="mt-1 ml-2" Color="Color.Info" Size="Size.Small"
-                            Icon="@Icons.Material.Filled.Refresh" Label="Limpiar" OnClick="LimpiarUI">
+                            Icon="@Icons.Material.Filled.Refresh" Label="Limpiar" OnClick="LimpiarUi">
                     </MudFab>
                 </div>
                 <div class="col-6 mt-2">
                     <MudFab Class="mt-1 ml-2" Color="Color.Success" Size="Size.Small"
-                            Icon="@Icons.Material.Filled.Add" Label="Agregar" OnClick="(() => AgregarAlCarro.InvokeAsync(ItemPedido))">
+                            Icon="@Icons.Material.Filled.Add" Label="Agregar" OnClick="AgregarAlCarroPrimerPaso">
                     </MudFab>
                 </div>
             </div>
@@ -78,6 +91,8 @@ else
     [Parameter] public GrupoProducto GrupoBlock { get; set; }
     [Parameter] public EventCallback<DetalleProductoEnCarro> AgregarAlCarro { get; set; }
 
+    protected IJSObjectReference Modulo;
+
     public List<Presentacion> PresentacionesDisponibles { get; set; }
     public List<Formato> FormatosDisponiblesEnGrupo { get; set; }
 
@@ -85,7 +100,8 @@ else
     protected int PresentacionIngresada { get; set; }
     protected int CantidadProducto { get; set; }
     protected string PathImagen = string.Empty;
-    protected DetalleProductoEnCarro ItemPedido = new();
+    protected BuscarPresentacionesDelFormatoGrupo requestPresentaciones;
+    protected DetalleProductoEnCarro payloadCarro;
 
     protected override async Task OnInitializedAsync()
     {
@@ -100,8 +116,58 @@ else
         StateHasChanged();
     }
 
-    protected void LimpiarUI()
+    protected async void BuscarPresentacionesDeFormato()
     {
+        requestPresentaciones = new BuscarPresentacionesDelFormatoGrupo
+        {
+            IdGrupo = GrupoBlock.IdGrupo,
+            IdFormato = FormatoIngresado
+        };
+        var result = await cliente.PostAsJsonAsync("api/Presentaciones/ObtenerPresentacionesDelGrupo", requestPresentaciones);
+        if (result.IsSuccessStatusCode)
+        {
+            PresentacionesDisponibles = await result.Content.ReadFromJsonAsync<List<Presentacion>>();
+        }
+        StateHasChanged();
+    }
+
+    protected void LimpiarUi()
+    {
+        PresentacionesDisponibles.Clear();
+        FormatoIngresado = 0;
+        PresentacionIngresada = 0;
+        CantidadProducto = 0;
+        StateHasChanged();
+    }
+
+    protected async void AgregarAlCarroPrimerPaso()
+    {
+        Modulo = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utilidades.js");
+        //obtener producto
+        var request = new ObtenerProductoParaPedido()
+        {
+            IdGrupo = GrupoBlock.IdGrupo,
+            IdPresentacion = PresentacionIngresada,
+            IdFormato = FormatoIngresado
+        };
+        //enviar al eventcallback
+        var result = await cliente.PostAsJsonAsync("api/Productos/ObtenerInfoProducto", request);
+        if (result.IsSuccessStatusCode)
+        {
+            var productoObtenido = await result.Content.ReadFromJsonAsync<Producto>();
+            payloadCarro = new DetalleProductoEnCarro()
+            {
+                Cantidad = CantidadProducto,
+                ProductoIncorporado = productoObtenido
+            };
+            await AgregarAlCarro.InvokeAsync(payloadCarro);
+            LimpiarUi();
+            await Modulo.InvokeVoidAsync("Exito");
+        }
+        else
+        {
+            await Modulo.InvokeVoidAsync("Error");
+        }
 
     }
 }

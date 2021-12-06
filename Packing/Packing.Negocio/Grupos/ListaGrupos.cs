@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -23,7 +24,10 @@ namespace Packing.Negocio.Grupos
 
             public async Task<List<GrupoProducto>> Handle(Query request, CancellationToken cancellationToken)
             {
-                return await _context.Grupos.ToListAsync(cancellationToken: cancellationToken);
+                //return await _context.Grupos.ToListAsync(cancellationToken: cancellationToken);
+                return await _context.Productos.Include(x => x.Grupo)
+                    .Where(x => x.Disponible)
+                    .Select(x => x.Grupo).Distinct().ToListAsync(cancellationToken);
             }
         }
     }

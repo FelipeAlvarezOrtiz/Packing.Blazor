@@ -1,36 +1,79 @@
 ﻿@inject HttpClient Cliente
 @inject NavigationManager Navigator
 @attribute [Authorize]
-
+@inject IJSRuntime JsRuntime
 @page "/Pedidos/Ver/{IdPedido}"
-
+@using Packing.Shared.Pedidos
+<MudTooltip Text="Atrás">
+    <MudFab Icon="@Icons.Outlined.ArrowBack" Size="Size.Small" OnClick="@(() => Navigator.NavigateTo("/"))"></MudFab>
+</MudTooltip>
+<br />
+<br />
+<h3><i class="fas fa-sitemap"></i>&nbsp;Detalles del pedido</h3>
+<hr />
 @if (string.IsNullOrEmpty(IdPedido.ToString()))
 {
     Navigator.NavigateTo("/Pedidos");
 }
-else if (PedidoInterno is null)
+else if (ListaDetalles is null)
 {
+    <MudSkeleton />
+    <MudSkeleton Animation="Animation.False" />
+    <MudSkeleton Animation="Animation.Wave" />
     <div class="row">
-        <div class="col-12 text-center">
-            <MudAlert Class="m-2" Severity="Severity.Warning" Variant="Variant.Filled">Este producto ha sido sacado del pedido, se actualizará su lista una vez recargue la página.</MudAlert>
+        <div class="col d-flex justify-content-center">
+            <p>Cargando información, espere por favor ...</p>
         </div>
     </div>
 }
 else
 {
-    <MudPaper>
-
-    </MudPaper>
+    <div class="row">
+        @foreach (var detalle in ListaDetalles)
+        {
+            <div class="col-sm-12 col-md-4">
+                <DetalleComponent ListaEstados="Estados" ActualizarEstado="ActualizarDetalle" Detalle="detalle"
+                                   CabeceraId="Guid.Parse(IdPedido)" BorrarDetalle="BorrarDetalle"></DetalleComponent>
+                <br/>
+            </div>
+        }
+    </div>
 }
 
 @code {
-    [Parameter] public Guid IdPedido { get; set; }
+    [Parameter] public string IdPedido { get; set; }
     protected Pedido PedidoInterno { get; set; }
     protected Dictionary<int,DetallePedido> ProductosEnPedido { get; set; }
+    protected List<DetallePedido> ListaDetalles;
+    protected ObtenerDetallesDelPedidoDto requestDetalles;
+    protected List<EstadoPedido> Estados;
+    protected IJSObjectReference Modulo;
 
-    protected async override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
-        PedidoInterno = await Cliente.GetFromJsonAsync<Pedido>("");
+        requestDetalles = new ObtenerDetallesDelPedidoDto()
+        {
+            PedidoCabecera = Guid.Parse(IdPedido)
+        };
+        Estados = await Cliente.GetFromJsonAsync<List<EstadoPedido>>("api/Pedidos/ObtenerEstados");
+        var result = await Cliente.PostAsJsonAsync("api/Pedidos/ObtenerDetalles", requestDetalles);
+        if (result.IsSuccessStatusCode)
+        {
+            try
+            {
+                ListaDetalles = await result.Content.ReadFromJsonAsync<List<DetallePedido>>();
+                StateHasChanged();
+            }
+            catch (Exception error)
+            {
+                Console.WriteLine(error.Message);
+                ListaDetalles = new();
+            }
+        }
+        else
+        {
+            Console.WriteLine("Error");
+        }
     }
 
     protected void EliminarProductoDelPedido(DetallePedido detalle)
@@ -49,6 +92,59 @@ else
             detalle.CantidadTotales = (uint)nuevaCantidad * (uint)detalle.ProductoInterno.Formato.UnidadPorFormato;
             detalle.FechaActualizacion = DateTime.Now;
             ProductosEnPedido[detalle.ProductoInterno.IdProducto] = detalle;
+        }
+    }
+
+    protected async void ActualizarDetalle(Tuple<Guid,Guid,int> requestActualizar)
+    {
+        //pegarle al cliente para borrar la wea
+        Modulo = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utilidades.js");
+        var actualizarEstado = new ActualizarEstadoPedido()
+        {
+            IdPedido = requestActualizar.Item1,
+            IdDetalle = requestActualizar.Item2,
+            NuevoEstado = requestActualizar.Item3
+        };
+        var result = await Cliente.PutAsJsonAsync("api/Pedidos/ActualizarDetalle", actualizarEstado);
+        if (result.IsSuccessStatusCode)
+        {
+            await Modulo.InvokeVoidAsync("Exito");
+            StateHasChanged();
+        }
+    }
+
+    protected async void BorrarDetalle(Guid requestBorrar)
+    {
+        var requestBorrarDetalle = new BorrarDetallePedidoDto()
+        {
+            IdCabecera = Guid.Parse(IdPedido),
+            IdDetalle = requestBorrar
+        };
+        var result = await Cliente.PostAsJsonAsync("api/Pedidos/EliminarDetalle", requestBorrarDetalle);
+        if (!result.IsSuccessStatusCode) return;
+        BuscarDetalles();
+        StateHasChanged();
+        await Modulo.InvokeVoidAsync("Exito");
+    }
+
+    protected async void BuscarDetalles()
+    {
+        requestDetalles = new ObtenerDetallesDelPedidoDto()
+        {
+            PedidoCabecera = Guid.Parse(IdPedido)
+        };
+        Estados = await Cliente.GetFromJsonAsync<List<EstadoPedido>>("api/Pedidos/ObtenerEstados");
+        var result = await Cliente.PostAsJsonAsync("api/Pedidos/ObtenerDetalles", requestDetalles);
+        if (!result.IsSuccessStatusCode) return;
+        try
+        {
+            ListaDetalles = await result.Content.ReadFromJsonAsync<List<DetallePedido>>();
+            StateHasChanged();
+        }
+        catch (Exception error)
+        {
+            Console.WriteLine(error.Message);
+            ListaDetalles = new();
         }
     }
 }

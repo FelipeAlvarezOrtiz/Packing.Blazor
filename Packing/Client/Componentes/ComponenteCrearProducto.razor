@@ -10,7 +10,8 @@
 @page "/Productos/Crear"
 
 <InputFile id="fileInput" OnChange="UploadFiles" hidden />
-
+<h3><i class="fas fa-box-open"></i>&nbsp;Nuevo producto</h3>
+<hr />
 @if (Formatos is null || Grupos is null || Presentaciones is null)
 {
     <div class="container-fluid">
@@ -47,6 +48,7 @@ else
                                 }
                             </MudSelect>&nbsp;
                             <MudFab Class="mt-2" Color="Color.Primary" Size="Size.Medium" Icon="@Icons.Material.Filled.Add" OnClick="AbrirDialogFormato" aria-label="Agregar" />
+                            <ValidationMessage For="@(()=>NuevoProducto.IdFormato)"></ValidationMessage>
                         </div>
                     </div>
                 </div>
@@ -60,6 +62,7 @@ else
                                 }
                             </MudSelect>&nbsp;
                             <MudFab Class="mt-2" Color="MudBlazor.Color.Primary" Size="Size.Medium" Icon="@Icons.Material.Filled.Add" OnClick="AbrirDialogGrupo" aria-label="Agregar" />
+                            <ValidationMessage For="@(()=>NuevoProducto.IdGrupo)"></ValidationMessage>
                         </div>
                     </div>
                 </div>
@@ -75,6 +78,7 @@ else
                                 }
                             </MudSelect>&nbsp;
                             <MudFab Class="mt-2" Color="Color.Primary" Size="Size.Medium" Icon="@Icons.Material.Filled.Add" OnClick="AbrirDialogPresentacion" aria-label="Agregar" />
+                            <ValidationMessage For="@(()=>NuevoProducto.IdPresentacion)"></ValidationMessage>
                         </div>
                     </div>
                 </div>
@@ -96,7 +100,7 @@ else
                 <MudFab Color="Color.Success" Icon="@Icons.Material.Filled.AddCircleOutline" ButtonType="ButtonType.Submit" Label="Crear"></MudFab>
             </div>
             <div class="col-6 text-center">
-                <MudFab Color="Color.Info" Icon="@Icons.Material.Filled.Loop" OnClick="@LimpiarSelecciones" Label="Limpiar"></MudFab>
+                <MudFab Color="Color.Info" Icon="@Icons.Material.Filled.Loop" OnClick="@LimpiarUi" Label="Limpiar"></MudFab>
             </div>
         </div>
     </EditForm>
@@ -110,7 +114,7 @@ else
     </TitleContent>
     <DialogContent>
         <EditForm Model="NuevoFormato" OnValidSubmit="GuardarFormato">
-            <DataAnnotationsValidator>
+            <DataAnnotationsValidator></DataAnnotationsValidator>
                 <div class="container-fluid">
                     <div class="row form-group">
                         <div class="col-md-12">
@@ -131,7 +135,6 @@ else
                         </div>
                     </div>
                 </div>
-            </DataAnnotationsValidator>
         </EditForm>
     </DialogContent>
     <DialogActions>
@@ -148,7 +151,7 @@ else
     </TitleContent>
     <DialogContent>
         <EditForm Model="NuevaPresentacion" OnValidSubmit="GuardarPresentacion">
-            <DataAnnotationsValidator>
+            <DataAnnotationsValidator></DataAnnotationsValidator>
                 <div class="container-fluid">
                     <div class="row form-group">
                         <div class="col-md-12">
@@ -160,7 +163,7 @@ else
                         </div>
                     </div>
                 </div>
-            </DataAnnotationsValidator>
+            
         </EditForm>
     </DialogContent>
     <DialogActions>
@@ -177,7 +180,7 @@ else
     </TitleContent>
     <DialogContent>
         <EditForm Model="NuevoGrupo" OnValidSubmit="SubirGrupo">
-            <DataAnnotationsValidator>
+            <DataAnnotationsValidator></DataAnnotationsValidator>
                 <div class="container-fluid">
                     <div class="row form-group">
                         <div class="col-md-12">
@@ -196,7 +199,7 @@ else
                         </div>
                     </div>
                 </div>
-            </DataAnnotationsValidator>
+            
         </EditForm>
     </DialogContent>
     <DialogActions>

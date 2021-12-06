@@ -1,6 +1,7 @@
 ﻿@page "/Productos/Indice"
 @inject HttpClient cliente
 @inject NavigationManager navigator
+@inject IJSRuntime JsRuntime
 @attribute [Authorize]
 
 <h3><i class="fas fa-boxes"></i>&nbsp;Productos Indice</h3>
@@ -34,31 +35,61 @@
     }
     else
     {
-    <div class="row">
-        @foreach (var producto in ProductosEnSistema)
-        {
-            <div class="col-sm-12 col-md-4 col-lg-4">
-                <ProductoVerComponent ProductoBlock="producto" EditarProducto="ActualizarProducto" BorrarProducto="BorrarProducto" ></ProductoVerComponent>
+        <div class="row">
+            @foreach (var producto in ProductosEnSistema)
+            {
+                <div class="col-sm-12 col-md-4 col-lg-4">
+                    <ProductoVerComponent ProductoBlock="producto" EditarProducto="ActualizarProducto" BorrarProducto="BorrarProducto" ></ProductoVerComponent>
+                </div>
+            }
+        </div>
+        <hr />
+        <div class="row">
+            <div class="col-6 text-center">
+                <MudFab Color="Color.Success" Icon="@Icons.Material.Filled.AddCircleOutline" ButtonType="ButtonType.Button" OnClick="NuevoProductoView" Label="Nuevo producto"></MudFab>
             </div>
-        }
-    </div>
+        </div>
     }
 </div>
+<br />
+<br/>
 
 @code {
     protected List<Producto> ProductosEnSistema;
+
+    protected IJSObjectReference Modulo;
 
     protected override async Task OnInitializedAsync()
     {
         ProductosEnSistema = await cliente.GetFromJsonAsync<List<Producto>>("api/Productos/ObtenerListaProductos");
     }
 
-    protected void ActualizarProducto(Producto productoBlock) => navigator.NavigateTo("/Productos/Ver/"+productoBlock.IdProducto);
+    protected void ActualizarProducto(Producto productoBlock) => navigator.NavigateTo("/Productos/Editar/" + productoBlock.IdProducto);
 
-    protected void BorrarProducto(Producto productoBlock)
+    protected async void BorrarProducto(Producto productoBlock)
     {
-        //actualizar visibilidad -1
-        navigator.NavigateTo(""+productoBlock.IdProducto);
+        Modulo = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utilidades.js");
+        try
+        {
+            var result = await cliente.DeleteAsync("api/Productos/BorrarProducto/" + productoBlock.IdProducto);
+            if (result.IsSuccessStatusCode)
+            {
+                await Modulo.InvokeVoidAsync("Exito");
+                ProductosEnSistema = await cliente.GetFromJsonAsync<List<Producto>>("api/Productos/ObtenerListaProductos");
+                StateHasChanged();
+
+            }
+            else
+            {
+                await Modulo.InvokeVoidAsync("Error");
+            }
+        }
+        catch (Exception error)
+        {
+            Console.WriteLine(error.Message);
+            await Modulo.InvokeVoidAsync("Error");
+        }
     }
 
+    protected void NuevoProductoView() => navigator.NavigateTo("/Productos/Crear");
 }

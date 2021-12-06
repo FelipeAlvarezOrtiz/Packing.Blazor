@@ -36,10 +36,10 @@ namespace Packing.Negocio.Pedidos
             {
                 return await _context.Pedidos.Include(x => x.EmpresaMandante)
                     .OrderByDescending(x => x.FechaPedido)
-                    .Include(x => x.ProductosEnPedido)
-                    .ThenInclude(x => x.Estado)
-                    .Include(x => x.ProductosEnPedido)
-                    .ThenInclude(x => x.ProductoInterno)
+                    //.Include(x => x.ProductosEnPedido)
+                    //.ThenInclude(x => x.Estado)
+                    //.Include(x => x.ProductosEnPedido)
+                    //.ThenInclude(x => x.ProductoInterno)
                     .Take(5)
                     .ToListAsync(cancellationToken);
             }

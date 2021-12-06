@@ -45,17 +45,18 @@ namespace Packing.Negocio.Pedidos
                 Observacion = request.Observacion
             };
             var estado = await _context.EstadosPedidos.Where(x => x.IdEstadoPedido == 1).FirstOrDefaultAsync(cancellationToken);
-            foreach (KeyValuePair<int,int> detallePar in request.ProductosEnPedido)
+            foreach (var detallePar in request.ProductosEnPedido)
             {
-                var idProducto = detallePar.Key;
+                var idProducto = detallePar.IdProducto;
                 var productoInterno = await _context.Productos.Where(x => x.IdProducto == idProducto)
                                                                 .Include(x => x.Grupo).Include(x => x.Presentacion)
                                                                 .Include(x => x.Formato).FirstOrDefaultAsync(cancellationToken);
+                
                 var idDetalle = Guid.NewGuid();
                 listaProductosEnPedido.Add(new DetallePedido()
                 {
-                    Cantidad = (uint)detallePar.Value,
-                    CantidadTotales = (uint)(detallePar.Value * productoInterno.Formato.UnidadPorFormato),
+                    Cantidad = (uint)detallePar.Cantidad,
+                    CantidadTotales = (uint)(detallePar.Cantidad * productoInterno.Formato.UnidadPorFormato),
                     Estado = estado,
                     FechaActualizacion = DateTime.Now,
                     ProductoInterno = productoInterno,

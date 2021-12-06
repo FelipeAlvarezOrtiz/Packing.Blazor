@@ -1,0 +1,202 @@
+﻿@page "/Productos/Editar/{IdProducto:int}"
+@using Packing.Shared.Productos
+@inject NavigationManager Navigator
+@inject HttpClient Cliente
+@inject IJSRuntime JsRuntime
+@attribute [Authorize(Roles="Administrador")]
+
+<h3><i class="far fa-edit"></i>&nbsp;Editar producto</h3>
+<hr />
+<div class="container-fluid">
+    @if (ProductoEntrante is null || Formatos is null || Grupos is null || Presentaciones is null)
+    {
+        <MudSkeleton />
+        <MudSkeleton Animation="Animation.False" />
+        <MudSkeleton Animation="Animation.Wave" />
+        <div class="row">
+            <div class="col d-flex justify-content-center">
+                <p>Cargando información, espere por favor ...</p>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-12">
+                <EditForm Model="ProductoRequest" OnValidSubmit="ActualizarProducto">
+                    <DataAnnotationsValidator></DataAnnotationsValidator>
+                    <div class="container-fluid">
+                        <div class="row form-group">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <MudTextField Label="Nombre" Variant="Variant.Outlined" @bind-Value="ProductoRequest.NombreProducto" id="nombreNuevoProducto"/>
+                                    <ValidationMessage For="@(() => ProductoRequest.NombreProducto)"></ValidationMessage>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <MudSelect T="int" @bind-Value="ProductoRequest.IdFormato" Label="Formato" Strict="true" Variant="Variant.Outlined" Format="F2" AnchorOrigin="Origin.BottomCenter">
+                                            @foreach (var formato in Formatos)
+                                            {
+                                                <MudSelectItem T="int" Value="formato.IdFormato">@formato.NombreFormato</MudSelectItem>
+                                            }
+                                        </MudSelect>&nbsp;
+                                        @*<MudFab Class="mt-2" Color="Color.Primary" Size="Size.Medium" Icon="@Icons.Material.Filled.Add" OnClick="AbrirDialogFormato" aria-label="Agregar" />*@
+                                        <ValidationMessage For="@(() => ProductoRequest.IdFormato)"></ValidationMessage>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <MudSelect T="int" @bind-Value="ProductoRequest.IdGrupo" Label="Grupo" Strict="true" Variant="Variant.Outlined" Format="F2" AnchorOrigin="Origin.BottomCenter">
+                                            @foreach (var grupo in Grupos)
+                                            {
+                                                <MudSelectItem T="int" Value="grupo.IdGrupo">@grupo.NombreGrupo</MudSelectItem>
+                                            }
+                                        </MudSelect>&nbsp;
+                                        @*<MudFab Class="mt-2" Color="MudBlazor.Color.Primary" Size="Size.Medium" Icon="@Icons.Material.Filled.Add" OnClick="AbrirDialogGrupo" aria-label="Agregar" />*@
+                                        <ValidationMessage For="@(() => ProductoRequest.IdGrupo)"></ValidationMessage>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-9">
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <MudSelect T="int" @bind-Value="ProductoRequest.IdPresentacion" Label="Presentación" Strict="true" Variant="Variant.Outlined" Format="F2" AnchorOrigin="Origin.BottomCenter">
+                                            @foreach (var presentacion in Presentaciones)
+                                            {
+                                                <MudSelectItem T="int" Value="presentacion.IdPresentacion">@presentacion.NombrePresentacion</MudSelectItem>
+                                            }
+                                        </MudSelect>&nbsp;
+                                        @*<MudFab Class="mt-2" Color="Color.Primary" Size="Size.Medium" Icon="@Icons.Material.Filled.Add" OnClick="AbrirDialogPresentacion" aria-label="Agregar" />*@
+                                        <ValidationMessage For="@(() => ProductoRequest.IdPresentacion)"></ValidationMessage>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <MudCheckBox @bind-Checked="@ProductoRequest.AfectoVencimiento" Size="Size.Large" Color="Color.Tertiary">Afecta a vencimiento</MudCheckBox>
+                            </div>
+                        </div>
+                        <div class="row mb-3" hidden="@(!ProductoRequest.AfectoVencimiento)">
+                            <div class="col-md-6 mt-2">
+                                <MudNumericField Min="0" Variant="Variant.Outlined" Label="Cantidad de días mínimo de vencimiento" Step="1" id="minDiaVencimiento" @bind-Value="ProductoEntrante.MinDiaVencimiento"/>
+                            </div>
+                            <div class="col-md-6 mt-2">
+                                <MudNumericField Min="0" Variant="Variant.Outlined" Label="Cantidad de días máximo de vencimiento" Step="1" id="maxDiaVencimiento" @bind-Value="ProductoEntrante.MaxDiaVencimiento"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-1">
+                        <div class="col-6 text-center">
+                            <MudFab Color="Color.Success" Icon="@Icons.Material.Filled.AddCircleOutline" ButtonType="ButtonType.Submit" Label="Crear"></MudFab>
+                        </div>
+                        <div class="col-6 text-center">
+                            <MudFab Color="Color.Info" Icon="@Icons.Material.Filled.Loop" OnClick="@(() => Navigator.NavigateTo("/Productos/Indice"))" Label="Atrás"></MudFab>
+                        </div>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public int IdProducto { get; set; }
+    protected List<Presentacion> Presentaciones { get; set; }
+    protected List<GrupoProducto> Grupos { get; set; }
+    protected List<Formato> Formatos { get; set; }
+
+    protected Producto ProductoEntrante;
+    protected ActualizarProductoCommand ProductoRequest = new();
+    protected ObtenerProductoQuery QueryRequest = new();
+    protected BorrarProductoCommand BorrarRequest = new();
+
+    protected IJSObjectReference Modulo;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Modulo = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utilidades.js");
+        try
+        {
+            Presentaciones = await Cliente.GetFromJsonAsync<List<Presentacion>>("api/Presentaciones/ObtenerPresentaciones");
+            Grupos = await Cliente.GetFromJsonAsync<List<GrupoProducto>>("api/Grupos/ObtenerGrupos");
+            Formatos = await Cliente.GetFromJsonAsync<List<Formato>>("api/Formatos/ObtenerFormatos");
+            QueryRequest.IdProducto = IdProducto;
+            var result = await Cliente.PostAsJsonAsync("api/Productos/ObtenerProducto", QueryRequest);
+            if(!result.IsSuccessStatusCode)
+                Navigator.NavigateTo("/Productos/Indice");
+            ProductoEntrante = await result.Content.ReadFromJsonAsync<Producto>();
+            if (ProductoEntrante is not null)
+            {
+                ProductoRequest.AfectoVencimiento = ProductoEntrante.AfectoVencimiento;
+                ProductoRequest.IdPresentacion = ProductoEntrante.Presentacion.IdPresentacion;
+                ProductoRequest.IdFormato = ProductoEntrante.Formato.IdFormato;
+                ProductoRequest.IdGrupo = ProductoEntrante.Grupo.IdGrupo;
+                ProductoRequest.NombreProducto = ProductoEntrante.NombreProducto;
+                ProductoRequest.IdProducto = ProductoEntrante.IdProducto;
+                ProductoRequest.DiaMaxVencimiento = ProductoEntrante.MaxDiaVencimiento;
+                ProductoRequest.DiaMinVencimiento = ProductoEntrante.MinDiaVencimiento;
+            }
+            else
+            {
+                Navigator.NavigateTo("/Productos/Indice");
+            }
+        }
+        catch (Exception error)
+        {
+            await Modulo.InvokeVoidAsync("Error");
+            Console.WriteLine(error.Message);
+        }
+    }
+
+    protected async void ActualizarProducto()
+    {
+        Modulo = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utilidades.js");
+        try
+        {
+            var result = await Cliente.PutAsJsonAsync("api/Productos/ActualizarProducto", ProductoRequest);
+            if (result.IsSuccessStatusCode)
+            {
+                await Modulo.InvokeVoidAsync("Exito");
+            }
+            else
+            {
+                await Modulo.InvokeVoidAsync("Error");
+            }
+        }
+        catch (Exception error)
+        {
+            Console.WriteLine(error.Message);
+            await Modulo.InvokeVoidAsync("Error");
+        }
+    }
+
+    protected async void BorrarProducto()
+    {
+        Modulo = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utilidades.js");
+        try
+        {
+            var result = await Cliente.DeleteAsync("api/Productos/BorrarProducto/" + IdProducto);
+            if (result.IsSuccessStatusCode)
+            {
+                await Modulo.InvokeVoidAsync("Exito");
+            }
+            else
+            {
+                await Modulo.InvokeVoidAsync("Error");
+            }
+        }
+        catch (Exception error)
+        {
+            Console.WriteLine(error.Message);
+            await Modulo.InvokeVoidAsync("Error");
+        }
+    }
+
+}
