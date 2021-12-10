@@ -1,4 +1,5 @@
 ﻿@page "/Productos/Grupos"
+@using Packing.Shared.GruposDto
 @inject HttpClient Cliente
 @inject NavigationManager Navigator
 @inject IJSRuntime JsRuntime
@@ -30,30 +31,142 @@ else
                     </tr>
                     </thead>
                     <tbody>
-                        @foreach (var grupo in GruposEnSistema)
-                        {
-                            <tr>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                        }
+                    @foreach (var grupo in GruposEnSistema)
+                    {
+                        <tr class="text-center">
+                            <td>@grupo.NombreGrupo</td>
+                            <td>
+                                <MudTooltip Text="Editar">
+                                    <MudFab Class="mt-2 ml-3" Color="Color.Primary" Size="Size.Medium" Icon="@Icons.Material.Filled.Edit"
+                                            OnClick="() => AbrirModalUpdate(grupo.IdGrupo, grupo.NombreGrupo)">
+                                    </MudFab>
+                                </MudTooltip>
+                            </td>
+                        </tr>
+                    }
                     </tbody>
                 </MudSimpleTable>
             </div>
         </div>
+        <div class="row d-flex align-content-center">
+                <div class="col-12 text-center">
+                    <MudFab IconSize="Size.Medium" Label="Nuevo grupo" OnClick="AbrirDialogNuevoGrupo" Color="Color.Success" Icon="@Icons.Material.Filled.Add"></MudFab>
+                </div>
+        </div>
     </div>
 }
 
+<MudDialog @bind-IsVisible="ModalVisible">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-3" /> Editar grupo
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <EditForm Model="UpdateGrupoRequest" OnValidSubmit="ActualizarGrupo">
+            <DataAnnotationsValidator></DataAnnotationsValidator>
+            <div class="container-fluid">
+                <div class="row form-group">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label class="col-form-label" for="nuevoNombrePresentacion">Nombre</label>
+                            <MudTextField id="nuevoNombrePresentacion" Variant="Variant.Outlined" @bind-Value="UpdateGrupoRequest.NombreGrupo" />
+                            <ValidationMessage For="@(()=>UpdateGrupoRequest.NombreGrupo)"></ValidationMessage>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+        <MudFab Size="Size.Medium" Icon="@Icons.Material.Filled.Cancel" Color="Color.Error" OnClick="CerrarModal"></MudFab>
+        <MudFab Size="Size.Medium" Icon="@Icons.Material.Filled.Save" Color="Color.Default" OnClick="ActualizarGrupo" Label="Guardar"></MudFab>
+    </DialogActions>
+</MudDialog>
+
+<MudDialog @bind-IsVisible="NuevoGrupoVisible">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-3" /> Nueva presentación
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <EditForm Model="NuevoGrupoCommand" OnValidSubmit="CrearGrupo">
+            <DataAnnotationsValidator></DataAnnotationsValidator>
+            <div class="container-fluid">
+                <div class="row form-group">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label class="col-form-label" for="NombrePresentacion">Nombre</label>
+                            <MudTextField id="NombrePresentacion" Variant="Variant.Outlined" @bind-Value="NuevoGrupoCommand.NombreGrupo" />
+                            <ValidationMessage For="@(()=>NuevoGrupoCommand.NombreGrupo)"></ValidationMessage>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+        <MudFab Size="Size.Medium" Icon="@Icons.Material.Filled.Cancel" Label="Cerrar" OnClick="CerrarModalCrear"></MudFab>
+        <MudFab Size="Size.Medium" Icon="@Icons.Material.Filled.Save" Color="Color.Success" OnClick="CrearGrupo" Label="Guardar"></MudFab>
+    </DialogActions>
+</MudDialog>
+
 @code {
     public List<GrupoProducto> GruposEnSistema;
-
+    protected ActualizarGrupoCommand UpdateGrupoRequest = new();
+    protected CrearGrupoCommand NuevoGrupoCommand = new();
+    protected bool ModalVisible = false, NuevoGrupoVisible = false;
+    protected IJSObjectReference Modulo;
+    
     protected override async Task OnInitializedAsync()
     {
         GruposEnSistema = await Cliente.GetFromJsonAsync<List<GrupoProducto>>("");
     }
 
-    protected void EditarGrupo()
+    protected async void ActualizarGrupo()
     {
-
+        Modulo = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utilidades.js");
+        var result = await Cliente.PostAsJsonAsync("api/Presentaciones/ActualizarPresentacion", UpdateGrupoRequest);
+        if (result.IsSuccessStatusCode)
+        {
+            await Modulo.InvokeVoidAsync("Exito");
+            GruposEnSistema = await Cliente.GetFromJsonAsync<List<GrupoProducto>>("api/Presentaciones/ObtenerPresentaciones");
+            ModalVisible = false;
+            StateHasChanged();
+        }
+        else
+        {
+            await Modulo.InvokeVoidAsync("Error");
+        }
     }
+
+    protected async void CrearGrupo()
+    {
+        try
+        {
+            Modulo = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utilidades.js");
+            await Modulo.InvokeVoidAsync("Exito");
+        }
+        catch (Exception error)
+        {
+            Console.WriteLine(error.Message);
+            await Modulo.InvokeVoidAsync("Error");
+        }
+    }
+
+    protected void AbrirModalUpdate(int idGrupo, string NombreGrupo)
+    {
+        UpdateGrupoRequest = new()
+        {
+            NombreGrupo = NombreGrupo,
+            IdGrupo = idGrupo
+        };
+        ModalVisible = true;
+    }
+
+    protected void CerrarModalCrear() => NuevoGrupoVisible = false;
+    protected void AbrirDialogNuevoGrupo() => NuevoGrupoVisible = true;
+    protected void CerrarModal() => ModalVisible = false;
 }
