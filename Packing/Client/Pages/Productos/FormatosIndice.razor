@@ -1,0 +1,202 @@
+﻿@page "/Productos/Formatos"
+@using Packing.Shared.FormatosDto
+@inject HttpClient Cliente
+@inject NavigationManager Navigator
+@inject IJSRuntime JsRuntime
+@attribute [Authorize(Roles = "Administrador")]
+
+<h3><i class="fas fa-box"></i>&nbsp;Formatos</h3>
+<hr />
+@if (FormatosEnSistema is null)
+{
+    <MudSkeleton />
+    <MudSkeleton Animation="Animation.False" />
+    <MudSkeleton Animation="Animation.Wave" />
+    <div class="row">
+        <div class="col d-flex justify-content-center">
+            <p>Cargando formatos, espere por favor ...</p>
+        </div>
+    </div>
+}
+else
+{
+    <div class="container-fluid">
+        <br />
+        <div class="row">
+            <div class="col">
+                <MudSimpleTable Dense="true" Hover="true" Bordered="true" Striped="true" Style="overflow-x: auto;">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th class="text-center">Nombre formato</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var formato in FormatosEnSistema)
+                        {
+                            <tr>
+                                <td class="text-center">@formato.NombreFormato</td>
+                                <td class="text-center">
+                                    <MudTooltip Text="Editar">
+                                        <MudFab Class="mt-2 ml-3" Color="Color.Primary" Size="Size.Medium" Icon="@Icons.Material.Filled.Edit"
+                                                OnClick="(() => AbrirModalUpdate(formato.IdFormato, formato.NombreFormato,formato.UnidadPorFormato))">
+                                        </MudFab>
+                                    </MudTooltip>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </MudSimpleTable>
+            </div>
+        </div>
+        <br />
+        <hr />
+        <br />
+        <div class="row d-flex align-content-center">
+            <div class="col-12 text-center">
+                <MudFab IconSize="Size.Medium" Label="Nuevo grupo" OnClick="AbrirDialogNuevoFormato" Color="Color.Success" Icon="@Icons.Material.Filled.Add"></MudFab>
+            </div>
+        </div>
+    </div>
+}
+
+<MudDialog @bind-IsVisible="ModalEditarVisible">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-3" /> Editar formato
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <EditForm Model="UpdateFormatoRequest" OnValidSubmit="ActualizarFormato">
+            <DataAnnotationsValidator></DataAnnotationsValidator>
+            <div class="container-fluid">
+                <div class="row form-group">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label class="col-form-label" for="nuevoNombrePresentacion">Nombre</label>
+                            <MudTextField id="nuevoNombrePresentacion" Variant="Variant.Outlined" @bind-Value="UpdateFormatoRequest.NombreFormato" />
+                            <ValidationMessage For="@(()=>UpdateFormatoRequest.NombreFormato)"></ValidationMessage>
+                        </div>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label class="col-form-label" for="nuevoNombrePresentacion">Unidades por formato</label>
+                            <MudTextField id="nuevoNombrePresentacion" Variant="Variant.Outlined" @bind-Value="UpdateFormatoRequest.CantidadPorFormato" />
+                            <ValidationMessage For="@(()=>UpdateFormatoRequest.CantidadPorFormato)"></ValidationMessage>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+        <MudFab Size="Size.Medium" Icon="@Icons.Material.Filled.Cancel" Color="Color.Error" OnClick="CerrarModal"></MudFab>
+        <MudFab Size="Size.Medium" Icon="@Icons.Material.Filled.Save" Color="Color.Default" OnClick="ActualizarFormato" Label="Guardar"></MudFab>
+    </DialogActions>
+</MudDialog>
+
+<MudDialog @bind-IsVisible="NuevoFormatoVisible">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-3" /> Nuevo formato
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <EditForm Model="NuevoFormatoCommand" OnValidSubmit="CrearFormato">
+            <DataAnnotationsValidator></DataAnnotationsValidator>
+            <div class="container-fluid">
+                <div class="row form-group">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label class="col-form-label" for="NombrePresentacion">Nombre</label>
+                            <MudTextField id="NombrePresentacion" Variant="Variant.Outlined" @bind-Value="NuevoFormatoCommand.NombreFormato" />
+                            <ValidationMessage For="@(()=>NuevoFormatoCommand.NombreFormato)"></ValidationMessage>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label class="col-form-label" for="NombrePresentacion">Unidades por formato</label>
+                            <MudTextField id="NombrePresentacion" Variant="Variant.Outlined" @bind-Value="NuevoFormatoCommand.CantidadPorFormato" />
+                            <ValidationMessage For="@(()=>NuevoFormatoCommand.CantidadPorFormato)"></ValidationMessage>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+        <MudFab Size="Size.Medium" Icon="@Icons.Material.Filled.Cancel" Label="Cerrar" OnClick="CerrarModalCrear"></MudFab>
+        <MudFab Size="Size.Medium" Icon="@Icons.Material.Filled.Save" Color="Color.Success" OnClick="CrearFormato" Label="Guardar"></MudFab>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    public List<Formato> FormatosEnSistema;
+    public ActualizarFormatoCommand UpdateFormatoRequest = new();
+    public CrearFormatoCommand NuevoFormatoCommand = new();
+    protected bool ModalEditarVisible = false, NuevoFormatoVisible = false;
+    protected IJSObjectReference Modulo;
+
+    protected override async Task OnInitializedAsync()
+    {
+        FormatosEnSistema = await Cliente.GetFromJsonAsync<List<Formato>>("api/Formatos/ObtenerFormatos");
+    }
+
+    protected async void ActualizarFormato()
+    {
+        Modulo = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utilidades.js");
+        var result = await Cliente.PostAsJsonAsync("api/Formatos/ActualizarFormato", UpdateFormatoRequest);
+        if (result.IsSuccessStatusCode)
+        {
+            await Modulo.InvokeVoidAsync("Exito");
+            FormatosEnSistema = await Cliente.GetFromJsonAsync<List<Formato>>("api/Formatos/ObtenerFormatos");
+            ModalEditarVisible = false;
+            StateHasChanged();
+        }
+        else
+        {
+            await Modulo.InvokeVoidAsync("Error");
+        }
+    }
+
+    protected async void CrearFormato()
+    {
+        try
+        {
+            Modulo = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utilidades.js");
+            var result = await Cliente.PostAsJsonAsync("api/", NuevoFormatoCommand);
+            if (result.IsSuccessStatusCode)
+            {
+                await Modulo.InvokeVoidAsync("Exito");
+                NuevoFormatoCommand = new CrearFormatoCommand();
+            }
+            else
+            {
+                await Modulo.InvokeVoidAsync("Error");
+            }
+        }
+        catch (Exception error)
+        {
+            Console.WriteLine(error.Message);
+            await Modulo.InvokeVoidAsync("Error");
+        }
+    }
+
+    protected void AbrirModalUpdate(int idFormato, string nombreFormato, int cantidadFormato)
+    {
+        UpdateFormatoRequest = new()
+        {
+            NombreFormato = nombreFormato,
+            CantidadPorFormato = cantidadFormato,
+            IdFormato = idFormato
+        };
+        ModalEditarVisible = true;
+    }
+
+    protected void CerrarModalCrear() => NuevoFormatoVisible = false;
+    protected void AbrirDialogNuevoFormato() => NuevoFormatoVisible = true;
+    protected void CerrarModal() => ModalEditarVisible = false;
+}

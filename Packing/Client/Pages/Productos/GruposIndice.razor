@@ -20,22 +20,24 @@
 }
 else
 {
+    <br />
     <div class="container-fluid">
+        <br />
         <div class="row">
             <div class="col">
                 <MudSimpleTable Dense="true" Hover="true" Bordered="true" Striped="true" Style="overflow-x: auto;">
-                    <thead>
-                    <tr class="text-center">
-                        <th>Nombre grupo</th>
-                        <th>Acciones</th>
+                    <thead class="thead-dark">
+                    <tr>
+                        <th class="text-center">Nombre grupo</th>
+                        <th class="text-center">Acciones</th>
                     </tr>
                     </thead>
                     <tbody>
                     @foreach (var grupo in GruposEnSistema)
                     {
-                        <tr class="text-center">
-                            <td>@grupo.NombreGrupo</td>
-                            <td>
+                        <tr>
+                            <td class="text-center">@grupo.NombreGrupo</td>
+                            <td class="text-center">
                                 <MudTooltip Text="Editar">
                                     <MudFab Class="mt-2 ml-3" Color="Color.Primary" Size="Size.Medium" Icon="@Icons.Material.Filled.Edit"
                                             OnClick="() => AbrirModalUpdate(grupo.IdGrupo, grupo.NombreGrupo)">
@@ -48,10 +50,13 @@ else
                 </MudSimpleTable>
             </div>
         </div>
+        <br />
+        <hr />
+        <br />
         <div class="row d-flex align-content-center">
-                <div class="col-12 text-center">
-                    <MudFab IconSize="Size.Medium" Label="Nuevo grupo" OnClick="AbrirDialogNuevoGrupo" Color="Color.Success" Icon="@Icons.Material.Filled.Add"></MudFab>
-                </div>
+            <div class="col-12 text-center">
+                <MudFab IconSize="Size.Medium" Label="Nuevo grupo" OnClick="AbrirDialogNuevoGrupo" Color="Color.Success" Icon="@Icons.Material.Filled.Add"></MudFab>
+            </div>
         </div>
     </div>
 }
@@ -88,7 +93,7 @@ else
 <MudDialog @bind-IsVisible="NuevoGrupoVisible">
     <TitleContent>
         <MudText Typo="Typo.h6">
-            <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-3" /> Nueva presentación
+            <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-3" /> Nuevo grupo
         </MudText>
     </TitleContent>
     <DialogContent>
@@ -122,17 +127,17 @@ else
     
     protected override async Task OnInitializedAsync()
     {
-        GruposEnSistema = await Cliente.GetFromJsonAsync<List<GrupoProducto>>("");
+        GruposEnSistema = await Cliente.GetFromJsonAsync<List<GrupoProducto>>("api/Grupos/ObtenerGrupos");
     }
 
     protected async void ActualizarGrupo()
     {
         Modulo = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utilidades.js");
-        var result = await Cliente.PostAsJsonAsync("api/Presentaciones/ActualizarPresentacion", UpdateGrupoRequest);
+        var result = await Cliente.PostAsJsonAsync("api/Grupos/ActualizarGrupo", UpdateGrupoRequest);
         if (result.IsSuccessStatusCode)
         {
             await Modulo.InvokeVoidAsync("Exito");
-            GruposEnSistema = await Cliente.GetFromJsonAsync<List<GrupoProducto>>("api/Presentaciones/ObtenerPresentaciones");
+            GruposEnSistema = await Cliente.GetFromJsonAsync<List<GrupoProducto>>("api/Grupos/ObtenerGrupos");
             ModalVisible = false;
             StateHasChanged();
         }

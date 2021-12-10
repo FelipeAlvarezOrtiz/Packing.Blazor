@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Packing.Core.Productos;
 using Packing.Negocio.Formatos;
 using Packing.Shared.FormatosDto;
+using Packing.Shared.GruposDto;
 
 namespace Packing.Server.Controllers.Formatos
 {
@@ -43,6 +44,12 @@ namespace Packing.Server.Controllers.Formatos
             {
                 return BadRequest(error.Message);
             }
+        }
+
+        [HttpPost("ActualizarFormato")]
+        public async Task<ActionResult<Unit>> ActualizarFormato(ActualizarGrupoCommand request)
+        {
+            return await Mediator.Send(request);
         }
     }
 }

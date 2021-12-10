@@ -32,5 +32,11 @@ namespace Packing.Server.Controllers.Grupos
                 return BadRequest(error.Message);
             }
         }
+
+        [HttpPost("ActualizarGrupo")]
+        public async Task<ActionResult<Unit>> ActualizarGrupo(ActualizarGrupoCommand request)
+        {
+            return await Mediator.Send(request);
+        }
     }
 }

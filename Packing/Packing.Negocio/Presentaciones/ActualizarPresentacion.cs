@@ -25,7 +25,7 @@ namespace Packing.Negocio.Presentaciones
             _context.Presentaciones.Update(presentacion);
             return await _context.SaveChangesAsync(cancellationToken) > 0 
                 ? Unit.Value 
-                : throw new Exception("Ha ocurrido un error al guardar la información");
+                : throw new Exception("Ha ocurrido un error al guardar la información.");
         }
     }
 }
