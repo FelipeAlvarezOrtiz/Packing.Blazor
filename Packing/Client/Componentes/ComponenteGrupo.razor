@@ -93,7 +93,10 @@ else
                     <div class="col-md-12 col-lg-12 mt-3">
                         <div class="row">
                             <div class="col-6 text-center">
-                                <MudFab Color="Color.Success" Icon="@Icons.Material.Filled.AddCircleOutline" OnClick="@AgregarProducto" Label="Agregar"></MudFab>
+                                @if (CantidadProducto > 0 && PresentacionIngresada > 0 && FormatoIngresado > 0)
+                                {
+                                    <MudFab Color="Color.Success" Icon="@Icons.Material.Filled.AddCircleOutline" OnClick="@AgregarProducto" Label="Agregar"></MudFab>
+                                }
                             </div>
                             <div class="col-6 text-center">
                                 <MudFab Color="Color.Info" Icon="@Icons.Material.Filled.Loop" OnClick="@LimpiarSelecciones" Label="Limpiar"></MudFab>

@@ -44,5 +44,11 @@ namespace Packing.Server.Controllers.Presentaciones
                 return BadRequest(error.Message);
             }
         }
+
+        [HttpPost("ActualizarPresentacion")]
+        public async Task<ActionResult<Unit>> ActualizarPresentacion(ActualizarPresentacionCommand request)
+        {
+            return await Mediator.Send(request);
+        }
     }
 }

@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Text.Json.Serialization;
 using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
@@ -56,7 +57,10 @@ namespace Packing.Server
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("role");
             services.AddAuthentication().AddIdentityServerJwt();
             services.AddMediatR(typeof(ListaProductos.Handler));
-            services.AddControllersWithViews();
+            services.AddControllersWithViews().AddJsonOptions(x =>
+            {
+                x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+            });
             services.AddRazorPages();
         }
         

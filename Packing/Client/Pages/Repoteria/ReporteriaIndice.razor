@@ -1,0 +1,164 @@
+﻿@inject HttpClient Cliente
+@inject IJSRuntime JsRuntime
+@inject NavigationManager Navigator
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@attribute [Authorize(Roles = "Administrador")]
+@page "/Reporteria/Indice"
+@using Packing.Shared.ReportesDto
+@using Packing.Shared.Pedidos
+
+<h3><i class="far fa-file-pdf"></i>&nbsp;Reporteria</h3>
+<hr />
+@if (EmpresasEnSistema is null)
+{
+    <MudSkeleton/>
+    <MudSkeleton Animation="Animation.False"/>
+    <MudSkeleton Animation="Animation.Wave"/>
+    <div class="row">
+        <div class="col d-flex justify-content-center">
+            <p>Cargando información, espere por favor ...</p>
+        </div>
+    </div>
+}
+else
+{
+    <div class="row">
+        <div class="col-sm-12 col-md-6">
+            <MudDatePicker Label="Fecha desde" @bind-Date="FechaDesde" MaxDate="FechaHasta"></MudDatePicker>
+        </div>
+        <div class="col-sm-12 col-md-6">
+            <MudDatePicker Label="Fecha hasta" @bind-Date="FechaHasta" MinDate="FechaDesde"></MudDatePicker>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-sm-12 col-md-12">
+            <div class="form-group">
+                <div class="input-group">
+                    <MudSelect T="int" Label="Empresas" @bind-Value="IdEmpresaSeleccionada" Placeholder="Selecciona una empresa"
+                               AdornmentIcon="@Icons.Material.Filled.BusinessCenter" AdornmentColor="Color.Primary">
+                        <MudSelectItem T="int" Value="0">Todas las empresas</MudSelectItem>
+                        @foreach (var empresa in EmpresasEnSistema)
+                        {
+                            <MudSelectItem T="int" Value="empresa.IdEmpresa">@empresa.NombreEmpresa</MudSelectItem>
+                        }
+                    </MudSelect>&nbsp;
+                    <MudTooltip Text="Buscar">
+                        <MudFab Color="Color.Primary" Icon="@Icons.Material.Filled.Search" OnClick="BuscarPedidos"/>
+                    </MudTooltip>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br />
+    <MudDivider></MudDivider>
+    <br />
+    <h4>&nbsp; Pedidos encontrados</h4>
+    <hr/>
+    <div class="row">
+        @if (PedidosEncontrados is null)
+        {
+            <div class="col-12">
+                <MudAlert Severity="Severity.Normal" Elevation="3" ContentAlignment="HorizontalAlignment.Center">Presione buscar para ver resultados.</MudAlert>
+            </div>
+        }
+        else if (PedidosEncontrados.Count == 0)
+        {
+            <div class="col-12">
+                <MudAlert Severity="Severity.Info" Elevation="3" ContentAlignment="HorizontalAlignment.Center">No existe información para los criterios seleccionados.</MudAlert>
+            </div>
+        }
+        else
+        {
+            <div class="col-12">
+                <h6><i class="fas fa-file-export"></i>&nbsp;Reportes</h6>
+                <div class="row text-center d-flex align-content-center justify-content-center">
+                    <div class="col-sm-12 col-md-6 mt-2">
+                        <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.PictureAsPdf" Color="Color.Primary">Exportar a Jefe de packing</MudButton>
+                    </div>
+                    <div class="col-sm-12 col-md-6 mt-2">
+                        <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.PictureAsPdf" Color="Color.Primary">Exportar a cosecheros</MudButton>
+                    </div>
+                </div>
+            </div>
+            <br />
+            <hr />
+            <div class="col-12">
+                <MudSimpleTable Dense="true" Hover="true" Bordered="true" Striped="true" Style="overflow-x: auto;">
+                    <thead>
+                    <tr>
+                        <th>Empresa</th>
+                        <th>Fecha</th>
+                        <th>Detalles</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var pedido in PedidosEncontrados)
+                        {
+                            <tr>
+                                <td>@pedido.EmpresaMandante.NombreEmpresa</td>
+                                <td>@pedido.FechaPedido</td>
+                                <td>
+                                    <MudTooltip Text="Ver">
+                                        <MudFab Class="mt-2 ml-3" Color="Color.Primary" Size="Size.Medium" Icon="@Icons.Material.Filled.NavigateNext" OnClick="() => DetallePedido(pedido.GuidPedido)" />
+                                    </MudTooltip>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </MudSimpleTable>
+               
+            </div>
+        }
+    </div>
+}
+
+
+@code {
+    public List<Empresa> EmpresasEnSistema;
+    public List<Pedido> PedidosEncontrados;
+    public DateTime? FechaDesde = DateTime.Today.AddDays(-1);
+    public DateTime? FechaHasta = DateTime.Today;
+    protected IJSObjectReference Modulo;
+    protected string IdUsuarioLoggeado = string.Empty;
+    protected ReporteCosecheroQuery RequestCosechero = new();
+    protected ReporteJefePackingQuery RequestJefePacking = new();
+    protected int IdEmpresaSeleccionada = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        EmpresasEnSistema = await Cliente.GetFromJsonAsync<List<Empresa>>("api/Empresas/ObtenerEmpresas");
+        StateHasChanged();
+    }
+
+    protected async void BuscarPedidos()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity != null) IdUsuarioLoggeado = authState.User.Identity.Name;
+
+        var dtoRequest = new BuscarPedidosReporteQuery()
+        {
+            FechaDesde = DateTime.TryParse(FechaDesde.ToString(),out var resultDesde) ? resultDesde : DateTime.Today,
+            FechaHasta = DateTime.TryParse(FechaHasta.ToString(),out var resultHasta) ? resultHasta : DateTime.Today,
+            IdEmpresa = IdEmpresaSeleccionada
+        };
+        var resultRequest = await Cliente.PostAsJsonAsync("api/Pedidos/ObtenerPedidosParaReporte", dtoRequest);
+        if (resultRequest.IsSuccessStatusCode)
+        {
+            try
+            {
+                PedidosEncontrados = await resultRequest.Content.ReadFromJsonAsync<List<Pedido>>();
+            }
+            catch (Exception)
+            {
+                PedidosEncontrados = new List<Pedido>();
+            }
+        }
+        StateHasChanged();
+    }
+
+    protected void DetallePedido(Guid urlDetalle)
+    {
+        Navigator.NavigateTo("/Pedidos/Ver/" + urlDetalle);
+    }
+}

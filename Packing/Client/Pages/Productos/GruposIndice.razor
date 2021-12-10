@@ -1,0 +1,59 @@
+﻿@page "/Productos/Grupos"
+@inject HttpClient Cliente
+@inject NavigationManager Navigator
+@inject IJSRuntime JsRuntime
+@attribute [Authorize(Roles = "Administrador")]
+
+<h3><i class="fas fa-layer-group"></i>&nbsp;Grupos en sistema.</h3>
+<hr />
+@if (GruposEnSistema is null)
+{
+    <MudSkeleton />
+    <MudSkeleton Animation="Animation.False" />
+    <MudSkeleton Animation="Animation.Wave" />
+    <div class="row">
+        <div class="col d-flex justify-content-center">
+            <p>Cargando grupos, espere por favor ...</p>
+        </div>
+    </div>
+}
+else
+{
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col">
+                <MudSimpleTable Dense="true" Hover="true" Bordered="true" Striped="true" Style="overflow-x: auto;">
+                    <thead>
+                    <tr class="text-center">
+                        <th>Nombre grupo</th>
+                        <th>Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var grupo in GruposEnSistema)
+                        {
+                            <tr>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        }
+                    </tbody>
+                </MudSimpleTable>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    public List<GrupoProducto> GruposEnSistema;
+
+    protected override async Task OnInitializedAsync()
+    {
+        GruposEnSistema = await Cliente.GetFromJsonAsync<List<GrupoProducto>>("");
+    }
+
+    protected void EditarGrupo()
+    {
+
+    }
+}

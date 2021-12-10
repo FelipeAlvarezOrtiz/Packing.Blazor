@@ -15,7 +15,7 @@
 {
     Navigator.NavigateTo("/Pedidos");
 }
-else if (ListaDetalles is null)
+else if (ListaDetalles is null && PedidoInterno is null)
 {
     <MudSkeleton />
     <MudSkeleton Animation="Animation.False" />
@@ -28,6 +28,26 @@ else if (ListaDetalles is null)
 }
 else
 {
+<div class="row">
+    <div class="col-sm-12 col-md-4 col-lg-4">
+        <MudTextField @bind-Value="PedidoInterno.EmpresaMandante.NombreEmpresa" ReadOnly="true" Label="Empresa"></MudTextField>
+    </div>
+    <div class="col-sm-12 col-md-4 col-lg-4">
+        <MudTextField @bind-Value="PedidoInterno.FechaPedido" ReadOnly="true" Class="col-sm-12 col-md-4" Label="Fecha del pedido"></MudTextField>
+    </div>
+    <div class="col-sm-12 col-md-4 col-lg-4">
+        <MudTextField @bind-Value="PedidoInterno.FechaUltimaActualizacion" ReadOnly="true" Class="col-sm-12 col-md-4" Label="Última actualización"></MudTextField>
+    </div>
+    <div class="col-sm-12 col-md-6 col-lg-6">
+        <MudTextField @bind-Value="PedidoInterno.EmpresaMandante.PersonaContacto" ReadOnly="true" Class="col-sm-12 col-md-4" Label="Persona contacto"></MudTextField>
+    </div>
+    <div class="col-sm-12 col-md-6 col-lg-6">
+        <MudTextField @bind-Value="PedidoInterno.EmpresaMandante.Direccion" ReadOnly="true" Class="col-sm-12 col-md-4" Label="Dirección"></MudTextField>
+    </div>
+</div>
+    <hr />
+    <h5><i class="fas fa-boxes"></i>&nbsp;Productos en el pedido</h5>
+    <br />
     <div class="row">
         @foreach (var detalle in ListaDetalles)
         {
@@ -42,7 +62,7 @@ else
 
 @code {
     [Parameter] public string IdPedido { get; set; }
-    protected Pedido PedidoInterno { get; set; }
+    protected Pedido PedidoInterno;
     protected Dictionary<int,DetallePedido> ProductosEnPedido { get; set; }
     protected List<DetallePedido> ListaDetalles;
     protected ObtenerDetallesDelPedidoDto requestDetalles;
@@ -51,10 +71,16 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        var pedidoInternoId = Guid.Parse(IdPedido);
         requestDetalles = new ObtenerDetallesDelPedidoDto()
         {
-            PedidoCabecera = Guid.Parse(IdPedido)
+            PedidoCabecera = pedidoInternoId
         };
+        var resultPedido = await Cliente.PostAsJsonAsync("api/Pedidos/ObtenerInfoPedido", new ObtenerInfoPedidoDto(){ GuidPedido = pedidoInternoId});
+        if (resultPedido.IsSuccessStatusCode)
+        {
+            PedidoInterno = await resultPedido.Content.ReadFromJsonAsync<Pedido>();
+        }
         Estados = await Cliente.GetFromJsonAsync<List<EstadoPedido>>("api/Pedidos/ObtenerEstados");
         var result = await Cliente.PostAsJsonAsync("api/Pedidos/ObtenerDetalles", requestDetalles);
         if (result.IsSuccessStatusCode)
@@ -109,6 +135,7 @@ else
         if (result.IsSuccessStatusCode)
         {
             await Modulo.InvokeVoidAsync("Exito");
+            BuscarDetalles();
             StateHasChanged();
         }
     }

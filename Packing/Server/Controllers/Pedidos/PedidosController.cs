@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Packing.Core.Pedidos;
 using Packing.Negocio.Pedidos.ObtenerEstados;
 using Packing.Shared.Pedidos;
+using Packing.Shared.ReportesDto;
 
 namespace Packing.Server.Controllers.Pedidos
 {
@@ -45,6 +46,18 @@ namespace Packing.Server.Controllers.Pedidos
 
         [HttpPost("EliminarDetalle")]
         public async Task<ActionResult<Unit>> EliminarDetalle(BorrarDetallePedidoDto request)
+        {
+            return await Mediator.Send(request);
+        }
+
+        [HttpPost("ObtenerInfoPedido")]
+        public async Task<ActionResult<Pedido>> ObtenerInfoPedido(ObtenerInfoPedidoDto requestPedido)
+        {
+            return await Mediator.Send(requestPedido);
+        }
+
+        [HttpPost("ObtenerPedidosParaReporte")]
+        public async Task<ActionResult<List<Pedido>>> ObtenerPedidosParaReporte(BuscarPedidosReporteQuery request)
         {
             return await Mediator.Send(request);
         }

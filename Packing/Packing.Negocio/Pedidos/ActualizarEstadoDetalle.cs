@@ -23,6 +23,7 @@ namespace Packing.Negocio.Pedidos
             var detalle = await _context.DetallePedidos
                 .Where(detalle => detalle.PedidoCabecera.GuidPedido.Equals(request.IdPedido) && detalle.IdDetalle.Equals(request.IdDetalle))
                 .Include(x => x.Estado)
+                .Include(x => x.PedidoCabecera)
                 .FirstOrDefaultAsync(cancellationToken);
             if (detalle is null) throw new Exception("El detalle no existe");
             var nuevoEstado = await _context.EstadosPedidos.Where(x => x.IdEstadoPedido == request.NuevoEstado)
@@ -31,6 +32,10 @@ namespace Packing.Negocio.Pedidos
             detalle.Estado = nuevoEstado;
             detalle.FechaActualizacion = DateTime.Now;
             _context.DetallePedidos.Update(detalle);
+            var cabecera = await _context.Pedidos.Where(x => x.GuidPedido.Equals(detalle.PedidoCabecera.GuidPedido))
+                .FirstOrDefaultAsync(cancellationToken);
+            cabecera.FechaUltimaActualizacion = DateTime.Now;
+            _context.Pedidos.Update(cabecera);
             return await _context.SaveChangesAsync(cancellationToken) > 0 
                 ? Unit.Value 
                 : throw new Exception("Ha ocurrido un problema al actualizar el detalle.");

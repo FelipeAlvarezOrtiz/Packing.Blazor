@@ -5,7 +5,7 @@
         <div class="row">
             <div class="col-md-12">
                 <p>Producto: <b>&nbsp;@Detalle.ProductoInterno.NombreParaBusqueda</b>.</p>
-                <p>Formato: <b>&nbsp;@Detalle.ProductoInterno.Formato.IdFormato</b>.</p>
+                <p>Formato: <b>&nbsp;@Detalle.ProductoInterno.Formato.NombreFormato</b>.</p>
                 <p>Grupos: <b>&nbsp;@Detalle.ProductoInterno.Grupo.NombreGrupo</b>.</p>
                 <p>Presentación: <b>&nbsp;@Detalle.ProductoInterno.Presentacion.NombrePresentacion</b>.</p>
             </div>
@@ -19,6 +19,7 @@
                         }
                         else
                         {
+                            if (Detalle.Estado.IdEstadoPedido > estado.IdEstadoPedido) continue;
                             <option value="@estado.IdEstadoPedido">@estado.NombreEstado</option>
                         }
                     }
@@ -28,15 +29,25 @@
         <MudDivider></MudDivider>
     </MudCardContent>
     <MudCardActions>
-        <div class="row">
-            <div class="col-sm-12 col-md-6 mt-2">
-                <MudFab Label="Eliminar" Icon="@Icons.Outlined.Delete" Size="Size.Medium" Color="Color.Error"
-                        OnClick="(async () => await BorrarDetalle.InvokeAsync(Detalle.IdDetalle))"></MudFab>
-            </div>
-            <div class="col-sm-12 col-md-6 mt-2">
-                <MudFab Label="Actualizar" Icon="@Icons.Outlined.Update" Size="Size.Medium" Color="Color.Info"
-                        OnClick="(async () => await ActualizarEstado.InvokeAsync(Tuple.Create(CabeceraId, Detalle.IdDetalle, IdEstadoSeleccionado)))"></MudFab>
-            </div>
+        <div class="row text-center d-flex align-content-center">
+            @if (!Detalle.Estado.NombreEstado.Equals("Completado"))
+            {
+                <div class="col-sm-12 col-md-6 mt-2">
+                    @if (Detalle.Estado.IdEstadoPedido == 1)
+                    {
+                        <MudFab Label="Eliminar" Icon="@Icons.Outlined.Delete" Size="Size.Medium" Color="Color.Error"
+                                OnClick="(async () => await BorrarDetalle.InvokeAsync(Detalle.IdDetalle))"></MudFab>
+                    }
+                </div>
+                <div class="col-sm-12 col-md-6 mt-2">
+                    <MudFab Label="Actualizar" Icon="@Icons.Outlined.Update" Size="Size.Medium" Color="Color.Info"
+                            OnClick="(async () => await ActualizarEstado.InvokeAsync(Tuple.Create(CabeceraId, Detalle.IdDetalle, IdEstadoSeleccionado)))"></MudFab>
+                </div>
+            }
+            else
+            {
+                <MudAlert Severity="Severity.Success">Este producto ya se ha procesado completamente.</MudAlert>
+            }
         </div>
         
     </MudCardActions>
