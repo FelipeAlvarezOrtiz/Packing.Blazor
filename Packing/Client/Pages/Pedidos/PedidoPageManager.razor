@@ -137,7 +137,20 @@
             </div>
             <hr />
             <br />
-            <MudFab OnClick="IngresarPedido" Label="Enviar Pedido"></MudFab>
+            <div class="row d-flex align-content-center">
+                @if (CarroPedido.Count > 0)
+                {
+                    <div class="col-12 text-center">
+                        <MudFab OnClick="IngresarPedido" Label="Enviar Pedido" Color="Color.Success"></MudFab>
+                    </div>
+                }
+                else
+                {
+                    <div class="col text-center">
+                        <div class="alert alert-info"><h4><i class="fas fa-info-circle"></i>&nbsp;No puede ingresar pedidos vacios.</h4></div>
+                    </div>
+                }
+            </div>
         </MudTabPanel>
     </MudTabs>
 </div>
@@ -231,7 +244,7 @@
         {
             Cantidad = key.Value.Cantidad, IdProducto = key.Key
         }).ToList();
-
+        Modulo = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utilidades.js");
         PedidoRequest = new PedidoRequestDto()
         {
             NombreUsuario = emailUsuario,
@@ -244,17 +257,20 @@
             if (result.IsSuccessStatusCode)
             {
                 //todo correcto
+                await Modulo.InvokeVoidAsync("Exito");
                 CarroPedido.Clear();
                 StateHasChanged();
                 Navigator.NavigateTo("/");
             }
             else
             {
+                await Modulo.InvokeVoidAsync("Error");
                 Console.WriteLine("Error");
             }
         }
         catch (Exception error)
         {
+            await Modulo.InvokeVoidAsync("Error");
             Console.WriteLine(error.Message);
         }
     }

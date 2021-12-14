@@ -4,7 +4,16 @@
 @inject NavigationManager Navigator
 @inject IJSRuntime JsRuntime
 @attribute [Authorize(Roles = "Administrador")]
-
+<div class="row">
+    <div class="col-6">
+        <MudTooltip Text="Atrás">
+            <MudFab Icon="@Icons.Outlined.ArrowBack" Size="Size.Small" OnClick="@(() => Navigator.NavigateTo("/Productos/Indice"))"></MudFab>
+        </MudTooltip>
+    </div>
+    <div class="col-6 text-center">
+    </div>
+</div>
+<br />
 <h3><i class="fas fa-box"></i>&nbsp;Formatos</h3>
 <hr />
 @if (FormatosEnSistema is null)

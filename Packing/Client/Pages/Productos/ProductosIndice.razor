@@ -45,8 +45,17 @@
         </div>
         <hr />
         <div class="row d-flex align-content-center">
-            <div class="col-sm-12 col-md-4 text-center">
+            <div class="col-sm-12 col-md-3 mt-2 text-center">
                 <MudFab Color="Color.Success" Icon="@Icons.Material.Filled.AddCircleOutline" ButtonType="ButtonType.Button" OnClick="NuevoProductoView" Label="Nuevo producto"></MudFab>
+            </div>
+            <div class="col-sm-12 col-md-3 mt-2 text-center">
+                <MudFab Color="Color.Success" Icon="@Icons.Material.Filled.AddCircleOutline" ButtonType="ButtonType.Button" OnClick="NuevoPresentacionView" Label="Nuevo presentación"></MudFab>
+            </div>
+            <div class="col-sm-12 col-md-3 mt-2 text-center">
+                <MudFab Color="Color.Success" Icon="@Icons.Material.Filled.AddCircleOutline" ButtonType="ButtonType.Button" OnClick="NuevoFormatoView" Label="Nuevo formato"></MudFab>
+            </div>
+            <div class="col-sm-12 col-md-3 mt-2 text-center">
+                <MudFab Color="Color.Success" Icon="@Icons.Material.Filled.AddCircleOutline" ButtonType="ButtonType.Button" OnClick="NuevoGrupoView" Label="Nuevo grupo"></MudFab>
             </div>
         </div>
     }
@@ -55,6 +64,7 @@
 <br/>
 
 @code {
+    
     protected List<Producto> ProductosEnSistema;
 
     protected IJSObjectReference Modulo;
@@ -92,4 +102,8 @@
     }
 
     protected void NuevoProductoView() => navigator.NavigateTo("/Productos/Crear");
+    protected void NuevoFormatoView() => navigator.NavigateTo("/Productos/Formatos");
+    protected void NuevoPresentacionView() => navigator.NavigateTo("/Productos/Presentaciones");
+    protected void NuevoGrupoView() => navigator.NavigateTo("/Productos/Grupos");
+
 }

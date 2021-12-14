@@ -4,11 +4,20 @@
 @using Packing.Shared.GruposDto
 @using Packing.Shared.Presentaciones
 @using Packing.Shared.Productos
-
 @inject HttpClient _cliente
+@inject NavigationManager Navigator
 @inject IJSRuntime JsRuntime
 @page "/Productos/Crear"
-
+<div class="row">
+    <div class="col-6">
+        <MudTooltip Text="Atrás">
+            <MudFab Icon="@Icons.Outlined.ArrowBack" Size="Size.Small" OnClick="@(() => Navigator.NavigateTo("/Productos/Indice"))"></MudFab>
+        </MudTooltip>
+    </div>
+    <div class="col-6 text-center">
+    </div>
+</div>
+<br />
 <InputFile id="fileInput" OnChange="UploadFiles" hidden />
 <h3><i class="fas fa-box-open"></i>&nbsp;Nuevo producto</h3>
 <hr />
@@ -17,9 +26,9 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-12">
-                <MudSkeleton/>
-                <MudSkeleton Animation="Animation.False"/>
-                <MudSkeleton Animation="Animation.Wave"/>
+                <MudSkeleton />
+                <MudSkeleton Animation="Animation.False" />
+                <MudSkeleton Animation="Animation.Wave" />
             </div>
         </div>
     </div>
@@ -115,26 +124,26 @@ else
     <DialogContent>
         <EditForm Model="NuevoFormato" OnValidSubmit="GuardarFormato">
             <DataAnnotationsValidator></DataAnnotationsValidator>
-                <div class="container-fluid">
-                    <div class="row form-group">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label class="col-form-label" for="nuevoNombreFormato">Nombre</label>
-                                <MudTextField id="nuevoNombreFormato" Variant="Variant.Outlined" @bind-Value="NuevoFormato.NombreFormato" />
-                                <ValidationMessage For="@(()=>NuevoFormato.NombreFormato)"></ValidationMessage>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row form-group">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label class="col-form-label" style="font-size: small;" for="nuevaUnidadPorFormato">Unidades por formato</label>
-                                <MudNumericField Min="0" Variant="Variant.Outlined" Step="1" id="nuevaUnidadPorFormato" @bind-Value="NuevoFormato.CantidadPorFormato" />
-                                <ValidationMessage For="@(()=>NuevoFormato.CantidadPorFormato)"></ValidationMessage>
-                            </div>
+            <div class="container-fluid">
+                <div class="row form-group">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label class="col-form-label" for="nuevoNombreFormato">Nombre</label>
+                            <MudTextField id="nuevoNombreFormato" Variant="Variant.Outlined" @bind-Value="NuevoFormato.NombreFormato" />
+                            <ValidationMessage For="@(()=>NuevoFormato.NombreFormato)"></ValidationMessage>
                         </div>
                     </div>
                 </div>
+                <div class="row form-group">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label class="col-form-label" style="font-size: small;" for="nuevaUnidadPorFormato">Unidades por formato</label>
+                            <MudNumericField Min="0" Variant="Variant.Outlined" Step="1" id="nuevaUnidadPorFormato" @bind-Value="NuevoFormato.CantidadPorFormato" />
+                            <ValidationMessage For="@(()=>NuevoFormato.CantidadPorFormato)"></ValidationMessage>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </EditForm>
     </DialogContent>
     <DialogActions>
@@ -152,18 +161,18 @@ else
     <DialogContent>
         <EditForm Model="NuevaPresentacion" OnValidSubmit="GuardarPresentacion">
             <DataAnnotationsValidator></DataAnnotationsValidator>
-                <div class="container-fluid">
-                    <div class="row form-group">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label class="col-form-label" for="nuevoNombreFormato">Nombre</label>
-                                <MudTextField id="nuevoNombrePresentacion" Variant="Variant.Outlined" @bind-Value="NuevaPresentacion.NombrePresentacion" />
-                                <ValidationMessage For="@(()=>NuevaPresentacion.NombrePresentacion)"></ValidationMessage>
-                            </div>
+            <div class="container-fluid">
+                <div class="row form-group">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label class="col-form-label" for="nuevoNombreFormato">Nombre</label>
+                            <MudTextField id="nuevoNombrePresentacion" Variant="Variant.Outlined" @bind-Value="NuevaPresentacion.NombrePresentacion" />
+                            <ValidationMessage For="@(()=>NuevaPresentacion.NombrePresentacion)"></ValidationMessage>
                         </div>
                     </div>
                 </div>
-            
+            </div>
+
         </EditForm>
     </DialogContent>
     <DialogActions>
@@ -181,25 +190,25 @@ else
     <DialogContent>
         <EditForm Model="NuevoGrupo" OnValidSubmit="SubirGrupo">
             <DataAnnotationsValidator></DataAnnotationsValidator>
-                <div class="container-fluid">
-                    <div class="row form-group">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label class="col-form-label" for="nuevoNombreFormato">Nombre</label>
-                                <MudTextField id="nuevoNombreGrupo" Variant="Variant.Outlined" @bind-Value="NuevoGrupo.NombreGrupo" />
-                                <ValidationMessage For="@(()=>NuevoGrupo.NombreGrupo)"></ValidationMessage>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row form-group">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <MudFab HtmlTag="label" Color="Color.Secondary" Icon="@Icons.Filled.Image" Label="Subir foto" for="fileInput" />
-                            </div>
+            <div class="container-fluid">
+                <div class="row form-group">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label class="col-form-label" for="nuevoNombreFormato">Nombre</label>
+                            <MudTextField id="nuevoNombreGrupo" Variant="Variant.Outlined" @bind-Value="NuevoGrupo.NombreGrupo" />
+                            <ValidationMessage For="@(()=>NuevoGrupo.NombreGrupo)"></ValidationMessage>
                         </div>
                     </div>
                 </div>
-            
+                <div class="row form-group">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <MudFab HtmlTag="label" Color="Color.Secondary" Icon="@Icons.Filled.Image" Label="Subir foto" for="fileInput" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </EditForm>
     </DialogContent>
     <DialogActions>
@@ -256,7 +265,7 @@ else
     }
 
     protected void LimpiarUi() => NuevoProducto = new();
-    
+
     protected void AbrirDialogFormato() => NuevoFormatoVisible = true;
     protected void AbrirDialogGrupo() => NuevoGrupoVisible = true;
     protected void AbrirDialogPresentacion() => NuevaPresentacionVisible = true;

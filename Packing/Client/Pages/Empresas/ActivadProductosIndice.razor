@@ -1,0 +1,53 @@
+﻿@page "/Empresas/Activador"
+@inject HttpClient Cliente
+@inject NavigationManager Navigator
+@inject IJSRuntime JsRuntime
+@attribute [Authorize(Roles = "Administrador")]
+
+<h3><i class="fab fa-creative-commons-share"></i>&nbsp;Activar productos</h3>
+<hr />
+@if (ProductosEnSistema is null)
+{
+    <MudSkeleton />
+    <MudSkeleton Animation="Animation.False" />
+    <MudSkeleton Animation="Animation.Wave" />
+    <div class="row">
+        <div class="col d-flex justify-content-center">
+            <p>Cargando productos, por favor espere ...</p>
+        </div>
+    </div>
+}
+else
+{
+    <div class="row">
+        @foreach (var producto in ProductosEnSistema)
+        {
+            <div class="col-sm-12 col-md-6 col-lg-4">
+                <ActivadorProductosComponent AgregarProductoEmpresa="AgregarProductoEmpresa" EliminarProductoEmpresa="EliminarProducto" 
+                                             CantidadDisponible="0" Incorporado="false" ProductoBlock="producto"></ActivadorProductosComponent>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    protected List<Producto> ProductosEnSistema;
+    protected IJSObjectReference Modulo;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ProductosEnSistema = await Cliente.GetFromJsonAsync<List<Producto>>("api/Productos/ObtenerListaProductos");
+    }
+
+    protected async void AgregarProductoEmpresa(Tuple<int, int> request)
+    {
+        Modulo = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utilidades.js");
+        await Modulo.InvokeVoidAsync("Exito");
+    }
+
+    protected async void EliminarProducto(int idProducto)
+    {
+        Modulo = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utilidades.js");
+        await Modulo.InvokeVoidAsync("Exito");
+    }
+}

@@ -1,0 +1,56 @@
+﻿@page "/Usuarios/Internos"
+@inject HttpClient Cliente
+@inject NavigationManager Navigator
+@inject IJSRuntime JsRuntime
+@attribute [Authorize(Roles = "Administrador")]
+
+<h3>&nbsp;Usuarios internos</h3>
+<hr />
+@if (UsuariosColones is null)
+{
+    <MudSkeleton />
+    <MudSkeleton Animation="Animation.False" />
+    <MudSkeleton Animation="Animation.Wave" />
+    <div class="row">
+        <div class="col d-flex justify-content-center">
+            <p>Cargando usuarios, espere por favor ...</p>
+        </div>
+    </div>
+}
+else
+{
+    @if (UsuariosColones is null)
+    {
+        <MudSkeleton />
+        <MudSkeleton Animation="Animation.False" />
+        <MudSkeleton Animation="Animation.Wave" />
+        <div class="row">
+            <div class="col d-flex justify-content-center">
+                <p>Cargando usuarios, espere por favor ...</p>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col text-center">
+                <div class="alert alert-info"><h5><i class="fas fa-info-circle"></i>&nbsp;No existen usuarios de colonos en el sistema.</h5></div>
+            </div>
+        </div>
+    }
+    <div class="row d-flex align-content-center">
+        <div class="col-sm-12 col-md-12 text-center">
+            <MudFab Color="Color.Success" Icon="@Icons.Material.Filled.AddCircleOutline" ButtonType="ButtonType.Button" Label="Nuevo usuario"></MudFab>
+        </div>
+    </div>
+}
+
+@code {
+    protected List<string> UsuariosColones;
+
+    protected override async Task OnInitializedAsync()
+    {
+        UsuariosColones = new();
+    }
+
+}

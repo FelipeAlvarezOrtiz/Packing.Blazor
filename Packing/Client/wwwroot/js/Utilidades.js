@@ -7,6 +7,16 @@
     });
 }
 
+export function InformeCorreos() {
+    return Swal.fire({
+        icon: 'success',
+        title: 'Se ha enviado el reporte a su correo.',
+        showConfirmButton: false,
+        timer: 1500
+    });
+}
+
+
 export function Error() {
     return Swal.fire({
         icon: 'error',

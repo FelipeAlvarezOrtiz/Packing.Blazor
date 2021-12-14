@@ -71,43 +71,51 @@ else
         else
         {
             <div class="col-12">
-                <h6><i class="fas fa-file-export"></i>&nbsp;Reportes</h6>
-                <div class="row text-center d-flex align-content-center justify-content-center">
-                    <div class="col-sm-12 col-md-6 mt-2">
-                        <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.PictureAsPdf" Color="Color.Primary">Exportar a Jefe de packing</MudButton>
-                    </div>
-                    <div class="col-sm-12 col-md-6 mt-2">
-                        <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.PictureAsPdf" Color="Color.Primary">Exportar a cosecheros</MudButton>
+                <div class="row">
+                    <div class="col-12">
+                        <h6><i class="fas fa-file-export"></i>&nbsp;Reportes</h6>
+                        <div class="row text-center d-flex align-content-center justify-content-center">
+                            <div class="col-sm-12 col-md-6 mt-2">
+                                <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.PictureAsPdf" Color="Color.Primary">Exportar a Jefe de packing</MudButton>
+                            </div>
+                            <div class="col-sm-12 col-md-6 mt-2">
+                                <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.PictureAsPdf" Color="Color.Primary">Exportar a cosecheros</MudButton>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
             <br />
             <hr />
+            <br />
             <div class="col-12">
-                <MudSimpleTable Dense="true" Hover="true" Bordered="true" Striped="true" Style="overflow-x: auto;">
-                    <thead>
-                    <tr>
-                        <th>Empresa</th>
-                        <th>Fecha</th>
-                        <th>Detalles</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var pedido in PedidosEncontrados)
-                        {
+                <div class="row">
+                    <div class="col-12 mt-2">
+                        <MudSimpleTable Dense="true" Hover="true" Bordered="true" Striped="true" Style="overflow-x: auto;">
+                            <thead>
                             <tr>
-                                <td>@pedido.EmpresaMandante.NombreEmpresa</td>
-                                <td>@pedido.FechaPedido</td>
-                                <td>
-                                    <MudTooltip Text="Ver">
-                                        <MudFab Class="mt-2 ml-3" Color="Color.Primary" Size="Size.Medium" Icon="@Icons.Material.Filled.NavigateNext" OnClick="() => DetallePedido(pedido.GuidPedido)" />
-                                    </MudTooltip>
-                                </td>
+                                <th>Empresa</th>
+                                <th>Fecha</th>
+                                <th>Detalles</th>
                             </tr>
-                        }
-                    </tbody>
-                </MudSimpleTable>
-               
+                            </thead>
+                            <tbody>
+                            @foreach (var pedido in PedidosEncontrados)
+                            {
+                                <tr>
+                                    <td>@pedido.EmpresaMandante.NombreEmpresa</td>
+                                    <td>@pedido.FechaPedido</td>
+                                    <td>
+                                        <MudTooltip Text="Ver">
+                                            <MudFab Class="mt-2 ml-3" Color="Color.Primary" Size="Size.Medium" Icon="@Icons.Material.Filled.NavigateNext" OnClick="() => DetallePedido(pedido.GuidPedido)" />
+                                        </MudTooltip>
+                                    </td>
+                                </tr>
+                            }
+                            </tbody>
+                        </MudSimpleTable>
+                    </div>
+                </div>
             </div>
         }
     </div>

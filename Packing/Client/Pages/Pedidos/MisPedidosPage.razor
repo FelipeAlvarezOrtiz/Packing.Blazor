@@ -1,20 +1,25 @@
-﻿@page "/MisPedidos/{IdEmpresa:int}"
+﻿@page "/Pedidos/MisPedidos"
+@using Packing.Shared.Pedidos
 @inject HttpClient client
 @inject NavigationManager navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @attribute [Authorize]
 
 <h3>Mis Pedidos</h3>
 <hr />
 @if (Pedidos is null)
 {
+    <MudSkeleton />
+    <MudSkeleton Animation="Animation.False" />
+    <MudSkeleton Animation="Animation.Wave" />
     <div class="row">
-        <div class="col-12 text-center">
-            <p>Cargando ...</p>
+        <div class="col d-flex justify-content-center">
+            <p>Aún estamos intentando conectarnos a la base de datos, vuelve más tarde.</p>
         </div>
     </div>
 }
 else if (Pedidos.Count <= 0)
-{ 
+{
     <div class="row">
         <div class="col-12 text-center">
             <p>&nbsp;No tiene pedidos ingresados.</p>
@@ -36,23 +41,38 @@ else
 }
 
 @code {
-    [Parameter] public int IdEmpresa { get; set; }
+    //[Parameter] public int IdEmpresa { get; set; }
 
     protected List<Pedido> Pedidos;
     protected Empresa EmpresaBlock;
+    protected string IdUsuarioLoggeado { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        try
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        if (authState.User.Identity != null) IdUsuarioLoggeado = authState.User.Identity.Name;
+
+        var dtoRequest = new ObtenerPedidosPorEmpresaDto()
         {
-            Pedidos = await client.GetFromJsonAsync<List<Pedido>>("" + IdEmpresa);
-            EmpresaBlock = await client.GetFromJsonAsync<Empresa>("" + IdEmpresa);
-            StateHasChanged();
-        }
-        catch (Exception error)
+            FechaDesde = null,
+            FechaHasta = null,
+            NombreUsuario = IdUsuarioLoggeado
+        };
+        var resultRequest = await client.PostAsJsonAsync("api/Pedidos/ObtenerPedidosDeEmpresa", dtoRequest);
+        if (resultRequest.IsSuccessStatusCode)
         {
-            Console.WriteLine(error.Message);
+            try
+            {
+                Pedidos = await resultRequest.Content.ReadFromJsonAsync<List<Pedido>>();
+                StateHasChanged();
+            }
+            catch (Exception)
+            {
+                Pedidos = new List<Pedido>();
+            }
         }
+        StateHasChanged();
     }
 
     protected void VerPedido(string urlPedido) => navigation.NavigateTo(urlPedido);
