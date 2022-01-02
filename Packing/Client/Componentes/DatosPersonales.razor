@@ -42,8 +42,8 @@ else
 
 
 @code {
-    protected string Observacion { get; set; }
-    public string Direccion { get; set; }
+    [Parameter] public string Observacion { get; set; }
+	public string Direccion { get; set; }
     protected AppUser UsuarioSolicitante;
     protected PedidoRequestDto PedidoRequest;
     protected ObtenerInfoUsuarioDto requestInfoUsuario;
@@ -67,4 +67,5 @@ else
     }
 
     [Parameter] public EventCallback<Tuple<string, string>> GuardarDatos { get; set; }
+
 }

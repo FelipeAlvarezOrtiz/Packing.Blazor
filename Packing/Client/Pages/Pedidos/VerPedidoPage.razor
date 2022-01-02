@@ -62,6 +62,7 @@ else
 
 @code {
     [Parameter] public string IdPedido { get; set; }
+    [Parameter] public string UrlCallBack { get; set; }
     protected Pedido PedidoInterno;
     protected Dictionary<int,DetallePedido> ProductosEnPedido { get; set; }
     protected List<DetallePedido> ListaDetalles;
@@ -125,19 +126,18 @@ else
     {
         //pegarle al cliente para borrar la wea
         Modulo = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utilidades.js");
-        var actualizarEstado = new ActualizarEstadoPedido()
+	    var (item1, item2, item3) = requestActualizar;
+	    var actualizarEstado = new ActualizarEstadoPedido()
         {
-            IdPedido = requestActualizar.Item1,
-            IdDetalle = requestActualizar.Item2,
-            NuevoEstado = requestActualizar.Item3
+            IdPedido = item1,
+            IdDetalle = item2,
+            NuevoEstado = item3
         };
         var result = await Cliente.PutAsJsonAsync("api/Pedidos/ActualizarDetalle", actualizarEstado);
-        if (result.IsSuccessStatusCode)
-        {
-            await Modulo.InvokeVoidAsync("Exito");
-            BuscarDetalles();
-            StateHasChanged();
-        }
+	    if (!result.IsSuccessStatusCode) return;
+	    await Modulo.InvokeVoidAsync("Exito");
+	    BuscarDetalles();
+	    StateHasChanged();
     }
 
     protected async void BorrarDetalle(Guid requestBorrar)

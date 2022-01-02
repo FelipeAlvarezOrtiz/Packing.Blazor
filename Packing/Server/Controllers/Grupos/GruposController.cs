@@ -19,6 +19,12 @@ namespace Packing.Server.Controllers.Grupos
             return await Mediator.Send(new ListaGrupos.Query());
         }
 
+        [HttpGet("ObtenerGruposProductos")]
+        public async Task<ActionResult<List<GrupoProducto>>> ObtenerGruposProductos()
+        {
+            return await Mediator.Send(new ListaGruposProductos.Query());
+        }
+
         [HttpPost("NuevoGrupo")]
         public async Task<ActionResult<Unit>> NuevoGrupo(CrearGrupoCommand request)
         {

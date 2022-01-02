@@ -79,14 +79,16 @@
             }
             else
             {
-                <MudSkeleton />
-                <MudSkeleton Animation="Animation.False" />
-                <MudSkeleton Animation="Animation.Wave" />
-                <div class="row">
-                    <div class="col d-flex justify-content-center">
-                        <p>Cargando pedidos, espere por favor ...</p>
-                    </div>
-                </div>
+	            <div class="col-12">
+		            <MudSkeleton />
+		            <MudSkeleton Animation="Animation.False" />
+		            <MudSkeleton Animation="Animation.Wave" />
+		            <div class="row">
+			            <div class="col d-flex justify-content-center">
+				            <p>Cargando pedidos, espere por favor ...</p>
+			            </div>
+		            </div>
+	            </div>
             }
         </div>
         <br />
@@ -94,7 +96,7 @@
         <br />
         <div class="row text-center d-flex align-content-center justify-content-center">
             <div class="col-12">
-                <MudFab Label="Crear un pedido" Color="Color.Success" Icon="@Icons.Material.Filled.Add" IconSize="Size.Medium"></MudFab>
+                <MudFab OnClick="@(()=> navigator.NavigateTo("/Pedidos/CrearPedido"))" Label="Crear un pedido" Color="Color.Success" Icon="@Icons.Material.Filled.Add" IconSize="Size.Medium"></MudFab>
             </div>
         </div>
     </div>

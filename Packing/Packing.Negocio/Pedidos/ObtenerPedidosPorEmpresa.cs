@@ -7,6 +7,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Packing.Core.Pedidos;
 using Packing.Persistencia;
+using Packing.Persistencia.Repositorios;
 using Packing.Shared.Pedidos;
 
 namespace Packing.Negocio.Pedidos
@@ -16,6 +17,8 @@ namespace Packing.Negocio.Pedidos
         public class Handler : IRequestHandler<ObtenerPedidosPorEmpresaDto, List<Pedido>>
         {
             private ApplicationDbContext _context;
+            private readonly PedidosRepository _pedidosRepository = new();
+
             public Handler(ApplicationDbContext context)
             {
                 _context = context;
@@ -46,11 +49,13 @@ namespace Packing.Negocio.Pedidos
 
             private async Task<List<Pedido>> ObtenerPedidosSinFiltro(int idEmpresa,CancellationToken cancellationToken)
             {
+                //var listaPedidos = await _pedidosRepository.ObtenerPedidosDeLaEmpresa(idEmpresa);
+                //return listaPedidos;
                 return await _context.Pedidos.Include(x => x.EmpresaMandante)
                     .Where(x => x.EmpresaMandante.IdEmpresa == idEmpresa).OrderByDescending(x => x.FechaPedido)
-                    .Include(x=> x.ProductosEnPedido)
-                    .ThenInclude(x=> x.Estado)
-                    .Include(x=> x.ProductosEnPedido)
+                    .Include(x => x.ProductosEnPedido)
+                    .ThenInclude(x => x.Estado)
+                    .Include(x => x.ProductosEnPedido)
                     .ThenInclude(x => x.ProductoInterno)
                     .Take(5)
                     .ToListAsync(cancellationToken);

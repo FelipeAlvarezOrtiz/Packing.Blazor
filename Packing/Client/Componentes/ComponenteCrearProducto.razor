@@ -236,7 +236,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         Presentaciones = await _cliente.GetFromJsonAsync<List<Presentacion>>("api/Presentaciones/ObtenerPresentaciones");
-        Grupos = await _cliente.GetFromJsonAsync<List<GrupoProducto>>("api/Grupos/ObtenerGrupos");
+        Grupos = await _cliente.GetFromJsonAsync<List<GrupoProducto>>("api/Grupos/ObtenerGruposProductos");
         Formatos = await _cliente.GetFromJsonAsync<List<Formato>>("api/Formatos/ObtenerFormatos");
     }
 

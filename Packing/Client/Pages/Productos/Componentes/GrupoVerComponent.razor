@@ -1,6 +1,6 @@
 ﻿@using Packing.Shared.Presentaciones
 @using Packing.Shared.Pedidos
-@inject HttpClient cliente
+@inject HttpClient _cliente
 @inject IJSRuntime JsRuntime
 
 @if (GrupoBlock is null || FormatosDisponiblesEnGrupo is null || PresentacionesDisponibles is null)
@@ -65,10 +65,13 @@ else
                     </p>
                 </div>
             </div>
-            <hr />
-            <div class="col-md-12">
-                <MudNumericField @bind-Value="CantidadProducto" Label="Cantidad" Min="0" Variant="Variant.Outlined" Step="1"/>
-            </div>
+	        <hr />
+	        <div class="row">
+		        <div class="col-12">
+			        <MudNumericField @bind-Value="CantidadProducto" Label="Cantidad" Min="0" Variant="Variant.Outlined" Step="1"/>
+		        </div>
+	        </div>
+            
         </MudCardContent>
         <MudCardActions Class="row text-center d-flex align-content-center">
             <div class="row text-center d-flex align-content-center">
@@ -110,8 +113,8 @@ else
     {
         var formatoRequest = new FormatosDelGrupo { IdGrupo = GrupoBlock.IdGrupo };
         PresentacionesDisponibles = new List<Presentacion>();
-        PathImagen = "/images/grupos/" + GrupoBlock.Imagen;
-        var result = await cliente.PostAsJsonAsync("api/Formatos/ObtenerFormatosDisponibles", formatoRequest);
+        PathImagen = "/images/grupos/" + GrupoBlock.Imagen+".png";
+        var result = await _cliente.PostAsJsonAsync("api/Formatos/ObtenerFormatosDisponibles", formatoRequest);
         if (result.IsSuccessStatusCode)
         {
             FormatosDisponiblesEnGrupo = await result.Content.ReadFromJsonAsync<List<Formato>>();
@@ -126,7 +129,7 @@ else
             IdGrupo = GrupoBlock.IdGrupo,
             IdFormato = FormatoIngresado
         };
-        var result = await cliente.PostAsJsonAsync("api/Presentaciones/ObtenerPresentacionesDelGrupo", requestPresentaciones);
+        var result = await _cliente.PostAsJsonAsync("api/Presentaciones/ObtenerPresentacionesDelGrupo", requestPresentaciones);
         if (result.IsSuccessStatusCode)
         {
             PresentacionesDisponibles = await result.Content.ReadFromJsonAsync<List<Presentacion>>();
@@ -154,7 +157,7 @@ else
             IdFormato = FormatoIngresado
         };
         //enviar al eventcallback
-        var result = await cliente.PostAsJsonAsync("api/Productos/ObtenerInfoProducto", request);
+        var result = await _cliente.PostAsJsonAsync("api/Productos/ObtenerInfoProducto", request);
         if (result.IsSuccessStatusCode)
         {
             var productoObtenido = await result.Content.ReadFromJsonAsync<Producto>();

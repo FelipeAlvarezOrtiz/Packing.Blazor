@@ -15,7 +15,6 @@
                 <MudTimelineItem Size="Size.Medium" Color="Color.Success"></MudTimelineItem>
                 <MudTimelineItem Size="Size.Small"></MudTimelineItem>
                 <MudTimelineItem Size="Size.Small"></MudTimelineItem>
-                <MudTimelineItem Size="Size.Small"></MudTimelineItem>
             </MudTimeline>
             <div class="row">
                 <div class="col-6 text-center"></div>
@@ -54,7 +53,6 @@
                 <MudTimelineItem Size="Size.Small"></MudTimelineItem>
                 <MudTimelineItem Size="Size.Medium" Color="Color.Success"></MudTimelineItem>
                 <MudTimelineItem Size="Size.Small"></MudTimelineItem>
-                <MudTimelineItem Size="Size.Small"></MudTimelineItem>
             </MudTimeline>
             <div class="row">
                 <div class="col-6 text-center">
@@ -74,7 +72,7 @@
                 <div class="row">
                     @foreach (var detalle in CarroPedido)
                     {
-                        <div class="col-sm-12 col-md-6 col-lg-6 col-xl-4 p-1">
+                        <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 p-1">
                             <ConfirmacionPedido Producto=detalle.Value.ProductoIncorporado CantidadProducto=detalle.Value.Cantidad
                                                 ActualizarCantidad="ActualizarCantidadProducto" />
                         </div>
@@ -99,7 +97,6 @@
                 <MudTimelineItem Size="Size.Small"></MudTimelineItem>
                 <MudTimelineItem Size="Size.Small"></MudTimelineItem>
                 <MudTimelineItem Size="Size.Medium" Color="Color.Success"></MudTimelineItem>
-                <MudTimelineItem Size="Size.Small"></MudTimelineItem>
             </MudTimeline>
             <div class="row">
                 <div class="col-6 text-center">
@@ -109,18 +106,39 @@
                 </div>
                 <div class="col-6 text-center">
                     <MudTooltip Text="Siguiente">
-                        <MudFab Icon="@Icons.Outlined.ArrowForward" OnClick="(() => Activar(3))">Siguiente</MudFab>
+                        @*<MudFab Icon="@Icons.Outlined.ArrowForward" OnClick="(() => Activar(3))">Siguiente</MudFab>*@
+                        <MudFab OnClick="IngresarPedido" Label="Enviar Pedido" Color="Color.Success"></MudFab>
                     </MudTooltip>
                 </div>
             </div>
             <hr />
             <div class="row">
                 <div class="col-12">
-                    <DatosPersonales />
+	                @*<DatosPersonales @bind-Observacion="PedidoRequest.Observacion"/>*@
+	                <div class="row ml-1">
+		                <!--Datos del usuario -->
+		                <div class="col-md-12 col-lg-6 p-1">
+			                <MudField Label="Nombre" Variant="Variant.Outlined">@InfoUsuario.NombreUsuario</MudField>
+		                </div>
+		                <div class="col-md-12 col-lg-6 p-1">
+			                <MudField Label="R.U.T" Variant="Variant.Outlined">@InfoUsuario.Empresa.RutEmpresa</MudField>
+		                </div>
+		                <div class="col-12 p-1">
+			                <MudTextField Label="Dirección" Variant="Variant.Outlined" @bind-Value="InfoUsuario.Direccion">@InfoUsuario.Direccion</MudTextField>
+		                </div>
+	                </div>
+	                <br />
+	                <hr />
+	                <div class="row">
+		                <div class="col-12">
+			                <MudTextField Placeholder="Cualquier dato extra acerca de tu pedido" T="string" 
+											Label="Observaciones" Variant="Variant.Outlined" @bind-Value="PedidoRequest.Observacion" Lines="6" />
+		                </div>
+	                </div>
                 </div>
             </div>
         </MudTabPanel>
-        <MudTabPanel @ref="ConfirmacionPedido">
+       @* <MudTabPanel @ref="ConfirmacionPedido">
             <MudTimeline TimelineOrientation="TimelineOrientation.Horizontal">
                 <MudTimelineItem Size="Size.Small"></MudTimelineItem>
                 <MudTimelineItem Size="Size.Small"></MudTimelineItem>
@@ -140,9 +158,7 @@
             <div class="row d-flex align-content-center">
                 @if (CarroPedido.Count > 0)
                 {
-                    <div class="col-12 text-center">
-                        <MudFab OnClick="IngresarPedido" Label="Enviar Pedido" Color="Color.Success"></MudFab>
-                    </div>
+                    
                 }
                 else
                 {
@@ -151,7 +167,7 @@
                     </div>
                 }
             </div>
-        </MudTabPanel>
+        </MudTabPanel>*@
     </MudTabs>
 </div>
 
@@ -164,7 +180,7 @@
     protected IJSObjectReference Modulo;
     protected ObtenerInfoUsuarioDto requestInfoUsuario;
     protected AppUser InfoUsuario = new();
-    protected PedidoRequestDto PedidoRequest;
+	protected PedidoRequestDto PedidoRequest = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -245,12 +261,9 @@
             Cantidad = key.Value.Cantidad, IdProducto = key.Key
         }).ToList();
         Modulo = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utilidades.js");
-        PedidoRequest = new PedidoRequestDto()
-        {
-            NombreUsuario = emailUsuario,
-            Observacion = string.Empty,
-            ProductosEnPedido = listaProductos
-        };
+
+	    PedidoRequest.NombreUsuario = emailUsuario;
+	    PedidoRequest.ProductosEnPedido = listaProductos;
         try
         {
             var result = await Cliente.PostAsJsonAsync("api/Pedidos/IngresarPedido", PedidoRequest);

@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using Packing.Core.Empresas;
 
 namespace Packing.Core.Pedidos
 {
     public class Pedido
     {
-        [Required, Key]
+        [Required, Key,BsonId,BsonGuidRepresentation(GuidRepresentation.Standard)]
         public Guid GuidPedido { get; set; }
         [Required]
         public Empresa EmpresaMandante { get; set; }

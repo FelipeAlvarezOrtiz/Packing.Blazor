@@ -21,14 +21,15 @@
     else if (ProductosEnSistema.Count == 0)
     {
         <div class="col">
-            <div class="row">
+	        <div class="row">
+		        <div class="col d-flex justify-content-center">
+			        <p><i class="fas fa-info-circle"></i>&nbsp;No existen productos creados en sistema.</p>
+		        </div>
+	        </div>
+	        <hr/>
+	        <div class="row">
                 <div class="col d-flex justify-content-center">
-                    <p><i class="fas fa-info-circle"></i>&nbsp;No existen productos creados en sistema.</p>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col d-flex justify-content-center">
-                    <MudFab Label="Crear producto"></MudFab>
+                    <MudFab OnClick="@(() => navigator.NavigateTo("/Productos/Crear"))" Label="Crear producto"></MudFab>
                 </div>
             </div>
         </div>

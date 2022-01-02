@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Packing.Persistencia.Repositorios;
 
 namespace Packing.Negocio.Pedidos
 {
@@ -15,6 +16,7 @@ namespace Packing.Negocio.Pedidos
     {
         private readonly ApplicationDbContext _context;
         private readonly IMediator _mediator;
+        private readonly PedidosRepository _pedidosRepository = new();
 
         public CrearPedido(IMediator mediator, ApplicationDbContext context)
         {
@@ -66,7 +68,8 @@ namespace Packing.Negocio.Pedidos
             }
             pedidoCabecera.ProductosEnPedido = listaProductosEnPedido;
             await _context.Pedidos.AddAsync(pedidoCabecera, cancellationToken);
-            return await _context.SaveChangesAsync() > 0
+            //await _pedidosRepository.CrearPedido(pedidoCabecera);
+            return await _context.SaveChangesAsync(cancellationToken) > 0
                    ? Unit.Value
                    : throw new Exception(
                        "Ha ocurrido un error al ingresar el pedido, intente más tarde o contacte al administrador.");

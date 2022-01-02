@@ -16,8 +16,8 @@ namespace Packing.Client
         {
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
-
-
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("NTU3NjMxQDMxMzkyZTM0MmUzMEFFMTl1TkhqV0ROTmdKU3pMTnJTb21Kc1FMT1d4WFl0ZkRXOTQwSFlNT0U9");
+            
             builder.RootComponents.Add<App>("#app");
 
             builder.Services.AddHttpClient("Packing.ServerAPI", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress))

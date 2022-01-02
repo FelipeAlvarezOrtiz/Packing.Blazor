@@ -7,42 +7,43 @@
                 <p>Producto: <b>&nbsp;@Detalle.ProductoInterno.NombreParaBusqueda</b>.</p>
                 <p>Formato: <b>&nbsp;@Detalle.ProductoInterno.Formato.NombreFormato</b>.</p>
                 <p>Grupos: <b>&nbsp;@Detalle.ProductoInterno.Grupo.NombreGrupo</b>.</p>
-                <p>Presentación: <b>&nbsp;@Detalle.ProductoInterno.Presentacion.NombrePresentacion</b>.</p>
+	            <p>Presentación: <b>&nbsp;@Detalle.ProductoInterno.Presentacion.NombrePresentacion</b>.</p>
+	            <AuthorizeView Roles="Cliente">
+					<p>Estado: <b>&nbsp;@Detalle.Estado.NombreEstado</b>.</p>
+                </AuthorizeView>
             </div>
-            <div class="col-md-12">
-                <select id="estados" class="form-control" @bind="IdEstadoSeleccionado">
-                    @foreach (var estado in ListaEstados)
-                    {
-                        @if (estado.IdEstadoPedido == Detalle.Estado.IdEstadoPedido)
-                        {
-                            <option value="@estado.IdEstadoPedido" selected>@estado.NombreEstado</option>
-                        }
-                        else
-                        {
-                            if (Detalle.Estado.IdEstadoPedido > estado.IdEstadoPedido) continue;
-                            <option value="@estado.IdEstadoPedido">@estado.NombreEstado</option>
-                        }
-                    }
-                </select>
-            </div>
+	        <div class="col-md-12">
+		        <AuthorizeView Roles="Administrador">
+			        <MudSelect T="int" @bind-Value="IdEstadoSeleccionado" Label="Estado" Strict="true" Variant="Variant.Outlined" Format="F2" AnchorOrigin="Origin.BottomCenter">
+				        @foreach (var estado in ListaEstados)
+				        {
+					        if (Detalle.Estado.IdEstadoPedido > estado.IdEstadoPedido) continue;
+					        <MudSelectItem T="int" Value="estado.IdEstadoPedido">@estado.NombreEstado</MudSelectItem>
+				        }
+			        </MudSelect>
+			        <br />
+		        </AuthorizeView>
+	        </div>
         </div>
         <MudDivider></MudDivider>
     </MudCardContent>
     <MudCardActions>
         <div class="row text-center d-flex align-content-center">
-            @if (!Detalle.Estado.NombreEstado.Equals("Completado"))
+            @if (Detalle.Estado.IdEstadoPedido < 4)
             {
                 <div class="col-sm-12 col-md-6 mt-2">
                     @if (Detalle.Estado.IdEstadoPedido == 1)
                     {
                         <MudFab Label="Eliminar" Icon="@Icons.Outlined.Delete" Size="Size.Medium" Color="Color.Error"
-                                OnClick="(async () => await BorrarDetalle.InvokeAsync(Detalle.IdDetalle))"></MudFab>
+                                OnClick="@(async () => await BorrarDetalle.InvokeAsync(Detalle.IdDetalle))"></MudFab>
                     }
                 </div>
-                <div class="col-sm-12 col-md-6 mt-2">
-                    <MudFab Label="Actualizar" Icon="@Icons.Outlined.Update" Size="Size.Medium" Color="Color.Info"
-                            OnClick="(async () => await ActualizarEstado.InvokeAsync(Tuple.Create(CabeceraId, Detalle.IdDetalle, IdEstadoSeleccionado)))"></MudFab>
-                </div>
+	            <div class="col-sm-12 col-md-6 mt-2">
+		            <AuthorizeView Roles="Administrador">
+			            <MudFab Label="Actualizar" Icon="@Icons.Outlined.Update" Size="Size.Medium" Color="Color.Info"
+			                    OnClick="@(async () => await ActualizarEstado.InvokeAsync(Tuple.Create(CabeceraId, Detalle.IdDetalle, IdEstadoSeleccionado)))"></MudFab>
+		            </AuthorizeView>
+	            </div>
             }
             else
             {
