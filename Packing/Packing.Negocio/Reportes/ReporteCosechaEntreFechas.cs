@@ -4,9 +4,11 @@ using Packing.Core.Reportes;
 using Packing.Persistencia;
 using Packing.Shared.ReportesDto;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Packing.Core.Productos;
 
 namespace Packing.Negocio.Reportes
 {
@@ -24,6 +26,7 @@ namespace Packing.Negocio.Reportes
         public async Task<ReporteCosechero> Handle(ReporteCosecheroQuery request, CancellationToken cancellationToken)
         {
             var reporteCosechero = new ReporteCosechero();
+            reporteCosechero.Grupos = new Dictionary<int, Tuple<GrupoProducto, int>>();
             var pedidosEnRango = await _context.Pedidos.Where(pedido => 
                     DateTime.Compare(pedido.FechaPedido,request.FechaHasta) <= 1 
                         && DateTime.Compare(pedido.FechaPedido,request.FechaDesde) >= 0)

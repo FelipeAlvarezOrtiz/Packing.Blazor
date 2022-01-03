@@ -11,6 +11,7 @@
 @using System.IO
 @using Syncfusion.Drawing;
 @using Packing.Client.Utilidades
+@using Packing.Core.Reportes
 @using Color = System.Drawing.Color
 @using Size = System.Drawing.Size
 
@@ -140,6 +141,12 @@ else
     protected ReporteJefePackingQuery RequestJefePacking = new();
     protected int IdEmpresaSeleccionada = 0;
 
+	public record ExportDataHelper
+	{
+		public string NombreGrupo { get; set; }
+        public int Cantidad { get; set; }
+	}
+
     protected override async Task OnInitializedAsync()
     {
         EmpresasEnSistema = await Cliente.GetFromJsonAsync<List<Empresa>>("api/Empresas/ObtenerEmpresas");
@@ -157,16 +164,26 @@ else
             FechaHasta = DateTime.TryParse(FechaHasta.ToString(),out var resultHasta) ? resultHasta.AddHours(23).AddMinutes(59) : DateTime.Today,
             IdEmpresa = IdEmpresaSeleccionada
         };
+	    var reporteJefe = new ReporteCosecheroQuery()
+	    {
+		    FechaDesde = resultDesde,
+		    FechaHasta = resultHasta.AddHours(23).AddMinutes(59),
+		    IdEmpresa = IdEmpresaSeleccionada,
+            UsuarioSolicitante = "SYSTEM"
+	    };
         var resultRequest = await Cliente.PostAsJsonAsync("api/Pedidos/ObtenerPedidosParaReporte", dtoRequest);
+        var resultRequestPedidos = await Cliente.PostAsJsonAsync("api/Pedidos/ObtenerReporteCosecheros", reporteJefe);
         if (resultRequest.IsSuccessStatusCode)
         {
             try
             {
                 PedidosEncontrados = await resultRequest.Content.ReadFromJsonAsync<List<Pedido>>();
-                ExportToPdf(PedidosEncontrados);
+                var dataExportar = await resultRequestPedidos.Content.ReadFromJsonAsync<ReporteCosechero>();
+                ExportToPdf(dataExportar);
             }
-            catch (Exception)
+            catch (Exception error)
             {
+                Console.WriteLine(error.Message);
                 PedidosEncontrados = new List<Pedido>();
             }
         }
@@ -181,54 +198,67 @@ else
 
 @functions{
 
-	void ExportToPdf(List<Pedido> listaPedidos)
-	{
-		const int paragraphAfterSpacing = 8;
-		const int cellMargin = 8;
-		var pdfDocument = new PdfDocument();
-		//Add Page to the PDF document.
-		var page = pdfDocument.Pages.Add();
+    void ExportToPdf(ReporteCosechero reporte)
+    {
+	    try
+	    {
+		    const int paragraphAfterSpacing = 8;
+		    const int cellMargin = 8;
+		    var pdfDocument = new PdfDocument();
+			//Add Page to the PDF document.
+		    var page = pdfDocument.Pages.Add();
 
-		//Create a new font.
-		var font = new PdfStandardFont(PdfFontFamily.TimesRoman, 16);
+			//Create a new font.
+		    var font = new PdfStandardFont(PdfFontFamily.TimesRoman, 16);
 
-		//Create a text element to draw a text in PDF page.
-		var title = new PdfTextElement("Información de pedidos", font, PdfBrushes.Black);
-		var result = title.Draw(page, new PointF(0, 0));
+			//Create a text element to draw a text in PDF page.
+		    var title = new PdfTextElement("Información de pedidos", font, PdfBrushes.Black);
+		    var result = title.Draw(page, new PointF(0, 0));
 
 
-		var contentFont = new PdfStandardFont(PdfFontFamily.TimesRoman, 12);
-		var content = new PdfTextElement("This component demonstrates fetching data from a client side and Exporting the data to PDF document using Syncfusion .NET PDF library.", contentFont, PdfBrushes.Black);
-		var format = new PdfLayoutFormat();
-		format.Layout = PdfLayoutType.Paginate;
+		    var contentFont = new PdfStandardFont(PdfFontFamily.TimesRoman, 12);
+		    var content = new PdfTextElement($"Información solicitada por el usuario {reporte.UsuarioSolicitante} válida para pedidos entre {reporte.RangoFechasConsideradas.Item1.ToShortDateString()}.- {reporte.RangoFechasConsideradas.Item2.ToShortDateString()}", contentFont, PdfBrushes.Black);
+		    var format = new PdfLayoutFormat();
+		    format.Layout = PdfLayoutType.Paginate;
 
-		//Draw a text to the PDF document.
-		result = content.Draw(page, new RectangleF(0, result.Bounds.Bottom + paragraphAfterSpacing, page.GetClientSize().Width, page.GetClientSize().Height), format);
+			//Draw a text to the PDF document.
+		    result = content.Draw(page, new RectangleF(0, result.Bounds.Bottom + paragraphAfterSpacing, page.GetClientSize().Width, page.GetClientSize().Height), format);
 
-		//Create a PdfGrid.
-		var pdfGrid = new PdfGrid();
-		pdfGrid.Style.CellPadding.Left = cellMargin;
-		pdfGrid.Style.CellPadding.Right = cellMargin;
+			//Create a PdfGrid.
+		    var pdfGrid = new PdfGrid();
+		    pdfGrid.Style.CellPadding.Left = cellMargin;
+		    pdfGrid.Style.CellPadding.Right = cellMargin;
 
-		//Applying built-in style to the PDF grid
-		pdfGrid.ApplyBuiltinStyle(PdfGridBuiltinStyle.GridTable4Accent1);
+			//Applying built-in style to the PDF grid
+		    pdfGrid.ApplyBuiltinStyle(PdfGridBuiltinStyle.GridTable4Accent1);
+		    var listaExport = new List<ExportDataHelper>();
+		    listaExport = reporte.Grupos.Select(key => new ExportDataHelper()
+		    {
+			    Cantidad = key.Value.Item2, NombreGrupo = key.Value.Item1.NombreGrupo
+		    }).ToList();
 
-		//Assign data source.
-		pdfGrid.DataSource = listaPedidos;
+			//formar la lista final
+			//Assign data source.
+		    pdfGrid.DataSource = listaExport;
 
-		pdfGrid.Style.Font = contentFont;
+		    pdfGrid.Style.Font = contentFont;
 
-		//Draw PDF grid into the PDF page.
-		pdfGrid.Draw(page, new Syncfusion.Drawing.PointF(0, result.Bounds.Bottom + paragraphAfterSpacing));
+			//Draw PDF grid into the PDF page.
+		    pdfGrid.Draw(page, new Syncfusion.Drawing.PointF(0, result.Bounds.Bottom + paragraphAfterSpacing));
 
-		var memoryStream = new MemoryStream();
+		    var memoryStream = new MemoryStream();
 
-		// Save the PDF document.
-		pdfDocument.Save(memoryStream);
+			// Save the PDF document.
+		    pdfDocument.Save(memoryStream);
 
-		// Download the PDF document
-		JsRuntime.SaveAs("Pedidos info.pdf", memoryStream.ToArray());
-
-	}
+			// Download the PDF document
+		    JsRuntime.SaveAs("Pedidos info.pdf", memoryStream.ToArray());
+	    }
+	    catch (Exception error)
+	    {
+            Console.WriteLine(error.Message);
+		    throw;
+	    }
+    }
 
 }
