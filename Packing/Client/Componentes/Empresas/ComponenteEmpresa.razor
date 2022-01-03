@@ -10,26 +10,31 @@
             <MudText><p>Razón social:&nbsp;<b class="text-center">@EmpresaEntrante.RazonSocial.</b></p></MudText>
             <MudText><p>Persona contacto:&nbsp;<b class="text-center">@EmpresaEntrante.PersonaContacto.</b></p></MudText>
             <MudText><p>R.U.T:&nbsp;<b class="text-center">@EmpresaEntrante.RutEmpresa.</b></p></MudText>
-        </MudCardContent>
-        <MudCardActions>
+			<MudDivider></MudDivider>
             <div class="row text-center d-flex align-content-center">
-                <div class="col-sm-12 col-md-6 mt-2">
-                    <MudFab Class="mt-1 ml-2" Color="Color.Error" Size="Size.Medium"
-                            Icon="@Icons.Material.Filled.Delete" Label="Borrar" OnClick="EditarEmpresa">
-                    </MudFab>
-                </div>
-                <div class="col-sm-12 col-md-6 mt-2">
-                    <MudFab Class="mt-1 ml-2" Color="Color.Info" Size="Size.Medium"
-                            Icon="@Icons.Material.Filled.NavigateNext" Label="Editar" OnClick="EditarEmpresa">
-                    </MudFab>
-                </div>
-                <div class="col-sm-12 col-md-6 mt-2">
-                    <MudFab Class="mt-1 ml-2" Color="Color.Primary" Size="Size.Medium"
-                            Icon="@Icons.Material.Filled.Add" Label="productos" OnClick="AgregarProductos">
-                    </MudFab>
-                </div>
+	            <div class="col-4 mt-2">
+		            <MudTooltip Text="Borrar">
+			            <MudFab Color="Color.Error" Size="Size.Small"
+			                    Icon="@Icons.Material.Filled.Delete" OnClick="EditarEmpresa">
+			            </MudFab>
+		            </MudTooltip>
+	            </div>
+	            <div class="col-4 mt-2">
+		            <MudTooltip Text="Editar">
+			            <MudFab Color="Color.Info" Size="Size.Small"
+			                    Icon="@Icons.Material.Filled.Edit" OnClick="EditarEmpresa">
+			            </MudFab>
+		            </MudTooltip>
+	            </div>
+	            <div class="col-4 mt-2">
+		            <MudTooltip Text="Asignar productos">
+			            <MudFab Color="Color.Primary" Size="Size.Small"
+			                    Icon="@Icons.Material.Filled.Add" OnClick="AgregarProductos">
+			            </MudFab>
+		            </MudTooltip>
+	            </div>
             </div>
-        </MudCardActions>
+        </MudCardContent>
     </MudCard>
 }
 

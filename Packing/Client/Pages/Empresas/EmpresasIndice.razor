@@ -7,13 +7,18 @@
 <hr />
 @if (EmpresasEnSistema is null)
 {
-    <div class="text-center row col-12">
-        <MudProgressCircular Color="Color.Secondary" Indeterminate="true" />
-    </div>
+	<MudSkeleton/>
+	<MudSkeleton Animation="Animation.False"/>
+	<MudSkeleton Animation="Animation.Wave"/>
+	<div class="row">
+		<div class="col d-flex justify-content-center">
+			<p>Cargando información, espere por favor ...</p>
+		</div>
+	</div>
 }
 else if (EmpresasEnSistema.Count == 0)
 {
-    <div class="text-center alert-info"><h4>No existen empresas en el sistema.</h4></div>
+	<div class="col-12 text-center alert alert-info"><h4><i class="fas fa-info-circle"></i>&nbsp;No existen empresas creadas en el sistema.</h4></div>
 }
 else
 {
