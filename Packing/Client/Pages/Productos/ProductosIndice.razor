@@ -38,27 +38,29 @@
         <div class="row">
             @foreach (var producto in ProductosEnSistema)
             {
-                <div class="col-sm-12 col-md-4 col-lg-4">
+                <div class="col-sm-12 col-md-6 col-lg-6">
                     <ProductoVerComponent ProductoBlock="producto" EditarProducto="ActualizarProducto" BorrarProducto="BorrarProducto" ></ProductoVerComponent>
                 </div>
             }
         </div>
-        <hr />
-        <div class="row d-flex align-content-center">
-            <div class="col-sm-12 col-md-3 mt-2 text-center">
-                <MudFab Color="Color.Success" Icon="@Icons.Material.Filled.AddCircleOutline" ButtonType="ButtonType.Button" OnClick="NuevoProductoView" Label="Nuevo producto"></MudFab>
-            </div>
-            <div class="col-sm-12 col-md-3 mt-2 text-center">
-                <MudFab Color="Color.Success" Icon="@Icons.Material.Filled.AddCircleOutline" ButtonType="ButtonType.Button" OnClick="NuevoPresentacionView" Label="Nuevo presentación"></MudFab>
-            </div>
-            <div class="col-sm-12 col-md-3 mt-2 text-center">
-                <MudFab Color="Color.Success" Icon="@Icons.Material.Filled.AddCircleOutline" ButtonType="ButtonType.Button" OnClick="NuevoFormatoView" Label="Nuevo formato"></MudFab>
-            </div>
-            <div class="col-sm-12 col-md-3 mt-2 text-center">
-                <MudFab Color="Color.Success" Icon="@Icons.Material.Filled.AddCircleOutline" ButtonType="ButtonType.Button" OnClick="NuevoGrupoView" Label="Nuevo grupo"></MudFab>
-            </div>
-        </div>
+	    <hr />
     }
+    <MudDivider></MudDivider>
+    <br />
+    <div class="row d-flex align-content-center">
+	    <div class="col-sm-12 col-md-3 mt-2 text-center">
+		    <MudFab Color="Color.Success" Icon="@Icons.Material.Filled.AddCircleOutline" ButtonType="ButtonType.Button" OnClick="NuevoProductoView" Label="Nuevo producto"></MudFab>
+	    </div>
+	    <div class="col-sm-12 col-md-3 mt-2 text-center">
+		    <MudFab Color="Color.Success" Icon="@Icons.Material.Filled.AddCircleOutline" ButtonType="ButtonType.Button" OnClick="NuevoPresentacionView" Label="Nuevo presentación"></MudFab>
+	    </div>
+	    <div class="col-sm-12 col-md-3 mt-2 text-center">
+		    <MudFab Color="Color.Success" Icon="@Icons.Material.Filled.AddCircleOutline" ButtonType="ButtonType.Button" OnClick="NuevoFormatoView" Label="Nuevo formato"></MudFab>
+	    </div>
+	    <div class="col-sm-12 col-md-3 mt-2 text-center">
+		    <MudFab Color="Color.Success" Icon="@Icons.Material.Filled.AddCircleOutline" ButtonType="ButtonType.Button" OnClick="NuevoGrupoView" Label="Nuevo grupo"></MudFab>
+	    </div>
+    </div>
 </div>
 <br />
 <br/>
@@ -84,20 +86,19 @@
             var result = await cliente.DeleteAsync("api/Productos/BorrarProducto/" + productoBlock.IdProducto);
             if (result.IsSuccessStatusCode)
             {
-                await Modulo.InvokeVoidAsync("Exito");
                 ProductosEnSistema = await cliente.GetFromJsonAsync<List<Producto>>("api/Productos/ObtenerListaProductos");
                 StateHasChanged();
-
+	            await Modulo.InvokeVoidAsync("Exito");
             }
             else
             {
-                await Modulo.InvokeVoidAsync("Error");
+	            var mensaje = await result.Content.ReadAsStringAsync();
+                await Modulo.InvokeVoidAsync("ErrorGeneral",mensaje);
             }
         }
         catch (Exception error)
         {
-            Console.WriteLine(error.Message);
-            await Modulo.InvokeVoidAsync("Error");
+            await Modulo.InvokeVoidAsync("ErrorGeneral",error.Message);
         }
     }
 

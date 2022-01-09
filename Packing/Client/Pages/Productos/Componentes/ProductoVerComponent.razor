@@ -1,33 +1,50 @@
-﻿@inject HttpClient cliente
-@inject NavigationManager Navigator
-
-<MudCard Elevation="3" Class="p-3 mt-2">
-    <MudCardContent>
-        <MudText Typo="Typo.h6">&nbsp;@ProductoBlock.NombreParaBusqueda</MudText>
-        <MudDivider />
-        <br />
-        <MudText><p>Grupo:&nbsp;<b class="text-center">@ProductoBlock.Grupo.NombreGrupo.</b></p></MudText>
-        <MudText><p>Formato:&nbsp;<b class="text-center">@ProductoBlock.Formato.NombreFormato.</b></p></MudText>
-        <MudText><p>Presentación:&nbsp;<b class="text-center">@ProductoBlock.Presentacion.NombrePresentacion.</b></p></MudText>
-    </MudCardContent>
-    <MudCardActions>
-        <div class="row text-center d-flex align-content-center">
-            <div class="col-sm-6 mt-2">
-                <MudFab Class="mt-1 ml-2" Color="Color.Error" Size="Size.Medium"
-                        Icon="@Icons.Material.Filled.Delete" Label="Borrar" OnClick="(() => BorrarProducto.InvokeAsync(ProductoBlock))">
-                </MudFab>
-            </div>
-            <div class="col-sm-6 mt-2">
-                <MudFab Class="mt-1 ml-2" Color="Color.Info" Size="Size.Medium"
-                        Icon="@Icons.Material.Filled.NavigateNext" Label="Editar" OnClick="(() => EditarProducto.InvokeAsync(ProductoBlock))">
-                </MudFab>
-            </div>
-        </div>
-    </MudCardActions>
+﻿
+<MudCard Elevation="3" Class="p-1 mt-2">
+	<MudCardContent>
+		<div class="row text-center d-flex align-content-center">
+			<div class="col-7">
+				<MudText Typo="Typo.h6">&nbsp;@ProductoBlock.NombreParaBusqueda</MudText>
+			</div>
+			<div class="col-2">
+				<MudTooltip Text="Borrar">
+					<MudFab Class="mt-1 ml-2" Color="Color.Error" Size="Size.Medium"
+					        Icon="@Icons.Material.Filled.Delete" OnClick="@(()=> BorrarProductoModalVisible = true)">
+					</MudFab>
+				</MudTooltip>
+			</div>
+			<div class="col-2">
+				<MudTooltip Text="Editar">
+					<MudFab Class="mt-1 ml-2" Color="Color.Info" Size="Size.Medium"
+					        Icon="@Icons.Material.Filled.Edit" OnClick="@(() => EditarProducto.InvokeAsync(ProductoBlock))">
+					</MudFab>
+				</MudTooltip>
+			</div>
+		</div>
+	</MudCardContent>
 </MudCard>
 
+<MudDialog @bind-IsVisible="BorrarProductoModalVisible">
+	<DialogContent>
+		<p>&nbsp; ¿Estás seguro que deseas eliminar el producto?</p>
+	</DialogContent>
+	<DialogActions>
+		<MudFab Size="Size.Small" Icon="@Icons.Material.Filled.Cancel" Label="Cerrar" OnClick="@(()=> BorrarProductoModalVisible = false)"></MudFab>
+		<MudFab Size="Size.Small" Icon="@Icons.Material.Filled.DeleteOutline" Color="Color.Error" OnClick="@(BorrarProductoInside)" Label="Borrar"></MudFab>
+	</DialogActions>
+</MudDialog>
+
 @code {
-    [Parameter] public Producto ProductoBlock { get; set; }
-    [Parameter] public EventCallback<Producto> EditarProducto { get; set; }
-    [Parameter] public EventCallback<Producto> BorrarProducto { get; set; }
+
+	protected bool BorrarProductoModalVisible = false;
+
+	[Parameter] public Producto ProductoBlock { get; set; }
+	[Parameter] public EventCallback<Producto> EditarProducto { get; set; }
+	[Parameter] public EventCallback<Producto> BorrarProducto { get; set; }
+
+	protected async void BorrarProductoInside()
+	{
+		BorrarProductoModalVisible = false;
+		await BorrarProducto.InvokeAsync(ProductoBlock);
+	}
+
 }

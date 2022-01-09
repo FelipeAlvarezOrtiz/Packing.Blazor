@@ -6,7 +6,7 @@
 
 <h3><i class="fab fa-creative-commons-share"></i>&nbsp;Activar productos</h3>
 <hr />
-@if (ProductosEnSistema is null)
+@if (Empresas is null)
 {
     <MudSkeleton />
     <MudSkeleton Animation="Animation.False" />
@@ -19,10 +19,40 @@
 }
 else
 {
+	<div class="row">
+		<div class="col-12">
+			<MudCard Elevation="3" Class="p-3">
+				<div class="form-group">
+					<div class="input-group">
+						<MudSelect T="int" @bind-Value="IdEmpresaSeleccionada" Label="Empresa" Strict="true" Variant="Variant.Outlined" Format="F2" AnchorOrigin="Origin.BottomCenter">
+								<MudSelectItem T="int" Value="0">Seleccione</MudSelectItem>
+							@foreach (var empresa in Empresas)
+							{
+								<MudSelectItem T="int" Value="empresa.IdEmpresa">@empresa.NombreEmpresa</MudSelectItem>
+							}
+						</MudSelect>&nbsp;
+						<MudTooltip Text="Buscar">
+							<MudFab Class="mt-2" Color="Color.Primary" Size="Size.Medium" Icon="@Icons.Material.Filled.Search" OnClick="BuscarProductosEmpresa" />
+						</MudTooltip>
+					</div>
+				</div>
+			</MudCard>
+		</div>
+	</div>
+	<MudDivider />
+	<div class="row text-center d-flex align-content-center m-2">
+		<div class="col-sm-12 mt-2">
+			<MudFab Class="mt-1 ml-2" Color="Color.Info" Size="Size.Medium"
+			        Icon="@Icons.Material.Filled.Refresh" Label="Actualizar">
+			</MudFab>
+		</div>
+	</div>
+	<MudDivider></MudDivider>
+    <br/>
     <div class="row">
         @foreach (var producto in ProductosEnSistema)
         {
-            <div class="col-sm-12 col-md-6 col-lg-4">
+            <div class="col-sm-12 col-md-12 col-lg-6">
                 <ActivadorProductosComponent AgregarProductoEmpresa="AgregarProductoEmpresa" EliminarProductoEmpresa="EliminarProducto" 
                                              CantidadDisponible="0" Incorporado="false" ProductoBlock="producto"></ActivadorProductosComponent>
             </div>
@@ -32,11 +62,15 @@ else
 
 @code {
     protected List<Producto> ProductosEnSistema;
+	protected List<Empresa> Empresas;
     protected IJSObjectReference Modulo;
+	protected int IdEmpresaSeleccionada = 0;
 
     protected override async Task OnInitializedAsync()
     {
         ProductosEnSistema = await Cliente.GetFromJsonAsync<List<Producto>>("api/Productos/ObtenerListaProductos");
+        Empresas = await Cliente.GetFromJsonAsync<List<Empresa>>("api/Empresas/ObtenerEmpresas");
+	    StateHasChanged();
     }
 
     protected async void AgregarProductoEmpresa(Tuple<int, int> request)
@@ -50,4 +84,9 @@ else
         Modulo = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utilidades.js");
         await Modulo.InvokeVoidAsync("Exito");
     }
+
+	protected void BuscarProductosEmpresa()
+	{
+
+	}
 }

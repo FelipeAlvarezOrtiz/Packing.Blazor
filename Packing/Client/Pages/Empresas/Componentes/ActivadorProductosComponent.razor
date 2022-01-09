@@ -1,32 +1,21 @@
 ﻿@inject HttpClient cliente
-@inject NavigationManager Navigator
 
 <MudCard Elevation="3" Class="p-3 mt-2">
     <MudCardContent>
         <MudText Typo="Typo.h6">&nbsp;@ProductoBlock.NombreParaBusqueda</MudText>
-        <br />
-        <MudDivider />
+	    <MudDivider />
         <div class="row">
-            <div class="col-sm-12 col-md-6 col-lg-6">
-                <MudCheckBox @bind-Checked="@Incorporado" Size="Size.Medium" Color="Color.Tertiary" Label="Agregado a empresa"></MudCheckBox>
-            </div>
-            @if (Incorporado)
-            {
-                <div class="col-sm-12 col-md-6 col-lg-6">
-                    <MudNumericField @bind-Value="CantidadDisponible" Label="Cantidad" Min="1" Variant="Variant.Outlined" Step="1" />
-                </div>
-            }
+	        <div class="col-sm-12 col-md-6 col-lg-6 p-2">
+		        <MudCheckBox @bind-Checked="@Incorporado" Size="Size.Medium" Color="Color.Tertiary" Label="Agregado a empresa"></MudCheckBox>
+	        </div>
+	        @if (Incorporado)
+	        {
+		        <div class="col-sm-12 col-md-6 col-lg-6 p-2">
+			        <MudNumericField @bind-Value="CantidadDisponible" Label="Cantidad Máxima" Min="1" Variant="Variant.Outlined" Step="1" />
+		        </div>
+	        }
         </div>
     </MudCardContent>
-    <MudCardActions>
-        <div class="row text-center d-flex align-content-center">
-            <div class="col-sm-12 mt-2">
-                <MudFab Class="mt-1 ml-2" Color="Color.Info" Size="Size.Medium"
-                        Icon="@Icons.Material.Filled.Update" Label="Actualizar" OnClick="(async () => await AgregarProductoEmpresa.InvokeAsync(Tuple.Create(ProductoBlock.IdProducto, CantidadDisponible)))">
-                </MudFab>
-            </div>
-        </div>
-    </MudCardActions>
 </MudCard>
 
 @code {

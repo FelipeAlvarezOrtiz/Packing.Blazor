@@ -178,8 +178,8 @@ else
             try
             {
                 PedidosEncontrados = await resultRequest.Content.ReadFromJsonAsync<List<Pedido>>();
-                var dataExportar = await resultRequestPedidos.Content.ReadFromJsonAsync<ReporteCosechero>();
-                ExportToPdf(dataExportar);
+                //var dataExportar = await resultRequestPedidos.Content.ReadFromJsonAsync<ReporteCosechero>();
+                //ExportToPdf(dataExportar);
             }
             catch (Exception error)
             {

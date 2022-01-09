@@ -25,3 +25,13 @@ export function Error() {
         timer: 1500
     });
 }
+
+
+export function ErrorGeneral(mensaje) {
+    return Swal.fire({
+        icon: 'error',
+        title: 'Ha ocurrido un error interno.',
+        text: mensaje,
+        showConfirmButton: true
+    });
+}
