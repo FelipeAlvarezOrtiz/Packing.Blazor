@@ -21,7 +21,7 @@ namespace Packing.Server.Controllers.Empresas
         [HttpGet("ObtenerEmpresa/{idEmpresa:int}")]
         public async Task<ActionResult<Empresa>> ObtenerEmpresa(int idEmpresa)
         {
-            return await Mediator.Send(new ObtenerEmpresaRequest{})
+            return await Mediator.Send(new ObtenerEmpresaQuery {IdEmpresa = idEmpresa});
         }
 
         [HttpDelete("DeshabilitarEmpresa/{idEmpresa:int}"),Authorize(Roles = "Administrador")]
