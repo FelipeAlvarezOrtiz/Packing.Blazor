@@ -1,6 +1,7 @@
-﻿@inject HttpClient Cliente
+﻿@inject HttpClient _cliente
 @inject NavigationManager Navigator
-
+@inject IJSRuntime JsRuntime
+@attribute [Authorize(Roles = "Administrador")]
 @page "/Empresas/Indice"
 
 <h3><i class="far fa-building"></i>&nbsp;Empresas en sistema</h3>
@@ -26,7 +27,7 @@ else
         @foreach (var empresa in EmpresasEnSistema)
         {
             <div class="col-sm-12 col-md-6 col-lg-6 col-xl-4 p-1">
-                <ComponenteEmpresa EmpresaEntrante="empresa"></ComponenteEmpresa>
+                <ComponenteEmpresa EmpresaEntrante="empresa" BorrarEmpresa="EliminarEmpresa"></ComponenteEmpresa>
             </div>
         }
     </div>
@@ -45,14 +46,39 @@ else
 
 @code {
     protected List<Empresa> EmpresasEnSistema;
+	protected IJSObjectReference Modulo;
 
     protected override async Task OnInitializedAsync()
     {
-        EmpresasEnSistema = await Cliente.GetFromJsonAsync<List<Empresa>>("api/Empresas/ObtenerEmpresas");
+        EmpresasEnSistema = await _cliente.GetFromJsonAsync<List<Empresa>>("api/Empresas/ObtenerEmpresas");
         StateHasChanged();
     }
 
     protected void CrearUsuarioEvent() {
         Navigator.NavigateTo("/Empresas/Crear"); 
     }
+
+	protected async void EliminarEmpresa(int idEmpresa)
+	{
+		Modulo = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utilidades.js");
+		try
+		{
+			var result = await _cliente.DeleteAsync("api/Empresas/DeshabilitarEmpresa/" + idEmpresa);
+			if (result.IsSuccessStatusCode)
+			{
+				EmpresasEnSistema = await _cliente.GetFromJsonAsync<List<Empresa>>("api/Empresas/ObtenerEmpresas");
+				StateHasChanged();
+				await Modulo.InvokeVoidAsync("Exito");
+			}
+			else
+			{
+				var mensaje = await result.Content.ReadAsStringAsync();
+				await Modulo.InvokeVoidAsync("ErrorGeneral",mensaje);
+			}
+		}
+		catch (Exception error)
+		{
+			await Modulo.InvokeVoidAsync("ErrorGeneral",error.Message);
+		}
+	}
 }

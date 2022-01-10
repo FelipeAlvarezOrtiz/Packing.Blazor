@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Packing.Core.Empresas;
 using Packing.Persistencia;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -23,7 +24,7 @@ namespace Packing.Negocio.Empresas
 
             public async Task<List<Empresa>> Handle(Query request, CancellationToken cancellationToken)
             {
-                return await _context.Empresas.Include(x => x.ProductosVisibles)
+                return await _context.Empresas.Where(x => x.EmpresaActiva).Include(x => x.ProductosVisibles)
                     .ThenInclude(p => p.Producto).ToListAsync(cancellationToken);
             }
         }

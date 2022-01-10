@@ -66,24 +66,24 @@ else
     protected IJSObjectReference Modulo;
 	protected int IdEmpresaSeleccionada = 0;
 
-    protected override async Task OnInitializedAsync()
-    {
-        ProductosEnSistema = await Cliente.GetFromJsonAsync<List<Producto>>("api/Productos/ObtenerListaProductos");
-        Empresas = await Cliente.GetFromJsonAsync<List<Empresa>>("api/Empresas/ObtenerEmpresas");
-	    StateHasChanged();
-    }
+	protected override async Task OnInitializedAsync()
+	{
+		ProductosEnSistema = await Cliente.GetFromJsonAsync<List<Producto>>("api/Productos/ObtenerListaProductos");
+		Empresas = await Cliente.GetFromJsonAsync<List<Empresa>>("api/Empresas/ObtenerEmpresas");
+		StateHasChanged();
+	}
 
-    protected async void AgregarProductoEmpresa(Tuple<int, int> request)
-    {
-        Modulo = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utilidades.js");
-        await Modulo.InvokeVoidAsync("Exito");
-    }
+	protected async void AgregarProductoEmpresa(Tuple<int, int> request)
+	{
+		Modulo = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utilidades.js");
+		await Modulo.InvokeVoidAsync("Exito");
+	}
 
-    protected async void EliminarProducto(int idProducto)
-    {
-        Modulo = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utilidades.js");
-        await Modulo.InvokeVoidAsync("Exito");
-    }
+	protected async void EliminarProducto(int idProducto)
+	{
+		Modulo = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utilidades.js");
+		await Modulo.InvokeVoidAsync("Exito");
+	}
 
 	protected void BuscarProductosEmpresa()
 	{

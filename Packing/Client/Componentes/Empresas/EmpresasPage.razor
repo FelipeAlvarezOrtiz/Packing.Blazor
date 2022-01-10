@@ -1,34 +1,123 @@
-﻿@inject HttpClient Cliente
-@inject NavigationManager Navigator
+﻿@inject HttpClient _cliente
+@inject NavigationManager _navigator
+@inject IJSRuntime _jsRuntime
 @page "/Empresas/Editar/{Id:int}"
-@*  -- Buscamos la empresa con el id
-    -- Vemos la autorizacion y si es admin puede editar y actualizar datos
-*@
+@attribute [Authorize(Roles="Administrador")]
+
 <h3>Empresa</h3>
 @if (EmpresaEntrante is null)
 {
-    <div><h3> Cargando...</h3></div>
+	<MudSkeleton/>
+	<MudSkeleton Animation="Animation.False"/>
+	<MudSkeleton Animation="Animation.Wave"/>
+	<div class="row">
+		<div class="col d-flex justify-content-center">
+			<p>Cargando información, espere por favor ...</p>
+		</div>
+	</div>
 }
 else
 {
-    
+	<h5><i class="far fa-building"></i>&nbsp;Datos de la empresa</h5>
+        <hr />
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <div class="input-group">
+                        <MudTextField id="nuevoRutEmpresa" Label="Rut de la empresa" Variant="Variant.Outlined" @bind-Value="EmpresaEntrante.RutEmpresa" />
+                        <MudTooltip Text="Buscar">
+                            <MudFab Class="mt-3 ml-3" Color="Color.Primary" Size="Size.Small" Icon="@Icons.Material.Filled.Search" />
+                        </MudTooltip>
+                        <ValidationMessage For="@(() => EmpresaEntrante.RutEmpresa)"></ValidationMessage>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <MudTextField Label="Nombre de la empresa" Variant="Variant.Outlined" @bind-Value="EmpresaEntrante.NombreEmpresa" />
+                    <ValidationMessage For="@(()=> EmpresaEntrante.NombreEmpresa)"></ValidationMessage>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <MudTextField Label="Persona de contacto" Variant="Variant.Outlined" @bind-Value="EmpresaEntrante.PersonaContacto" />
+                    <ValidationMessage For="@(()=> EmpresaEntrante.PersonaContacto)"></ValidationMessage>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <MudTextField Label="Razón social" Variant="Variant.Outlined" @bind-Value="EmpresaEntrante.RazonSocial" />
+                    <ValidationMessage For="@(()=> EmpresaEntrante.RazonSocial)"></ValidationMessage>
+                </div>
+            </div>
+        </div>
+        <hr />
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <MudTextField Label="Dirección" Variant="Variant.Outlined" @bind-Value="EmpresaEntrante.Direccion" />
+                    <ValidationMessage For="@(()=> EmpresaEntrante.Direccion)"></ValidationMessage>
+                </div>
+            </div>
+        </div>
+        <hr />
+	
 }
+
+<MudDialog @bind-IsVisible="ModalBorrar">
+	<DialogContent>
+		<p>&nbsp; ¿Estás seguro que deseas deshabilitar a esta empresa?, ya no podrá generar pedidos ni ingresar.</p>
+	</DialogContent>
+	<DialogActions>
+		<MudFab Size="Size.Small" Icon="@Icons.Material.Filled.Cancel" Label="Cerrar" OnClick="@(()=> ModalBorrar = false)"></MudFab>
+		<MudFab Size="Size.Small" Icon="@Icons.Material.Filled.DeleteOutline" Color="Color.Error" OnClick="@(EliminarEmpresa)" Label="Borrar"></MudFab>
+	</DialogActions>
+</MudDialog>
 
 @code {
 
     [Parameter] public int Id { get; set; }
-    protected Packing.Core.Empresas.Empresa EmpresaEntrante;
 
-    protected async override Task OnInitializedAsync()
+	protected IJSObjectReference Modulo;
+	protected bool ModalBorrar;
+	protected Packing.Core.Empresas.Empresa EmpresaEntrante;
+
+    protected override async Task OnInitializedAsync()
     {
-        //buscar la empresa
         try
         {
-            EmpresaEntrante = await Cliente.GetFromJsonAsync<Packing.Core.Empresas.Empresa>("api/Empresas/ObtenerEmpresa/"+Id);
+            EmpresaEntrante = await _cliente.GetFromJsonAsync<Packing.Core.Empresas.Empresa>("api/Empresas/ObtenerEmpresa/"+Id);
+
         }
         catch (Exception error)
         {
-            Console.WriteLine(error.Message);
+	        _navigator.NavigateTo("/Empresas/Indice");
         }
     }
+
+	protected async void EliminarEmpresa()
+	{
+		ModalBorrar = false;
+		Modulo = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utilidades.js");
+		try
+		{
+			var result = await _cliente.DeleteAsync("api/Empresas/DeshabilitarEmpresa/" + EmpresaEntrante.IdEmpresa);
+			if (result.IsSuccessStatusCode)
+			{
+				await Modulo.InvokeVoidAsync("Exito");
+				_navigator.NavigateTo("/Empresas/indice");
+			}
+			else
+			{
+				var mensaje = await result.Content.ReadAsStringAsync();
+				await Modulo.InvokeVoidAsync("ErrorGeneral",mensaje);
+			}
+		}
+		catch (Exception error)
+		{
+			await Modulo.InvokeVoidAsync("ErrorGeneral",error.Message);
+		}
+	}
 }

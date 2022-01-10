@@ -40,11 +40,9 @@
 	[Parameter] public Producto ProductoBlock { get; set; }
 	[Parameter] public EventCallback<Producto> EditarProducto { get; set; }
 	[Parameter] public EventCallback<Producto> BorrarProducto { get; set; }
-
 	protected async void BorrarProductoInside()
 	{
 		BorrarProductoModalVisible = false;
 		await BorrarProducto.InvokeAsync(ProductoBlock);
 	}
-
 }

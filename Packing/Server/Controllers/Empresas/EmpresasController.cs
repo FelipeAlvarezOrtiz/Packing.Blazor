@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Packing.Core.Empresas;
 using Packing.Negocio.Empresas;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MediatR;
+using Packing.Shared.EmpresaDto;
 
 namespace Packing.Server.Controllers.Empresas
 {
@@ -16,10 +18,23 @@ namespace Packing.Server.Controllers.Empresas
             return await Mediator.Send(new ListaEmpresas.Query { });
         }
 
-        [HttpPost("DeshabilitarEmpresa"),Authorize(Roles = "Administrador")]
-        public async Task<ActionResult<Unit>> DeshabilitarEmpresa()
+        [HttpGet("ObtenerEmpresa/{idEmpresa:int}")]
+        public async Task<ActionResult<Empresa>> ObtenerEmpresa(int idEmpresa)
         {
-            return Ok();
+            return await Mediator.Send(new ObtenerEmpresaRequest{})
+        }
+
+        [HttpDelete("DeshabilitarEmpresa/{idEmpresa:int}"),Authorize(Roles = "Administrador")]
+        public async Task<ActionResult<Unit>> DeshabilitarEmpresa(int idEmpresa)
+        {
+            try
+            {
+                return await Mediator.Send(new DeshabilitarEmpresaCommand{IdEmpresa = idEmpresa });
+            }
+            catch (Exception error)
+            {
+                return BadRequest(error.Message);
+            }
         }
     }
 }

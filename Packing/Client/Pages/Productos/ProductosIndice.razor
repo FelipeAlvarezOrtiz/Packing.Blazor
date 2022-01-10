@@ -20,18 +20,19 @@
     }
     else if (ProductosEnSistema.Count == 0)
     {
-        <div class="col">
-	        <div class="row">
-		        <div class="col-12 text-center alert alert-info"><h4><i class="fas fa-info-circle"></i>&nbsp;No existen productos creados en sistema.</h4></div>
-	        </div>
-	        <hr/>
-	        <div class="row">
-                <div class="col d-flex justify-content-center">
-	                <MudFab Color="Color.Success" Size="Size.Medium" Icon="@Icons.Material.Filled.Add"
-	                        OnClick="@(() => navigator.NavigateTo("/Productos/Crear"))" Label="Crear producto"></MudFab>
-                </div>
-            </div>
-        </div>
+	    <div class="col">
+		    <div class="row">
+			    <div class="col-12 text-center alert alert-info"><h4><i class="fas fa-info-circle"></i>&nbsp;No existen productos creados en sistema.</h4></div>
+		    </div>
+		    <hr/>
+		    <div class="row">
+			    <div class="col d-flex justify-content-center">
+				    <MudFab Color="Color.Success" Size="Size.Medium" Icon="@Icons.Material.Filled.Add"
+				            OnClick="@(() => navigator.NavigateTo("/Productos/Crear"))" Label="Crear producto"></MudFab>
+			    </div>
+		    </div>
+	    </div>
+        <br/>
     }
     else
     {
@@ -44,6 +45,7 @@
             }
         </div>
 	    <hr />
+	    <br />
     }
     <MudDivider></MudDivider>
     <br />

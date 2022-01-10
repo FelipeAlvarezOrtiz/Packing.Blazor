@@ -15,7 +15,7 @@
 	            <div class="col-4 mt-2">
 		            <MudTooltip Text="Borrar">
 			            <MudFab Color="Color.Error" Size="Size.Small"
-			                    Icon="@Icons.Material.Filled.Delete" OnClick="EditarEmpresa">
+			                    Icon="@Icons.Material.Filled.Delete" OnClick="@(()=> ModalBorrar = true)">
 			            </MudFab>
 		            </MudTooltip>
 	            </div>
@@ -38,11 +38,27 @@
     </MudCard>
 }
 
+<MudDialog @bind-IsVisible="ModalBorrar">
+	<DialogContent>
+		<p>&nbsp; ¿Estás seguro que deseas deshabilitar a esta empresa?, ya no podrá generar pedidos ni ingresar.</p>
+	</DialogContent>
+	<DialogActions>
+		<MudFab Size="Size.Small" Icon="@Icons.Material.Filled.Cancel" Label="Cerrar" OnClick="@(()=> ModalBorrar = false)"></MudFab>
+		<MudFab Size="Size.Small" Icon="@Icons.Material.Filled.DeleteOutline" Color="Color.Error" OnClick="@(EliminarEmpresa)" Label="Borrar"></MudFab>
+	</DialogActions>
+</MudDialog>
 
 @code {
     [Parameter] public Packing.Core.Empresas.Empresa EmpresaEntrante { get; set; }
+	[Parameter] public EventCallback<int> BorrarEmpresa { get; set; }
 
+	protected bool ModalBorrar = false;
     protected void EditarEmpresa() => Navigator.NavigateTo("/Empresas/Editar/"+EmpresaEntrante.IdEmpresa);
+	protected void AgregarProductos() => Navigator.NavigateTo("/Empresas/Agregar/"+EmpresaEntrante.IdEmpresa);
 
-    protected void AgregarProductos() => Navigator.NavigateTo("/Empresas/Agregar/"+EmpresaEntrante.IdEmpresa);
+	protected async void EliminarEmpresa()
+	{
+		ModalBorrar = false;
+		await BorrarEmpresa.InvokeAsync(this.EmpresaEntrante.IdEmpresa);
+	}
 }

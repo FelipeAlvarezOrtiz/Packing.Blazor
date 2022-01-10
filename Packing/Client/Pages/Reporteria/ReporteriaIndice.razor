@@ -12,8 +12,6 @@
 @using Syncfusion.Drawing;
 @using Packing.Client.Utilidades
 @using Packing.Core.Reportes
-@using Color = System.Drawing.Color
-@using Size = System.Drawing.Size
 
 <h3><i class="far fa-file-pdf"></i>&nbsp;Reporteria</h3>
 <hr />
@@ -194,9 +192,6 @@ else
     {
         Navigator.NavigateTo("/Pedidos/Ver/" + urlDetalle);
     }
-}
-
-@functions{
 
     void ExportToPdf(ReporteCosechero reporte)
     {
