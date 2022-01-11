@@ -4,6 +4,12 @@
 @page "/Empresas/Editar/{Id:int}"
 @attribute [Authorize(Roles="Administrador")]
 
+<MudTooltip Text="Atrás">
+	<MudFab Class="mt-2" Color="Color.Info" Size="Size.Small" Icon="@Icons.Material.Filled.ArrowBack" OnClick="@(() => _navigator.NavigateTo("/Empresas/Indice"))"/>
+</MudTooltip>
+<br />
+<MudDivider></MudDivider>
+<br />
 <h3>Empresa</h3>
 @if (EmpresaEntrante is null)
 {
@@ -19,62 +25,73 @@
 else
 {
 	<h5><i class="far fa-building"></i>&nbsp;Datos de la empresa</h5>
-        <hr />
-        <div class="row">
-            <div class="col-md-6">
-                <div class="form-group">
-                    <div class="input-group">
-                        <MudTextField id="nuevoRutEmpresa" Label="Rut de la empresa" Variant="Variant.Outlined" @bind-Value="EmpresaEntrante.RutEmpresa" />
-                        <MudTooltip Text="Buscar">
-                            <MudFab Class="mt-3 ml-3" Color="Color.Primary" Size="Size.Small" Icon="@Icons.Material.Filled.Search" />
-                        </MudTooltip>
-                        <ValidationMessage For="@(() => EmpresaEntrante.RutEmpresa)"></ValidationMessage>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <MudTextField Label="Nombre de la empresa" Variant="Variant.Outlined" @bind-Value="EmpresaEntrante.NombreEmpresa" />
-                    <ValidationMessage For="@(()=> EmpresaEntrante.NombreEmpresa)"></ValidationMessage>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6">
-                <div class="form-group">
-                    <MudTextField Label="Persona de contacto" Variant="Variant.Outlined" @bind-Value="EmpresaEntrante.PersonaContacto" />
-                    <ValidationMessage For="@(()=> EmpresaEntrante.PersonaContacto)"></ValidationMessage>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <MudTextField Label="Razón social" Variant="Variant.Outlined" @bind-Value="EmpresaEntrante.RazonSocial" />
-                    <ValidationMessage For="@(()=> EmpresaEntrante.RazonSocial)"></ValidationMessage>
-                </div>
-            </div>
-        </div>
-        <hr />
-        <div class="row">
-            <div class="col-md-12">
-                <div class="form-group">
-                    <MudTextField Label="Dirección" Variant="Variant.Outlined" @bind-Value="EmpresaEntrante.Direccion" />
-                    <ValidationMessage For="@(()=> EmpresaEntrante.Direccion)"></ValidationMessage>
-                </div>
-            </div>
-        </div>
-        <hr />
-	
-}
+	<EditForm Model="EmpresaEntrante">
+		<DataAnnotationsValidator></DataAnnotationsValidator>
+		<hr />
+		<div class="row">
+			<div class="col-md-6">
+				<div class="form-group">
+					<div class="input-group">
+						<MudTextField id="nuevoRutEmpresa" Label="Rut de la empresa" Variant="Variant.Outlined" @bind-Value="EmpresaEntrante.RutEmpresa" />
+						<ValidationMessage For="@(() => EmpresaEntrante.RutEmpresa)"></ValidationMessage>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<MudTextField Label="Nombre de la empresa" Variant="Variant.Outlined" @bind-Value="EmpresaEntrante.NombreEmpresa" />
+					<ValidationMessage For="@(()=> EmpresaEntrante.NombreEmpresa)"></ValidationMessage>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-6">
+				<div class="form-group">
+					<MudTextField Label="Persona de contacto" Variant="Variant.Outlined" @bind-Value="EmpresaEntrante.PersonaContacto" />
+					<ValidationMessage For="@(()=> EmpresaEntrante.PersonaContacto)"></ValidationMessage>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<MudTextField Label="Razón social" Variant="Variant.Outlined" @bind-Value="EmpresaEntrante.RazonSocial" />
+					<ValidationMessage For="@(()=> EmpresaEntrante.RazonSocial)"></ValidationMessage>
+				</div>
+			</div>
+		</div>
+		<hr />
+		<div class="row">
+			<div class="col-md-12">
+				<div class="form-group">
+					<MudTextField Label="Dirección" Variant="Variant.Outlined" @bind-Value="EmpresaEntrante.Direccion" />
+					<ValidationMessage For="@(()=> EmpresaEntrante.Direccion)"></ValidationMessage>
+				</div>
+			</div>
+		</div>
+		<hr />
+		<div class="row d-flex align-content-center text-center">
+			<div class="col-6">
+				<MudTooltip Text="Actualizar">
+					<MudFab Class="mt-2" Color="Color.Primary" Size="Size.Medium" Icon="@Icons.Material.Filled.Update" />
+				</MudTooltip>
+			</div>
+			<div class="col-6">
+				<MudTooltip Text="Borrar">
+					<MudFab Class="mt-2" Color="Color.Error" Size="Size.Medium" Icon="@Icons.Material.Filled.Delete" OnClick="@(() => ModalBorrar = true)" />
+				</MudTooltip>
+			</div>
+		</div>
+	</EditForm>
 
-<MudDialog @bind-IsVisible="ModalBorrar">
-	<DialogContent>
-		<p>&nbsp; ¿Estás seguro que deseas deshabilitar a esta empresa?, ya no podrá generar pedidos ni ingresar.</p>
-	</DialogContent>
-	<DialogActions>
-		<MudFab Size="Size.Small" Icon="@Icons.Material.Filled.Cancel" Label="Cerrar" OnClick="@(()=> ModalBorrar = false)"></MudFab>
-		<MudFab Size="Size.Small" Icon="@Icons.Material.Filled.DeleteOutline" Color="Color.Error" OnClick="@(EliminarEmpresa)" Label="Borrar"></MudFab>
-	</DialogActions>
-</MudDialog>
+	<MudDialog @bind-IsVisible="ModalBorrar">
+		<DialogContent>
+			<p>&nbsp; ¿Estás seguro que deseas deshabilitar a esta empresa?, ya no podrá generar pedidos ni ingresar.</p>
+		</DialogContent>
+		<DialogActions>
+			<MudFab Size="Size.Small" Icon="@Icons.Material.Filled.Cancel" Label="Cerrar" OnClick="@(()=> ModalBorrar = false)"></MudFab>
+			<MudFab Size="Size.Small" Icon="@Icons.Material.Filled.DeleteOutline" Color="Color.Error" OnClick="@(EliminarEmpresa)" Label="Borrar"></MudFab>
+		</DialogActions>
+	</MudDialog>
+}
 
 @code {
 
@@ -89,7 +106,7 @@ else
         try
         {
             EmpresaEntrante = await _cliente.GetFromJsonAsync<Packing.Core.Empresas.Empresa>("api/Empresas/ObtenerEmpresa/"+Id);
-
+            
         }
         catch (Exception error)
         {
