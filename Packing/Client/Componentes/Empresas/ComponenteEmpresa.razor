@@ -10,15 +10,29 @@
             <MudText><p>Razón social:&nbsp;<b class="text-center">@EmpresaEntrante.RazonSocial.</b></p></MudText>
             <MudText><p>Persona contacto:&nbsp;<b class="text-center">@EmpresaEntrante.PersonaContacto.</b></p></MudText>
             <MudText><p>R.U.T:&nbsp;<b class="text-center">@EmpresaEntrante.RutEmpresa.</b></p></MudText>
+            <MudText><p>Estado:&nbsp;<b class="text-center">@(EmpresaEntrante.EmpresaActiva ? "Activa" : "Deshabilitada").</b></p></MudText>
 			<MudDivider></MudDivider>
             <div class="row text-center d-flex align-content-center">
-	            <div class="col-4 mt-2">
-		            <MudTooltip Text="Borrar">
-			            <MudFab Color="Color.Error" Size="Size.Small"
-			                    Icon="@Icons.Material.Filled.Delete" OnClick="@(()=> ModalBorrar = true)">
-			            </MudFab>
-		            </MudTooltip>
-	            </div>
+				@if (EmpresaEntrante.EmpresaActiva)
+				{
+					<div class="col-4 mt-2">
+						<MudTooltip Text="Deshabilitar">
+							<MudFab Color="Color.Warning" Size="Size.Small"
+							        Icon="@Icons.Material.Filled.DisabledVisible" OnClick="@(() => ModalBorrar = true)">
+							</MudFab>
+						</MudTooltip>
+					</div>
+				}
+				else
+				{
+					<div class="col-4 mt-2">
+						<MudTooltip Text="Habilitar">
+							<MudFab Color="Color.Default" Size="Size.Small"
+							        Icon="@Icons.Material.Filled.Update" OnClick="@EliminarEmpresa">
+							</MudFab>
+						</MudTooltip>
+					</div>
+				}
 	            <div class="col-4 mt-2">
 		            <MudTooltip Text="Editar">
 			            <MudFab Color="Color.Info" Size="Size.Small"

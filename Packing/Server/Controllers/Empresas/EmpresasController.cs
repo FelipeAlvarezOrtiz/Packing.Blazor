@@ -37,5 +37,17 @@ namespace Packing.Server.Controllers.Empresas
             }
         }
 
+        [HttpPost("ActualizarEmpresa"), Authorize(Roles = "Administrador")]
+        public async Task<ActionResult<Unit>> ActualizarEmpresa(ActualizarEmpresaCommand request)
+        {
+            try
+            {
+                return await Mediator.Send(request);
+            }
+            catch (Exception error)
+            {
+                return BadRequest(error.Message);
+            }
+        }
     }
 }

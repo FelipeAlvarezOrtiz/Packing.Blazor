@@ -24,7 +24,7 @@ namespace Packing.Negocio.Empresas
 
             public async Task<List<Empresa>> Handle(Query request, CancellationToken cancellationToken)
             {
-                return await _context.Empresas.Where(x => x.EmpresaActiva).Include(x => x.ProductosVisibles)
+                return await _context.Empresas.Include(x => x.ProductosVisibles)
                     .ThenInclude(p => p.Producto).ToListAsync(cancellationToken);
             }
         }

@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using MediatR;
 
 namespace Packing.Shared.EmpresaDto
 {
-    class ActualizarEmpresaCommand
+    public class ActualizarEmpresaCommand : IRequest
     {
-        [Required(ErrorMessage = "Este dato es requerido")]
         public int IdEmpresa { get; set; }
         [Required(ErrorMessage = "Este dato es requerido"), MinLength(5,ErrorMessage = "Muy pocos caracteres")]
         public string NombreEmpresa { get; set; }
@@ -16,13 +16,5 @@ namespace Packing.Shared.EmpresaDto
         public string Direccion { get; set; }
         [Required(ErrorMessage = "Este dato es requerido"),MinLength(5, ErrorMessage = "Muy pocos caracteres")]
         public string PersonaContacto { get; set; }
-        [Required(ErrorMessage = "Este dato es requerido"), MinLength(5, ErrorMessage = "Muy pocos caracteres")]
-        public string NombreUsuario { get; set; }
-        [Required(ErrorMessage = "Este dato es requerido"),MinLength(5,ErrorMessage = "Muy pocos caracteres")]
-        public string RolUsuario { get; set; }
-        [Required(ErrorMessage = "Este dato es requerido"),MinLength(5, ErrorMessage = "Muy pocos caracteres")]
-        public string EmailUsuario { get; set; }
-        [Required(ErrorMessage = "Este dato es requerido"),MinLength(5, ErrorMessage = "Muy pocos caracteres")]
-        public string Telefono { get; set; }
     }
 }

@@ -43,7 +43,7 @@ namespace Packing.Negocio.Pedidos
                     //.ThenInclude(x => x.Estado)
                     //.Include(x => x.ProductosEnPedido)
                     //.ThenInclude(x => x.ProductoInterno)
-                    .Take(5)
+                    .Take(3)
                     .ToListAsync(cancellationToken);
             }
 
@@ -57,7 +57,7 @@ namespace Packing.Negocio.Pedidos
                     .ThenInclude(x => x.Estado)
                     .Include(x => x.ProductosEnPedido)
                     .ThenInclude(x => x.ProductoInterno)
-                    .Take(5)
+                    .Take(3)
                     .ToListAsync(cancellationToken);
             }
 

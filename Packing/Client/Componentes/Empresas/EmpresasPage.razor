@@ -10,7 +10,6 @@
 <br />
 <MudDivider></MudDivider>
 <br />
-<h3>Empresa</h3>
 @if (EmpresaEntrante is null)
 {
 	<MudSkeleton/>
@@ -24,7 +23,7 @@
 }
 else
 {
-	<h5><i class="far fa-building"></i>&nbsp;Datos de la empresa</h5>
+	<h3><i class="far fa-building"></i>&nbsp;Editar empresa</h3>
 	<EditForm Model="EmpresaEntrante">
 		<DataAnnotationsValidator></DataAnnotationsValidator>
 		<hr />
@@ -32,7 +31,7 @@ else
 			<div class="col-md-6">
 				<div class="form-group">
 					<div class="input-group">
-						<MudTextField id="nuevoRutEmpresa" Label="Rut de la empresa" Variant="Variant.Outlined" @bind-Value="EmpresaEntrante.RutEmpresa" />
+						<MudTextField Label="Rut de la empresa" Variant="Variant.Outlined" @bind-Value="EmpresaEntrante.RutEmpresa" />
 						<ValidationMessage For="@(() => EmpresaEntrante.RutEmpresa)"></ValidationMessage>
 					</div>
 				</div>
@@ -71,7 +70,8 @@ else
 		<div class="row d-flex align-content-center text-center">
 			<div class="col-6">
 				<MudTooltip Text="Actualizar">
-					<MudFab Class="mt-2" Color="Color.Primary" Size="Size.Medium" Icon="@Icons.Material.Filled.Update" />
+					<MudFab Class="mt-2" Color="Color.Primary" Size="Size.Medium" Icon="@Icons.Material.Filled.Update" 
+					        OnClick="ActualizarEmpresa"></MudFab>
 				</MudTooltip>
 			</div>
 			<div class="col-6">
@@ -100,6 +100,7 @@ else
 	protected IJSObjectReference Modulo;
 	protected bool ModalBorrar;
 	protected Packing.Core.Empresas.Empresa EmpresaEntrante;
+	protected ActualizarEmpresaCommand requestUpdate;
 
     protected override async Task OnInitializedAsync()
     {
@@ -135,6 +136,37 @@ else
 		catch (Exception error)
 		{
 			await Modulo.InvokeVoidAsync("ErrorGeneral",error.Message);
+		}
+	}
+
+	protected async Task ActualizarEmpresa()
+	{
+		Modulo = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utilidades.js");
+		try
+		{
+			requestUpdate = new ActualizarEmpresaCommand()
+			{
+				Direccion = EmpresaEntrante.Direccion,
+				IdEmpresa = EmpresaEntrante.IdEmpresa,
+				NombreEmpresa = EmpresaEntrante.NombreEmpresa,
+				PersonaContacto = EmpresaEntrante.PersonaContacto,
+				RazonSocial = EmpresaEntrante.RazonSocial,
+				RutEmpresa = EmpresaEntrante.RutEmpresa
+			};
+			var result = await _cliente.PostAsJsonAsync("api/Empresas/ActualizarEmpresa", requestUpdate);
+			if (result.IsSuccessStatusCode)
+			{
+				await Modulo.InvokeVoidAsync("Exito");
+			}
+			else
+			{
+				var respuesta = await result.Content.ReadAsStringAsync();
+				await Modulo.InvokeVoidAsync("ErrorGeneral", respuesta);
+			}
+		}
+		catch (Exception error)
+		{
+			await Modulo.InvokeVoidAsync("ErrorGeneral", error.Message);
 		}
 	}
 }

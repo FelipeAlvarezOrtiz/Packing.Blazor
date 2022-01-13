@@ -23,7 +23,7 @@ namespace Packing.Negocio.Empresas
                 .ThenInclude(p => p.Producto).FirstOrDefaultAsync(cancellationToken);
             if (empresa is null)
                 throw new Exception("La empresa no existe");
-            empresa.EmpresaActiva = false;
+            empresa.EmpresaActiva = !empresa.EmpresaActiva;
 
             _context.Empresas.Update(empresa);
 
