@@ -1,20 +1,32 @@
 ﻿
 <MudCard Elevation="3" Class="p-1 mt-2">
 	<MudCardContent>
-		<div class="row text-center d-flex align-content-center">
+		<div class="row">
 			<div class="col-7">
-				<MudText Typo="Typo.h6">&nbsp;@ProductoBlock.NombreParaBusqueda</MudText>
+				<MudText Typo="Typo.body2">&nbsp;@ProductoBlock.NombreParaBusqueda</MudText>
 			</div>
 			<div class="col-2">
-				<MudTooltip Text="Borrar">
-					<MudFab Class="mt-1 ml-2" Color="Color.Error" Size="Size.Medium"
-					        Icon="@Icons.Material.Filled.Delete" OnClick="@(()=> BorrarProductoModalVisible = true)">
-					</MudFab>
-				</MudTooltip>
+				@if (ProductoBlock.Disponible)
+				{
+					<MudTooltip Text="Deshabilitar">
+						<MudFab Class="mt-1 ml-2" Color="Color.Error" Size="Size.Small"
+						        Icon="@Icons.Material.Filled.Delete" OnClick="@(() => BorrarProductoModalVisible = true)">
+						</MudFab>
+					</MudTooltip>
+				}
+				else
+				{
+					<MudTooltip Text="Habilitar">
+						<MudFab Class="mt-1 ml-2" Color="Color.Success" Size="Size.Small"
+						        Icon="@Icons.Material.Filled.BrowserUpdated">
+						</MudFab>
+					</MudTooltip>
+				}
+				
 			</div>
 			<div class="col-2">
 				<MudTooltip Text="Editar">
-					<MudFab Class="mt-1 ml-2" Color="Color.Info" Size="Size.Medium"
+					<MudFab Class="mt-1 ml-2" Color="Color.Info" Size="Size.Small"
 					        Icon="@Icons.Material.Filled.Edit" OnClick="@(() => EditarProducto.InvokeAsync(ProductoBlock))">
 					</MudFab>
 				</MudTooltip>
@@ -25,11 +37,11 @@
 
 <MudDialog @bind-IsVisible="BorrarProductoModalVisible">
 	<DialogContent>
-		<p>&nbsp; ¿Estás seguro que deseas eliminar el producto?</p>
+		<p>&nbsp; ¿Estás seguro que deseas deshabilitar el producto?</p>
 	</DialogContent>
 	<DialogActions>
 		<MudFab Size="Size.Small" Icon="@Icons.Material.Filled.Cancel" Label="Cerrar" OnClick="@(()=> BorrarProductoModalVisible = false)"></MudFab>
-		<MudFab Size="Size.Small" Icon="@Icons.Material.Filled.DeleteOutline" Color="Color.Error" OnClick="@(BorrarProductoInside)" Label="Borrar"></MudFab>
+		<MudFab Size="Size.Small" Icon="@Icons.Material.Filled.DeleteOutline" Color="Color.Error" OnClick="@(BorrarProductoInside)" Label="Deshabilitar"></MudFab>
 	</DialogActions>
 </MudDialog>
 

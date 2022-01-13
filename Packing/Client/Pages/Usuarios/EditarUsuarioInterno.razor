@@ -1,0 +1,126 @@
+﻿@page "/UsuarioInterno/Editar/{IdUsuarioInterno:int}"
+@using Microsoft.AspNetCore.Components
+@using Packing.Shared.Usuarios
+@attribute [Authorize(Roles = "Administrador")]
+@inject HttpClient _client
+@inject IJSRuntime _jsRuntime
+@inject NavigationManager _navigator
+
+<h3><i class="fas fa-user-edit"></i>&nbsp;Editar usuario</h3>
+@if (UsuarioEntrante is null)
+{
+	<MudSkeleton />
+	<MudSkeleton Animation="Animation.False" />
+	<MudSkeleton Animation="Animation.Wave" />
+	<div class="row">
+		<div class="col d-flex justify-content-center">
+			<p>Cargando productos, espere por favor ...</p>
+		</div>
+	</div>
+}
+else
+{
+	<EditForm Model="UsuarioEntrante" OnValidSubmit="ActualizarUsuario">
+		<DataAnnotationsValidator></DataAnnotationsValidator>
+		<hr />
+		<div class="row">
+			<div class="col-md-6">
+				<MudTextField Label="Nombre" Variant="Variant.Outlined" @bind-Value="UsuarioEntrante.NombreUsuario" />
+				<ValidationMessage For="@(() => UsuarioEntrante.NombreUsuario)"></ValidationMessage>
+			</div>
+			<div class="col-md-6">
+				<MudTextField Label="Correo" Variant="Variant.Outlined" @bind-Value="UsuarioEntrante.CorreoUsuario" />
+				<ValidationMessage For="@(()=> UsuarioEntrante.CorreoUsuario)"></ValidationMessage>
+			</div>
+		</div>
+		<hr />
+		<div class="row">
+			<div class="col-md-6">
+				<MudTextField Label="R.U.T" Variant="Variant.Outlined" @bind-Value="UsuarioEntrante.RutUsuario" />
+				<ValidationMessage For="@(() => UsuarioEntrante.RutUsuario)"></ValidationMessage>
+			</div>
+			<div class="col-md-6">
+				<MudTextField Label="Numero telefonico" Variant="Variant.Outlined" @bind-Value="UsuarioEntrante.NumeroTelefono" />
+				<ValidationMessage For="@(()=> UsuarioEntrante.NumeroTelefono)"></ValidationMessage>
+			</div>
+		</div>
+		<hr />
+		<div class="row">
+			<div class="col-md-8">
+				<MudSelect T="int" Label="Cargo" @bind-Value="UsuarioEntrante.Cargo.IdCargo" Placeholder="Selecciona un cargo"
+				           AdornmentIcon="@Icons.Material.Filled.BusinessCenter" AdornmentColor="Color.Primary">
+						<MudSelectItem T="int" Value="0">Seleccione</MudSelectItem>
+					@foreach (var cargo in CargosInternos)
+					{
+						<MudSelectItem T="int" Value="cargo.IdCargo">@cargo.NombreCargo</MudSelectItem>
+					}
+				</MudSelect>&nbsp;
+				<ValidationMessage For="@(()=> UsuarioEntrante.NumeroTelefono)"></ValidationMessage>
+			</div>
+			<div class="col-md-4">
+				<MudCheckBox @bind-Checked="@UsuarioEntrante.UsuarioActivo" Size="Size.Medium"
+						 Color="Color.Tertiary">Usuario activo</MudCheckBox>
+			</div>
+		</div>
+		<hr />
+		<div class="row text-center d-flex align-content-center justify-content-center">
+			<div class="col-6">
+				<MudTooltip Text="Volver atrás">
+					<MudFab Variant="Variant.Filled" OnClick="@(() => _navigator.NavigateTo("/Usuarios/Internos"))" Icon="@Icons.Material.Filled.ArrowBack" Color="MudBlazor.Color.Primary"></MudFab>
+				</MudTooltip>
+			</div>
+			<div class="col-6">
+				<MudTooltip Text="Guardar">
+					<MudFab Variant="Variant.Filled" Icon="@Icons.Material.Filled.Save" ButtonType="ButtonType.Submit"
+						Color="MudBlazor.Color.Primary"></MudFab>
+				</MudTooltip>
+			</div>
+		</div>
+	</EditForm>
+}
+
+@code {
+	[Parameter] public int IdUsuarioInterno { get; set; }
+	protected UsuarioInterno UsuarioEntrante;
+	protected List<CargoInterno> CargosInternos;
+	protected ActualizarUsuarioDto usuarioUpdateRequest;
+	protected IJSObjectReference Modulo;
+
+	protected override async Task OnInitializedAsync()
+	{
+		CargosInternos = await _client.GetFromJsonAsync<List<CargoInterno>>("api/Usuarios/ObtenerCargosInternos");
+		UsuarioEntrante = await _client.GetFromJsonAsync<UsuarioInterno>("api/Usuarios/ObtenerUsuarioInterno/"+IdUsuarioInterno);
+	}
+
+	protected async void ActualizarUsuario()
+	{
+		usuarioUpdateRequest = new ActualizarUsuarioDto()
+		{
+			UsuarioActivo = UsuarioEntrante.UsuarioActivo,
+			CorreoUsuario = UsuarioEntrante.CorreoUsuario,
+			IdCargo = UsuarioEntrante.Cargo.IdCargo,
+			IdUsuario = UsuarioEntrante.IdUsuario,
+			NombreUsuario = UsuarioEntrante.NombreUsuario,
+			RutUsuario = UsuarioEntrante.RutUsuario,
+			NumeroTelefono = UsuarioEntrante.NumeroTelefono
+		};
+		Modulo = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utilidades.js");
+		try
+		{
+			var result = await _client.PostAsJsonAsync("api/Usuarios/ActualizarUsuario", usuarioUpdateRequest);
+			if (result.IsSuccessStatusCode)
+			{
+				await Modulo.InvokeVoidAsync("Exito");
+			}
+			else
+			{
+				var responseError = await result.Content.ReadAsStringAsync();
+				await Modulo.InvokeVoidAsync("ErrorGeneral",responseError);
+			}
+		}
+		catch (Exception error)
+		{
+			await Modulo.InvokeVoidAsync("ErrorGeneral",error.Message);
+		}
+	}
+}

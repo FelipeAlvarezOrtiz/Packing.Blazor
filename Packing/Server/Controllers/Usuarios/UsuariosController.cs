@@ -62,5 +62,16 @@ namespace Packing.Server.Controllers.Usuarios
             }
         }
 
+        [HttpGet("ObtenerUsuarioInterno/{idUsuario:int}")]
+        public async Task<ActionResult<UsuarioInterno>> ObtenerUsuarioInterno(int idUsuario)
+        {
+            return await Mediator.Send(new ObtenerUsuarioInternoPorId {IdUsuario = idUsuario});
+        }
+
+        [HttpPost("ActualizarUsuario"), Authorize(Roles = "Administrador")]
+        public async Task<ActionResult<Unit>> ActualizarUsuario(ActualizarUsuarioDto request)
+        {
+            return await Mediator.Send(request);
+        }
     }
 }
