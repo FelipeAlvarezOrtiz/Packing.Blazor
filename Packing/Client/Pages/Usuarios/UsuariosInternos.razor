@@ -5,7 +5,7 @@
 @inject IJSRuntime JsRuntime
 @attribute [Authorize(Roles = "Administrador")]
 
-<h3>&nbsp;Usuarios internos</h3>
+<h3><i class="fas fa-user-cog"></i>&nbsp;Usuarios internos</h3>
 <hr />
 @if (UsuariosColones is null)
 {
@@ -34,7 +34,7 @@ else
 			@foreach (var usuario in UsuariosColones)
 			{
 				<div class="col-sm-12 col-md-4">
-					<VerUsuarioInterno UsuarioEntrante="usuario"></VerUsuarioInterno>
+					<VerUsuarioInterno UsuarioEntrante="usuario" Refrescar="RefrescarUsuarios"></VerUsuarioInterno>
 				</div>
 			}
 		</div>
@@ -42,6 +42,7 @@ else
 	}
 	<br />
 	<MudDivider></MudDivider>
+	<br />
 	<div class="row d-flex align-content-center">
 		<div class="col-sm-12 col-md-12 text-center">
 			<MudFab Color="Color.Success" Icon="@Icons.Material.Filled.AddCircleOutline" OnClick="@(()=> _navigator.NavigateTo("/Usuarios/Internos/Crear"))"
@@ -53,10 +54,15 @@ else
 @code {
 	protected List<UsuarioInterno> UsuariosColones;
 
-	protected override async Task OnInitializedAsync()
+	protected async Task RefrescarUsuarios()
 	{
 		UsuariosColones = await _cliente.GetFromJsonAsync<List<UsuarioInterno>>("api/Usuarios/ObtenerUsuariosInternos");
 		StateHasChanged();
+	}
+
+	protected override async Task OnInitializedAsync()
+	{
+		await RefrescarUsuarios();
 	}
 
 }

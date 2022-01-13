@@ -1,22 +1,41 @@
-﻿<MudPaper Elevation="3">
+﻿@using Packing.Shared.Usuarios
+@inject NavigationManager _navigation
+@inject HttpClient _cliente
+@inject IJSRuntime _jsRuntime
+
+<MudPaper Elevation="3">
 	<MudCardContent>
 		<MudText Typo="Typo.h6">&nbsp;@UsuarioEntrante.NombreUsuario</MudText>
 		<MudDivider />
 		<br />
 		<MudText><p>Cargo:&nbsp;<b class="text-center">@UsuarioEntrante.Cargo.NombreCargo.</b></p></MudText>
 		<MudText><p>R.U.T:&nbsp;<b class="text-center">@UsuarioEntrante.RutUsuario.</b></p></MudText>
+		<MudText><p>Estado:&nbsp;<b class="text-center">@((UsuarioEntrante.UsuarioActivo) ? "Activo" : "Inhabilitado")</b></p></MudText>
 		<MudDivider></MudDivider>
 		<div class="row text-center d-flex align-content-center">
-			<div class="col-6 mt-2">
-				<MudTooltip Text="Borrar">
-					<MudFab Color="Color.Error" Size="Size.Small"
-					        Icon="@Icons.Material.Filled.Delete">
-					</MudFab>
-				</MudTooltip>
-			</div>
+			@if (UsuarioEntrante.UsuarioActivo)
+			{
+				<div class="col-6 mt-2">
+					<MudTooltip Text="Deshabilitar">
+						<MudFab Color="Color.Warning" Size="Size.Small" OnClick="@(()=> ModalDeshabilitarVisible = true)"
+						        Icon="@Icons.Material.Filled.DisabledVisible">
+						</MudFab>
+					</MudTooltip>
+				</div>
+			}
+			else
+			{
+				<div class="col-6 mt-2">
+					<MudTooltip Text="Habilitar">
+						<MudFab Color="Color.Info" Size="Size.Small" OnClick="@(()=> ModalDeshabilitarVisible = true)"
+						        Icon="@Icons.Material.Filled.Update">
+						</MudFab>
+					</MudTooltip>
+				</div>
+			}
 			<div class="col-6 mt-2">
 				<MudTooltip Text="Editar">
-					<MudFab Color="Color.Info" Size="Size.Small"
+					<MudFab Color="Color.Info" Size="Size.Small" OnClick="@(() => _navigation.NavigateTo("/UsuarioInterno/Editar/" + UsuarioEntrante.IdUsuario))"
 					        Icon="@Icons.Material.Filled.Edit">
 					</MudFab>
 				</MudTooltip>
@@ -25,6 +44,49 @@
 	</MudCardContent>
 </MudPaper>
 
+<MudDialog @bind-IsVisible="ModalDeshabilitarVisible">
+	<DialogContent>
+		<p>&nbsp; ¿Estás seguro que deseas cambiar el estado a este usuario?.</p>
+	</DialogContent>
+	<DialogActions>
+		<MudFab Size="Size.Small" Icon="@Icons.Material.Filled.Cancel" Label="Cerrar" OnClick="@(() => ModalDeshabilitarVisible = false)"></MudFab>
+		<MudFab Size="Size.Small" Icon="@Icons.Material.Filled.ChangeCircle" Color="Color.Warning" OnClick="@(async ()=> await CambiarEstadoUsuario())" Label="Cambiar"></MudFab>
+	</DialogActions>
+</MudDialog>
+
 @code {
+
 	[Parameter]public UsuarioInterno UsuarioEntrante { get; set; }
+	[Parameter] public EventCallback Refrescar { get; set; }
+	protected ModificarEstadoUsuarioDto requestEstado;
+	protected IJSObjectReference Modulo;
+
+	protected bool ModalDeshabilitarVisible = false;
+
+	public async Task CambiarEstadoUsuario()
+	{
+		ModalDeshabilitarVisible = false;
+		requestEstado = new ModificarEstadoUsuarioDto {IdUsuarioInterno = UsuarioEntrante.IdUsuario};
+		Modulo = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utilidades.js");
+		try
+		{
+			var result = await _cliente.PostAsJsonAsync("api/Usuarios/CambiarEstadoUsuario", requestEstado);
+			if (result.IsSuccessStatusCode)
+			{
+				await Modulo.InvokeVoidAsync("Exito");
+				await Refrescar.InvokeAsync();
+				StateHasChanged();
+			}
+			else
+			{
+				var mensajeRespuesta = await result.Content.ReadAsStringAsync();
+				await Modulo.InvokeVoidAsync("ErrorGeneral",mensajeRespuesta);
+			}
+		}
+		catch (Exception error)
+		{
+			await Modulo.InvokeVoidAsync("ErrorGeneral",error.Message);
+		}
+	}
+	
 }

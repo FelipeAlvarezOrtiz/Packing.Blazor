@@ -53,6 +53,7 @@
 	[Parameter] public EventCallback<int> BorrarEmpresa { get; set; }
 
 	protected bool ModalBorrar = false;
+
     protected void EditarEmpresa() => Navigator.NavigateTo("/Empresas/Editar/"+EmpresaEntrante.IdEmpresa);
 	protected void AgregarProductos() => Navigator.NavigateTo("/Empresas/Agregar/"+EmpresaEntrante.IdEmpresa);
 

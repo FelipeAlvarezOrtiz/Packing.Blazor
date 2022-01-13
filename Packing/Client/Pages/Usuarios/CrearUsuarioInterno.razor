@@ -2,10 +2,10 @@
 @using Packing.Shared.Usuarios
 @inject HttpClient _cliente
 @inject NavigationManager _navigator
-@inject IJSRuntime JsRuntime
+@inject IJSRuntime _jsRuntime
 @attribute [Authorize(Roles = "Administrador")]
 
-<h3>Crear Usuario Interno</h3>
+<h3><i class="fas fa-user-plus"></i>&nbsp;Crear Usuario Interno</h3>
 @if (CargosInternos is null)
 {
 	<MudSkeleton />
@@ -81,6 +81,7 @@ else
 
 	protected List<CargoInterno> CargosInternos;
 	protected CrearUsuarioInternoDto NuevoUsuario = new();
+	protected IJSObjectReference Modulo;
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -90,22 +91,24 @@ else
 
 	protected async void InsertarUsuarioInterno()
 	{
+		Modulo = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utilidades.js");
 		try
 		{
 			var result = await _cliente.PostAsJsonAsync("api/Usuarios/CrearUsuarioInterno", NuevoUsuario);
 			if (result.IsSuccessStatusCode)
 			{
-				NuevoUsuario = new CrearUsuarioInternoDto();
-				StateHasChanged();
+				await Modulo.InvokeVoidAsync("Exito");
+				_navigator.NavigateTo("/Usuarios/Internos");
 			}
 			else
 			{
-				Console.WriteLine("Ha ocurrido un error");
+				var mensajeRespuesta = await result.Content.ReadAsStringAsync();
+				await Modulo.InvokeVoidAsync("ErrorGeneral",mensajeRespuesta);
 			}
 		}
 		catch (Exception error)
 		{
-			Console.WriteLine(error.Message);
+			await Modulo.InvokeVoidAsync("ErrorGeneral",error.Message);
 		}
 	}
 }

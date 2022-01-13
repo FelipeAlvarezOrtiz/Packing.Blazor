@@ -13,8 +13,10 @@ namespace Packing.Shared.Usuarios
         public string RutUsuario { get; set; }
         [Required(ErrorMessage = "El dato es requerido."),MaxLength(100),EmailAddress(ErrorMessage = "No tiene formato válido de correo.")]
         public string CorreoUsuario { get; set; }
-        public bool UsuarioActivo { get; set; }
-        [Required(ErrorMessage = "El cargo es requerido.")]
+
+        public bool UsuarioActivo { get; set; } = true;
+
+        [Required(ErrorMessage = "El cargo es requerido."),Range(1,2,ErrorMessage = "Escoga una opción válida.")]
         public int IdCargo { get; set; }
     }
 }

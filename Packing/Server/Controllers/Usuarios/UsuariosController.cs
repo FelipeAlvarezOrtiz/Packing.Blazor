@@ -48,5 +48,19 @@ namespace Packing.Server.Controllers.Usuarios
         {
             return await Mediator.Send(new ObtenerUsuariosInternosQuery());
         }
+
+        [HttpPost("CambiarEstadoUsuario"), Authorize(Roles = "Administrador")]
+        public async Task<ActionResult<Unit>> CambiarEstadoUsuario(ModificarEstadoUsuarioDto request)
+        {
+            try
+            {
+                return await Mediator.Send(request);
+            }
+            catch (Exception error)
+            {
+                return BadRequest(error.Message);
+            }
+        }
+
     }
 }
