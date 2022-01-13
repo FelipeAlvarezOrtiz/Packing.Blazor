@@ -9,7 +9,7 @@ namespace Packing.Shared.Usuarios
         public string NombreUsuario { get; set; }
         [Required(ErrorMessage = "Este dato es requerido."),MaxLength(100),Phone(ErrorMessage = "No tiene formato válido de teléfono.")]
         public string NumeroTelefono { get; set; }
-        [Required(ErrorMessage = "El dato es requerido."), MinLength(9), MaxLength(15)]
+        [Required(ErrorMessage = "Debes ingresar el RUT de cliente. Sin puntos, con guión."), Packing.Shared.Validador.RutValidador]
         public string RutUsuario { get; set; }
         [Required(ErrorMessage = "El dato es requerido."),MaxLength(100),EmailAddress(ErrorMessage = "No tiene formato válido de correo.")]
         public string CorreoUsuario { get; set; }
