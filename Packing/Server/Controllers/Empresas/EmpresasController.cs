@@ -36,5 +36,6 @@ namespace Packing.Server.Controllers.Empresas
                 return BadRequest(error.Message);
             }
         }
+
     }
 }

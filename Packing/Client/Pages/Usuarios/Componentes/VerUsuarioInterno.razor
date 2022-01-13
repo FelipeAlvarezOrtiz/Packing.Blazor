@@ -1,0 +1,30 @@
+﻿<MudPaper Elevation="3">
+	<MudCardContent>
+		<MudText Typo="Typo.h6">&nbsp;@UsuarioEntrante.NombreUsuario</MudText>
+		<MudDivider />
+		<br />
+		<MudText><p>Cargo:&nbsp;<b class="text-center">@UsuarioEntrante.Cargo.NombreCargo.</b></p></MudText>
+		<MudText><p>R.U.T:&nbsp;<b class="text-center">@UsuarioEntrante.RutUsuario.</b></p></MudText>
+		<MudDivider></MudDivider>
+		<div class="row text-center d-flex align-content-center">
+			<div class="col-6 mt-2">
+				<MudTooltip Text="Borrar">
+					<MudFab Color="Color.Error" Size="Size.Small"
+					        Icon="@Icons.Material.Filled.Delete">
+					</MudFab>
+				</MudTooltip>
+			</div>
+			<div class="col-6 mt-2">
+				<MudTooltip Text="Editar">
+					<MudFab Color="Color.Info" Size="Size.Small"
+					        Icon="@Icons.Material.Filled.Edit">
+					</MudFab>
+				</MudTooltip>
+			</div>
+		</div>
+	</MudCardContent>
+</MudPaper>
+
+@code {
+	[Parameter]public UsuarioInterno UsuarioEntrante { get; set; }
+}

@@ -1,0 +1,111 @@
+﻿@page "/Usuarios/Internos/Crear"
+@using Packing.Shared.Usuarios
+@inject HttpClient _cliente
+@inject NavigationManager _navigator
+@inject IJSRuntime JsRuntime
+@attribute [Authorize(Roles = "Administrador")]
+
+<h3>Crear Usuario Interno</h3>
+@if (CargosInternos is null)
+{
+	<MudSkeleton />
+	<MudSkeleton Animation="Animation.False" />
+	<MudSkeleton Animation="Animation.Wave" />
+	<div class="row">
+		<div class="col d-flex justify-content-center">
+			<p>Cargando, espere por favor ...</p>
+		</div>
+	</div>
+}
+else
+{
+	<EditForm Model="NuevoUsuario" OnValidSubmit="InsertarUsuarioInterno">
+		<DataAnnotationsValidator></DataAnnotationsValidator>
+		<hr />
+		<div class="row">
+			<div class="col-md-6">
+				<MudTextField Label="Nombre" Variant="Variant.Outlined" @bind-Value="NuevoUsuario.NombreUsuario" />
+				<ValidationMessage For="@(() => NuevoUsuario.NombreUsuario)"></ValidationMessage>
+			</div>
+			<div class="col-md-6">
+				<MudTextField Label="Correo" Variant="Variant.Outlined" @bind-Value="NuevoUsuario.CorreoUsuario" />
+				<ValidationMessage For="@(()=> NuevoUsuario.CorreoUsuario)"></ValidationMessage>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-6">
+				<MudTextField Label="R.U.T" Variant="Variant.Outlined" @bind-Value="NuevoUsuario.RutUsuario" />
+				<ValidationMessage For="@(() => NuevoUsuario.RutUsuario)"></ValidationMessage>
+			</div>
+			<div class="col-md-6">
+				<MudTextField Label="Numero telefonico" Variant="Variant.Outlined" @bind-Value="NuevoUsuario.NumeroTelefono" />
+				<ValidationMessage For="@(()=> NuevoUsuario.NumeroTelefono)"></ValidationMessage>
+			</div>
+		</div>
+		<hr />
+		<div class="row">
+			<div class="col-md-8">
+				<MudSelect T="int" Label="Cargo" @bind-Value="NuevoUsuario.IdCargo" Placeholder="Selecciona un cargo"
+				           AdornmentIcon="@Icons.Material.Filled.BusinessCenter" AdornmentColor="MudBlazor.Color.Primary">
+						<MudSelectItem T="int" Value="0">Seleccione</MudSelectItem>
+					@foreach (var cargo in CargosInternos)
+					{
+						<MudSelectItem T="int" Value="cargo.IdCargo">@cargo.NombreCargo</MudSelectItem>
+					}
+				</MudSelect>&nbsp;
+				<ValidationMessage For="@(()=> NuevoUsuario.NumeroTelefono)"></ValidationMessage>
+			</div>
+			<div class="col-md-4">
+				<MudCheckBox @bind-Checked="@NuevoUsuario.UsuarioActivo" Size="Size.Medium"
+						 Color="Color.Tertiary">Usuario activo</MudCheckBox>
+			</div>
+		</div>
+		<hr />
+		<div class="row text-center d-flex align-content-center justify-content-center">
+			<div class="col-6">
+				<MudTooltip Text="Volver atrás">
+					<MudFab Variant="Variant.Filled" OnClick="@(() => _navigator.NavigateTo("/Usuarios/Internos"))" Icon="@Icons.Material.Filled.ArrowBack" Color="MudBlazor.Color.Primary"></MudFab>
+				</MudTooltip>
+			</div>
+			<div class="col-6">
+				<MudTooltip Text="Guardar">
+					<MudFab Variant="Variant.Filled" Icon="@Icons.Material.Filled.Save" ButtonType="ButtonType.Submit"
+						Color="MudBlazor.Color.Primary"></MudFab>
+				</MudTooltip>
+			</div>
+		</div>
+	</EditForm>
+}
+
+@code {
+
+	protected List<CargoInterno> CargosInternos;
+	protected CrearUsuarioInternoDto NuevoUsuario = new();
+
+	protected override async Task OnInitializedAsync()
+	{
+		CargosInternos = await _cliente.GetFromJsonAsync<List<CargoInterno>>("api/Usuarios/ObtenerCargosInternos");
+		StateHasChanged();
+	}
+
+	protected async void InsertarUsuarioInterno()
+	{
+		try
+		{
+			var result = await _cliente.PostAsJsonAsync("api/Usuarios/CrearUsuarioInterno", NuevoUsuario);
+			if (result.IsSuccessStatusCode)
+			{
+				NuevoUsuario = new CrearUsuarioInternoDto();
+				StateHasChanged();
+			}
+			else
+			{
+				Console.WriteLine("Ha ocurrido un error");
+			}
+		}
+		catch (Exception error)
+		{
+			Console.WriteLine(error.Message);
+		}
+	}
+}

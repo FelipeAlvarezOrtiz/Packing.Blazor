@@ -1,6 +1,7 @@
 ﻿@page "/Usuarios/Internos"
-@inject HttpClient Cliente
-@inject NavigationManager Navigator
+@using Packing.Client.Pages.Usuarios.Componentes
+@inject HttpClient _cliente
+@inject NavigationManager _navigator
 @inject IJSRuntime JsRuntime
 @attribute [Authorize(Roles = "Administrador")]
 
@@ -8,49 +9,54 @@
 <hr />
 @if (UsuariosColones is null)
 {
-    <MudSkeleton />
-    <MudSkeleton Animation="Animation.False" />
-    <MudSkeleton Animation="Animation.Wave" />
-    <div class="row">
-        <div class="col d-flex justify-content-center">
-            <p>Cargando usuarios, espere por favor ...</p>
-        </div>
-    </div>
+	<MudSkeleton />
+	<MudSkeleton Animation="Animation.False" />
+	<MudSkeleton Animation="Animation.Wave" />
+	<div class="row">
+		<div class="col d-flex justify-content-center">
+			<p>Cargando usuarios, espere por favor ...</p>
+		</div>
+	</div>
 }
 else
 {
-    @if (UsuariosColones is null)
-    {
-        <MudSkeleton />
-        <MudSkeleton Animation="Animation.False" />
-        <MudSkeleton Animation="Animation.Wave" />
-        <div class="row">
-            <div class="col d-flex justify-content-center">
-                <p>Cargando usuarios, espere por favor ...</p>
-            </div>
-        </div>
-    }
-    else
-    {
-        <div class="row">
-            <div class="col text-center">
-                <div class="alert alert-info"><h5><i class="fas fa-info-circle"></i>&nbsp;No existen usuarios de colonos en el sistema.</h5></div>
-            </div>
-        </div>
-    }
-    <div class="row d-flex align-content-center">
-        <div class="col-sm-12 col-md-12 text-center">
-            <MudFab Color="Color.Success" Icon="@Icons.Material.Filled.AddCircleOutline" ButtonType="ButtonType.Button" Label="Nuevo usuario"></MudFab>
-        </div>
-    </div>
+	if (!UsuariosColones.Any())
+	{
+		<div class="row">
+			<div class="col text-center">
+				<div class="alert alert-info"><h5><i class="fas fa-info-circle"></i>&nbsp;No existen usuarios de colonos en el sistema.</h5></div>
+			</div>
+		</div>
+	}
+	else
+	{
+		<div class="row">
+			@foreach (var usuario in UsuariosColones)
+			{
+				<div class="col-sm-12 col-md-4">
+					<VerUsuarioInterno UsuarioEntrante="usuario"></VerUsuarioInterno>
+				</div>
+			}
+		</div>
+		
+	}
+	<br />
+	<MudDivider></MudDivider>
+	<div class="row d-flex align-content-center">
+		<div class="col-sm-12 col-md-12 text-center">
+			<MudFab Color="Color.Success" Icon="@Icons.Material.Filled.AddCircleOutline" OnClick="@(()=> _navigator.NavigateTo("/Usuarios/Internos/Crear"))"
+				ButtonType="ButtonType.Button" Label="Nuevo usuario"></MudFab>
+		</div>
+	</div>
 }
 
 @code {
-    protected List<string> UsuariosColones;
+	protected List<UsuarioInterno> UsuariosColones;
 
-    protected override async Task OnInitializedAsync()
-    {
-        UsuariosColones = new();
-    }
+	protected override async Task OnInitializedAsync()
+	{
+		UsuariosColones = await _cliente.GetFromJsonAsync<List<UsuarioInterno>>("api/Usuarios/ObtenerUsuariosInternos");
+		StateHasChanged();
+	}
 
 }
