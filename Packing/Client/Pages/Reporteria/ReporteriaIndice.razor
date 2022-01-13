@@ -1,7 +1,7 @@
-﻿@inject HttpClient Cliente
-@inject IJSRuntime JsRuntime
-@inject NavigationManager Navigator
-@inject AuthenticationStateProvider AuthenticationStateProvider
+﻿@inject HttpClient _cliente
+@inject IJSRuntime _jsRuntime
+@inject NavigationManager _navigator
+@inject AuthenticationStateProvider _authenticationStateProvider
 @attribute [Authorize(Roles = "Administrador")]
 @page "/Reporteria/Indice"
 @using Packing.Shared.ReportesDto
@@ -78,17 +78,24 @@ else
         {
             <div class="col-12">
                 <div class="row">
-                    <div class="col-12">
-                        <h6><i class="fas fa-file-export"></i>&nbsp;Reportes</h6>
-                        <div class="row text-center d-flex align-content-center justify-content-center">
-                            <div class="col-sm-12 col-md-6 mt-2">
-                                <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.PictureAsPdf" Color="MudBlazor.Color.Primary">Exportar a Jefe de packing</MudButton>
-                            </div>
-                            <div class="col-sm-12 col-md-6 mt-2">
-                                <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.PictureAsPdf" Color="MudBlazor.Color.Primary">Exportar a cosecheros</MudButton>
-                            </div>
-                        </div>
-                    </div>
+	                <div class="col-12">
+                        @if (UsuariosInternos is null || UsuariosInternos.Count == 0)
+                        {
+	                        <MudAlert Severity="Severity.Warning" Elevation="3" ContentAlignment="HorizontalAlignment.Center">No existen usuarios internos creados para enviar reportes.</MudAlert>
+                        }
+                        else
+                        {
+	                        <h6><i class="fas fa-file-export"></i>&nbsp;Reportes</h6>
+	                        <div class="row text-center d-flex align-content-center justify-content-center">
+		                        <div class="col-sm-12 col-md-6 mt-2">
+			                        <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.PictureAsPdf" Color="MudBlazor.Color.Primary">Exportar a Jefe de packing</MudButton>
+		                        </div>
+		                        <div class="col-sm-12 col-md-6 mt-2">
+			                        <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.PictureAsPdf" Color="MudBlazor.Color.Primary">Exportar a cosecheros</MudButton>
+		                        </div>
+	                        </div>
+                        }
+	                </div>
                 </div>
             </div>
             <br />
@@ -138,6 +145,7 @@ else
     protected ReporteCosecheroQuery RequestCosechero = new();
     protected ReporteJefePackingQuery RequestJefePacking = new();
     protected int IdEmpresaSeleccionada = 0;
+	protected List<UsuarioInterno> UsuariosInternos;
 
 	public record ExportDataHelper
 	{
@@ -147,16 +155,18 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        EmpresasEnSistema = await Cliente.GetFromJsonAsync<List<Empresa>>("api/Empresas/ObtenerEmpresas");
-        StateHasChanged();
+        EmpresasEnSistema = await _cliente.GetFromJsonAsync<List<Empresa>>("api/Empresas/ObtenerEmpresas");
+        UsuariosInternos = await _cliente.GetFromJsonAsync<List<UsuarioInterno>>("api/Usuarios/ObtenerUsuariosInternos");
+	    UsuariosInternos = UsuariosInternos.Where(x => x.UsuarioActivo).ToList();
+	    StateHasChanged();
     }
 
     protected async void BuscarPedidos()
     {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
         if (authState.User.Identity != null) IdUsuarioLoggeado = authState.User.Identity.Name;
 
-        var dtoRequest = new BuscarPedidosReporteQuery()
+	    var dtoRequest = new BuscarPedidosReporteQuery()
         {
             FechaDesde = DateTime.TryParse(FechaDesde.ToString(),out var resultDesde) ? resultDesde : DateTime.Today,
             FechaHasta = DateTime.TryParse(FechaHasta.ToString(),out var resultHasta) ? resultHasta.AddHours(23).AddMinutes(59) : DateTime.Today,
@@ -169,13 +179,14 @@ else
 		    IdEmpresa = IdEmpresaSeleccionada,
             UsuarioSolicitante = "SYSTEM"
 	    };
-        var resultRequest = await Cliente.PostAsJsonAsync("api/Pedidos/ObtenerPedidosParaReporte", dtoRequest);
-        var resultRequestPedidos = await Cliente.PostAsJsonAsync("api/Pedidos/ObtenerReporteCosecheros", reporteJefe);
+        var resultRequest = await _cliente.PostAsJsonAsync("api/Pedidos/ObtenerPedidosParaReporte", dtoRequest);
+        var resultRequestPedidos = await _cliente.PostAsJsonAsync("api/Pedidos/ObtenerReporteCosecheros", reporteJefe);
         if (resultRequest.IsSuccessStatusCode)
         {
             try
             {
                 PedidosEncontrados = await resultRequest.Content.ReadFromJsonAsync<List<Pedido>>();
+                StateHasChanged();
                 //var dataExportar = await resultRequestPedidos.Content.ReadFromJsonAsync<ReporteCosechero>();
                 //ExportToPdf(dataExportar);
             }
@@ -190,7 +201,7 @@ else
 
     protected void DetallePedido(Guid urlDetalle)
     {
-        Navigator.NavigateTo("/Pedidos/Ver/" + urlDetalle);
+        _navigator.NavigateTo("/Pedidos/Ver/" + urlDetalle);
     }
 
     void ExportToPdf(ReporteCosechero reporte)
@@ -247,7 +258,7 @@ else
 		    pdfDocument.Save(memoryStream);
 
 			// Download the PDF document
-		    JsRuntime.SaveAs("Pedidos info.pdf", memoryStream.ToArray());
+		    _jsRuntime.SaveAs("Pedidos info.pdf", memoryStream.ToArray());
 	    }
 	    catch (Exception error)
 	    {
