@@ -33,7 +33,7 @@ else
                         {
                             <div class="form-group">
                                 <div class="input-group">
-                                    <MudSelect T="int" @bind-Value="FormatoIngresado" Label="Formato" Strict="true" Variant="Variant.Outlined" Format="F2" AnchorOrigin="Origin.BottomCenter">
+                                    <MudSelect T="int" @bind-Value="FormatoIngresado" @onchange="Cambiado" Label="Formato" Strict="true" Variant="Variant.Outlined" Format="F2" AnchorOrigin="Origin.BottomCenter">
                                         @foreach (var formato in FormatosDisponiblesEnGrupo)
                                         {
                                             <MudSelectItem T="int" Value="formato.IdFormato">@formato.NombreFormato</MudSelectItem>
@@ -173,4 +173,9 @@ else
         }
 
     }
+
+	protected void Cambiado()
+	{
+        Console.WriteLine("Cambiado");
+	}
 }

@@ -107,10 +107,13 @@
 						</MudTooltip>
 					</div>
 					<div class="col-6 text-center">
-						<MudTooltip Text="Siguiente">
-							@*<MudFab Icon="@Icons.Outlined.ArrowForward" OnClick="(() => Activar(3))">Siguiente</MudFab>*@
-							<MudFab Icon="@Icons.Outlined.Send" OnClick="IngresarPedido" Label="Enviar" Size="Size.Small" Color="Color.Success"></MudFab>
-						</MudTooltip>
+						@if (CarroPedido.Count > 0)
+						{
+							<MudTooltip Text="Siguiente">
+								@*<MudFab Icon="@Icons.Outlined.ArrowForward" OnClick="(() => Activar(3))">Siguiente</MudFab>*@
+								<MudFab Icon="@Icons.Outlined.Send" OnClick="IngresarPedido" Label="Enviar" Size="Size.Small" Color="Color.Success"></MudFab>
+							</MudTooltip>
+						}
 					</div>
 				</div>
 				<hr />
@@ -148,10 +151,10 @@
 				<MudSkeleton Animation="Animation.False" />
 				<MudSkeleton Animation="Animation.Wave" />
 				<div class="row">
-					<div class="col d-flex justify-content-center">
+					<div class="col-12 d-flex justify-content-center">
 						<p>Creando el pedido, espere ...</p>
 					</div>
-					<div class="col text-center d-flex justify-content-center">
+					<div class="col-12 text-center d-flex justify-content-center">
 						<MudProgressCircular Color="Color.Primary" Size="Size.Large" Indeterminate="true" />
 					</div>
 				</div>
