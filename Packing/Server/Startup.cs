@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Packing.Core.Usuarios;
+using Packing.Negocio.Mailing;
 using Packing.Negocio.Productos;
 using Packing.Persistencia;
 
@@ -57,6 +58,7 @@ namespace Packing.Server
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("role");
             services.AddAuthentication().AddIdentityServerJwt();
             services.AddMediatR(typeof(ListaProductos.Handler));
+            services.AddSingleton<EnviadorCorreos>();
             services.AddControllersWithViews().AddJsonOptions(x =>
             {
                 x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;

@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Packing.Negocio.Mailing;
 using Packing.Persistencia.Repositorios;
 
 namespace Packing.Negocio.Pedidos
@@ -17,11 +18,12 @@ namespace Packing.Negocio.Pedidos
         private readonly ApplicationDbContext _context;
         private readonly IMediator _mediator;
         private readonly PedidosRepository _pedidosRepository = new();
-
-        public CrearPedido(IMediator mediator, ApplicationDbContext context)
+        private readonly EnviadorCorreos _enviadorCorreos;
+        public CrearPedido(IMediator mediator, ApplicationDbContext context, EnviadorCorreos enviadorCorreos)
         {
             _mediator = mediator;
             _context = context;
+            _enviadorCorreos = enviadorCorreos;
         }
 
         public async Task<Unit> Handle(PedidoRequestDto request, CancellationToken cancellationToken)
@@ -69,10 +71,22 @@ namespace Packing.Negocio.Pedidos
             pedidoCabecera.ProductosEnPedido = listaProductosEnPedido;
             await _context.Pedidos.AddAsync(pedidoCabecera, cancellationToken);
             //await _pedidosRepository.CrearPedido(pedidoCabecera);
+            _enviadorCorreos.EnviarEmail("falvarezortiz@hotmail.com",
+                "Nuevo pedido ingresado",
+                ReemplazaTextoHtml(empresaMandante.NombreEmpresa,pedidoCabecera.GuidPedido.ToString()));
             return await _context.SaveChangesAsync(cancellationToken) > 0
                    ? Unit.Value
                    : throw new Exception(
                        "Ha ocurrido un error al ingresar el pedido, intente más tarde o contacte al administrador.");
+        }
+
+        public string ReemplazaTextoHtml(string empresa,string idPedido)
+        {
+            return $@"<h3>Han ingresado nuevo pedido: {idPedido}</h3>
+                    <div>
+                        <p>Te informamos que con fecha {DateTime.Now:dd-MM-yyyy} a las {DateTime.Now:HH:mm:ss}, la empresa {empresa} ha ingresado un nuevo pedido a la plataforma. </p>
+                            <br /> <p>Revisa en pedidos recientes para encontrar más detalles.</p>
+                    </div>";
         }
     }
 }

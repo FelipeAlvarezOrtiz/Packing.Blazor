@@ -6,7 +6,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using MudBlazor.Services;
-using Packing.Client.Servicios;
 
 namespace Packing.Client
 {
@@ -40,7 +39,6 @@ namespace Packing.Client
 
         private static void ConfigurarServicios(IServiceCollection services)
         {
-            services.AddSingleton<EnviadorCorreos>();
             services.AddMudServices();
         }
     }

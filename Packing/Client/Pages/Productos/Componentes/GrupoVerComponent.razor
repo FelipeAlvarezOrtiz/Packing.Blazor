@@ -71,25 +71,22 @@ else
 			        <MudNumericField @bind-Value="CantidadProducto" Label="Cantidad" Min="0" Variant="Variant.Outlined" Step="1"/>
 		        </div>
 	        </div>
-            
+	        <div class="row text-center d-flex align-content-center">
+		        <div class="col-6 mt-2">
+			        <MudFab Class="mt-1 ml-2" Color="Color.Info" Size="Size.Small"
+			                Icon="@Icons.Material.Filled.Refresh" Label="Limpiar" OnClick="LimpiarUi">
+			        </MudFab>
+		        </div>
+		        <div class="col-6 mt-2">
+			        @if (CantidadProducto > 0 && PresentacionIngresada > 0 && FormatoIngresado > 0)
+			        {
+				        <MudFab Class="mt-1 ml-2" Color="Color.Success" Size="Size.Small"
+				                Icon="@Icons.Material.Filled.Add" Label="Agregar" OnClick="AgregarAlCarroPrimerPaso">
+				        </MudFab>
+			        }
+		        </div>
+	        </div>
         </MudCardContent>
-        <MudCardActions Class="row text-center d-flex align-content-center">
-            <div class="row text-center d-flex align-content-center">
-                <div class="col-6 mt-2">
-                    <MudFab Class="mt-1 ml-2" Color="Color.Info" Size="Size.Small"
-                            Icon="@Icons.Material.Filled.Refresh" Label="Limpiar" OnClick="LimpiarUi">
-                    </MudFab>
-                </div>
-                <div class="col-6 mt-2">
-                    @if (CantidadProducto > 0 && PresentacionIngresada > 0 && FormatoIngresado > 0)
-                    {
-                    <MudFab Class="mt-1 ml-2" Color="Color.Success" Size="Size.Small"
-                            Icon="@Icons.Material.Filled.Add" Label="Agregar" OnClick="AgregarAlCarroPrimerPaso">
-                    </MudFab>
-                    }
-                </div>
-            </div>
-        </MudCardActions>
     </MudCard>
 }
 
