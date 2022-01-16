@@ -1,9 +1,8 @@
 ﻿@inject NavigationManager navigator
 @inject AuthenticationStateProvider AuthenticationStateProvider
-@inject HttpClient client
+@inject HttpClient _client
 @page "/"
 @using Packing.Shared.Pedidos
-@using Packing.Client.Pages.Usuarios.Componentes
 @using Packing.Client.Pages.Usuarios
 
 @attribute [Authorize]
@@ -115,14 +114,14 @@
 		var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
 		var user = authState.User;
 		if (authState.User.Identity != null) IdUsuarioLoggeado = authState.User.Identity.Name;
-		GruposEnSistema = await client.GetFromJsonAsync<List<GrupoProducto>>("api/Grupos/ObtenerGrupos");
+		GruposEnSistema = await _client.GetFromJsonAsync<List<GrupoProducto>>("api/Grupos/ObtenerGrupos");
 		var dtoRequest = new ObtenerPedidosPorEmpresaDto()
 			{
 				FechaDesde = null,
 				FechaHasta = null,
 				NombreUsuario = IdUsuarioLoggeado
 			};
-		var resultRequest = await client.PostAsJsonAsync("api/Pedidos/ObtenerPedidosDeEmpresa", dtoRequest);
+		var resultRequest = await _client.PostAsJsonAsync("api/Pedidos/ObtenerPedidosDeEmpresa", dtoRequest);
 		if (resultRequest.IsSuccessStatusCode)
 		{
 			try
