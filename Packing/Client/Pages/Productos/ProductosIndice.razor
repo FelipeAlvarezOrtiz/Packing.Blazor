@@ -7,7 +7,7 @@
 <h3><i class="fas fa-boxes"></i>&nbsp;Productos Indice</h3>
 <hr />
 <div class="container-fluid">
-    @if (ProductosEnSistema is null)
+    @if (ProductosEnSistema is null && !Buscando)
     {
         <MudSkeleton />
         <MudSkeleton Animation="Animation.False" />
@@ -18,7 +18,7 @@
             </div>
         </div>
     }
-    else if (ProductosEnSistema.Count == 0)
+    else if (ProductosEnSistema.Count == 0 && !NoHayNadaEnBusqueda && !Buscando)
     {
 	    <div class="col">
 		    <div class="row">
@@ -36,30 +36,60 @@
     }
     else
     {
-        <div class="row">
-            @foreach (var producto in ProductosEnSistema)
-            {
-                <div class="col-sm-12 col-md-6 col-lg-4">
-                    <ProductoVerComponent ProductoBlock="producto" EditarProducto="ActualizarProducto" BorrarProducto="BorrarProducto" ></ProductoVerComponent>
-                </div>
-            }
-        </div>
+	    <div class="row">
+		    <div class="col-9">
+			    <MudTextField @bind-Value="NombreProductoBusqueda" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+		    </div>
+		    <div class="col-2 mt-1">
+			    <MudFab Size="Size.Small" Icon="@Icons.Material.Filled.Search" OnClick="BuscarProducto"></MudFab>
+		    </div>
+	    </div>
+	    <hr/>
+	    if (Buscando)
+	    {
+		    <div class="row">
+			    <div class="col-12 d-flex justify-content-center">
+				    <p>Buscando, espere ...</p>
+			    </div>
+		    </div>
+		    <div class="d-flex justify-content-center align-content-center text-center">
+			    <MudProgressCircular Color="Color.Primary" Size="Size.Large" Indeterminate="true" />
+		    </div>
+	    }
+	    else
+	    {
+		    if (NoHayNadaEnBusqueda)
+		    {
+			    <MudAlert Severity="Severity.Warning" Elevation="3" ContentAlignment="HorizontalAlignment.Center">No existe productos con esas palabras.</MudAlert>
+		    }
+		    else
+		    {
+			    <div class="row">
+				    @foreach (var producto in ProductosEnSistema)
+				    {
+					    <div class="col-sm-12 col-md-6 col-lg-4">
+						    <ProductoVerComponent ProductoBlock="producto" EditarProducto="ActualizarProducto" BorrarProducto="BorrarProducto"></ProductoVerComponent>
+					    </div>
+				    }
+			    </div>
+		    }
+	    }
 	    <br />
     }
     <MudDivider></MudDivider>
     <br />
     <div class="row d-flex align-content-center">
 	    <div class="col-sm-12 col-md-3 mt-2 text-center">
-		    <MudFab Color="Color.Success" Icon="@Icons.Material.Filled.AddCircleOutline" ButtonType="ButtonType.Button" OnClick="NuevoProductoView" Label="Nuevo producto"></MudFab>
+		    <MudFab Size="Size.Small" Color="Color.Success" Icon="@Icons.Material.Filled.AddCircleOutline" ButtonType="ButtonType.Button" OnClick="NuevoProductoView" Label="Nuevo producto"></MudFab>
 	    </div>
 	    <div class="col-sm-12 col-md-3 mt-2 text-center">
-		    <MudFab Color="Color.Success" Icon="@Icons.Material.Filled.AddCircleOutline" ButtonType="ButtonType.Button" OnClick="NuevoPresentacionView" Label="Nuevo presentación"></MudFab>
+		    <MudFab Size="Size.Small" Color="Color.Success" Icon="@Icons.Material.Filled.AddCircleOutline" ButtonType="ButtonType.Button" OnClick="NuevoPresentacionView" Label="Nueva presentación"></MudFab>
 	    </div>
 	    <div class="col-sm-12 col-md-3 mt-2 text-center">
-		    <MudFab Color="Color.Success" Icon="@Icons.Material.Filled.AddCircleOutline" ButtonType="ButtonType.Button" OnClick="NuevoFormatoView" Label="Nuevo formato"></MudFab>
+		    <MudFab Size="Size.Small" Color="Color.Success" Icon="@Icons.Material.Filled.AddCircleOutline" ButtonType="ButtonType.Button" OnClick="NuevoFormatoView" Label="Nuevo formato"></MudFab>
 	    </div>
 	    <div class="col-sm-12 col-md-3 mt-2 text-center">
-		    <MudFab Color="Color.Success" Icon="@Icons.Material.Filled.AddCircleOutline" ButtonType="ButtonType.Button" OnClick="NuevoGrupoView" Label="Nuevo grupo"></MudFab>
+		    <MudFab Size="Size.Small" Color="Color.Success" Icon="@Icons.Material.Filled.AddCircleOutline" ButtonType="ButtonType.Button" OnClick="NuevoGrupoView" Label="Nuevo grupo"></MudFab>
 	    </div>
     </div>
 </div>
@@ -68,11 +98,16 @@
 
 @code {
 	protected List<Producto> ProductosEnSistema;
+	protected List<Producto> ProductosEnBusqueda;
 	protected IJSObjectReference Modulo;
+	protected string NombreProductoBusqueda = string.Empty;
+	protected bool NoHayNadaEnBusqueda;
+	protected bool Buscando;
 
     protected override async Task OnInitializedAsync()
     {
         ProductosEnSistema = await cliente.GetFromJsonAsync<List<Producto>>("api/Productos/ObtenerListaProductos");
+	    ProductosEnBusqueda = ProductosEnSistema;
     }
 
     protected void ActualizarProducto(Producto productoBlock) => navigator.NavigateTo("/Productos/Editar/" + productoBlock.IdProducto);
@@ -106,4 +141,42 @@
     protected void NuevoPresentacionView() => navigator.NavigateTo("/Productos/Presentaciones");
     protected void NuevoGrupoView() => navigator.NavigateTo("/Productos/Grupos");
 
+	protected async void BuscarProducto()
+	{
+		Buscando = true;
+		if (ProductosEnSistema.Count == 0 && NoHayNadaEnBusqueda)
+		{
+			ProductosEnSistema = await cliente.GetFromJsonAsync<List<Producto>>("api/Productos/ObtenerListaProductos");
+			if (string.IsNullOrEmpty(NombreProductoBusqueda))
+			{
+				NoHayNadaEnBusqueda = false;
+			}
+			else
+			{
+				ProductosEnSistema = ProductosEnSistema.Where(x => x.NombreParaBusqueda.ToLower().Contains(NombreProductoBusqueda.ToLower())).ToList();
+				NoHayNadaEnBusqueda = ProductosEnSistema.Count == 0;
+			}
+			Buscando = false;
+			StateHasChanged();
+		}
+		else
+		{
+			ProductosEnSistema = await cliente.GetFromJsonAsync<List<Producto>>("api/Productos/ObtenerListaProductos");
+			if (string.IsNullOrEmpty(NombreProductoBusqueda))
+			{
+				NoHayNadaEnBusqueda = false;
+			}
+			else
+			{
+				ProductosEnSistema = ProductosEnSistema.Where(x => x.NombreParaBusqueda.ToLower()
+					.Contains(NombreProductoBusqueda.ToLower())).ToList();
+				if (ProductosEnSistema.Count == 0)
+				{
+					NoHayNadaEnBusqueda = true;
+				}
+			}
+			Buscando = false;
+			StateHasChanged();
+		}
+	}
 }

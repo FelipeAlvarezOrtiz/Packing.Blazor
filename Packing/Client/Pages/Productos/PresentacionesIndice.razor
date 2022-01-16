@@ -29,39 +29,40 @@
 }
 else
 {
-    <div class="row">
-        <div class="col">
-            <MudSimpleTable Dense="true" Hover="true" Bordered="true" Striped="true" Style="overflow-x: auto;">
-                <thead class="thead-dark">
-                <tr>
-                    <th class="text-center">
-                        Nombre presentación
-                    </th>
-                    <th class="text-center">
-                        Acciones
-                    </th>
-                </tr>
-                </thead>
-                <tbody>
-                @foreach (var presentacion in PresentacionesEnSistema)
-                {
-                    <tr>
-                        <td class="text-center">@presentacion.NombrePresentacion</td>
-                        <td class="text-center">
-                            <MudTooltip Text="Editar">
-                                <MudFab Class="mt-2 ml-3" Color="Color.Primary" Size="Size.Medium"
-                                        Icon="@Icons.Material.Filled.Edit"
-                                        OnClick="() => AbrirModalUpdate(presentacion.IdPresentacion, presentacion.NombrePresentacion)">
-                                </MudFab>
-                            </MudTooltip>
-                        </td>
-                    </tr>
-                }
-                </tbody>
-            </MudSimpleTable>
-        </div>
-    </div>
-    <div class="row d-flex align-content-center">
+	<div class="row">
+		<div class="col">
+			<MudSimpleTable Dense="true" Hover="true" Bordered="true" Striped="true" Style="overflow-x: auto;">
+				<thead class="thead-dark">
+				<tr>
+					<th class="text-center">
+						<i class="fas fa-info-circle"></i>&nbsp;Nombre presentación
+					</th>
+					<th class="text-center">
+						<i class="far fa-edit"></i>&nbsp;Acciones
+					</th>
+				</tr>
+				</thead>
+				<tbody>
+				@foreach (var presentacion in PresentacionesEnSistema)
+				{
+					<tr>
+						<td class="text-center">@presentacion.NombrePresentacion</td>
+						<td class="text-center">
+							<MudTooltip Text="Editar">
+								<MudFab Class="mt-2 ml-3" Color="Color.Primary" Size="Size.Small"
+								        Icon="@Icons.Material.Filled.Edit"
+								        OnClick="() => AbrirModalUpdate(presentacion.IdPresentacion, presentacion.NombrePresentacion)">
+								</MudFab>
+							</MudTooltip>
+						</td>
+					</tr>
+				}
+				</tbody>
+			</MudSimpleTable>
+		</div>
+	</div>
+	<hr />
+	<div class="row d-flex align-content-center">
         <div class="col-12 text-center">
             <MudFab IconSize="Size.Medium" Label="Nueva presentación" OnClick="AbrirDialogPresentacion" Color="Color.Success" Icon="@Icons.Material.Filled.Add"></MudFab>
         </div>
