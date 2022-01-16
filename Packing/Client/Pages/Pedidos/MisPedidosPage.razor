@@ -1,79 +1,101 @@
 ﻿@page "/Pedidos/MisPedidos"
 @using Packing.Shared.Pedidos
 @inject HttpClient client
-@inject NavigationManager navigation
+@inject NavigationManager _navigation
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @attribute [Authorize]
 
-<h3>Mis Pedidos</h3>
-<hr />
 @if (Pedidos is null)
 {
-    <MudSkeleton />
-    <MudSkeleton Animation="Animation.False" />
-    <MudSkeleton Animation="Animation.Wave" />
-    <div class="row">
-        <div class="col d-flex justify-content-center">
-            <p>Aún estamos intentando conectarnos a la base de datos, vuelve más tarde.</p>
-        </div>
-    </div>
+	<MudSkeleton />
+	<MudSkeleton Animation="Animation.False" />
+	<MudSkeleton Animation="Animation.Wave" />
+	<div class="row">
+		<div class="col d-flex justify-content-center">
+			<p>Aún estamos intentando conectarnos a la base de datos, vuelve más tarde.</p>
+		</div>
+	</div>
 }
 else if (Pedidos.Count <= 0)
 {
-    <div class="row">
-        <div class="col-12 text-center">
-            <p>&nbsp;No tiene pedidos ingresados.</p>
-        </div>
-    </div>
+	<div class="row">
+		<div class="col-12 text-center">
+			<p>&nbsp;No tiene pedidos ingresados.</p>
+		</div>
+	</div>
 }
 else
 {
-    <div class="container-fluid">
-        <div class="row">
-            @foreach (var pedido in Pedidos)
-            {
-                <div class="col-sm-12 col-md-4">
-                    <DetallePedidoComponent PedidoBlock="pedido" VerPedido="VerPedido"></DetallePedidoComponent>
-                </div>
-            }
-        </div>
-    </div>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-12 mt-2">
+				<MudTable Items="@Pedidos" Dense="true" Hover="true" Bordered="true" Striped="true" RowsPerPage="4" 
+				          Elevation="3">
+					<ToolBarContent>
+						<MudText Typo="Typo.h5"><span class="oi oi-basket"></span>&nbsp;Mis pedidos</MudText>
+						<MudSpacer />
+						<MudDivider></MudDivider>
+						@*<MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>*@
+					</ToolBarContent>
+					<HeaderContent>
+						<MudTh Class="text-center"><i class="far fa-calendar-alt"></i>&nbsp;Fecha del pedido</MudTh>
+						<MudTh Class="text-center"><i class="fas fa-info-circle"></i>&nbsp;Detalles</MudTh>
+					</HeaderContent>
+					<RowTemplate>
+						<MudTd Class="text-center" DataLabel="Fecha del pedido">@context.FechaPedido</MudTd>
+						<MudTd Class="text-center" DataLabel="Detalles">
+							<MudTooltip Text="Ver">
+								<MudFab Class="mt-2 ml-3" Label="Ver" Color="MudBlazor.Color.Primary" Size="MudBlazor.Size.Small" Icon="@Icons.Material.Filled.NavigateNext" OnClick="() => DetallePedido(context.GuidPedido)" />
+							</MudTooltip>
+						</MudTd>
+					</RowTemplate>
+					<PagerContent>
+						<MudTablePager RowsPerPageString="Cantidad de registros" />
+					</PagerContent>
+				</MudTable>
+			</div>
+		</div>
+	</div>
 }
 
 @code {
-    //[Parameter] public int IdEmpresa { get; set; }
+	//[Parameter] public int IdEmpresa { get; set; }
 
-    protected List<Pedido> Pedidos;
-    protected Empresa EmpresaBlock;
-    protected string IdUsuarioLoggeado { get; set; }
+	protected List<Pedido> Pedidos;
+	protected Empresa EmpresaBlock;
+	protected string IdUsuarioLoggeado { get; set; }
 
-    protected override async Task OnInitializedAsync()
-    {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-        if (authState.User.Identity != null) IdUsuarioLoggeado = authState.User.Identity.Name;
+	protected override async Task OnInitializedAsync()
+	{
+		var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+		var user = authState.User;
+		if (authState.User.Identity != null) IdUsuarioLoggeado = authState.User.Identity.Name;
 
-        var dtoRequest = new ObtenerPedidosPorEmpresaDto()
-        {
-            FechaDesde = null,
-            FechaHasta = null,
-            NombreUsuario = IdUsuarioLoggeado
-        };
-        var resultRequest = await client.PostAsJsonAsync("api/Pedidos/ObtenerPedidosDeEmpresa", dtoRequest);
-        if (resultRequest.IsSuccessStatusCode)
-        {
-            try
-            {
-                Pedidos = await resultRequest.Content.ReadFromJsonAsync<List<Pedido>>();
-                StateHasChanged();
-            }
-            catch (Exception)
-            {
-                Pedidos = new List<Pedido>();
-            }
-        }
-        StateHasChanged();
-    }
+		var dtoRequest = new ObtenerPedidosPorEmpresaDto()
+			{
+				FechaDesde = null,
+				FechaHasta = null,
+				NombreUsuario = IdUsuarioLoggeado
+			};
+		var resultRequest = await client.PostAsJsonAsync("api/Pedidos/ObtenerPedidosDeEmpresa", dtoRequest);
+		if (resultRequest.IsSuccessStatusCode)
+		{
+			try
+			{
+				Pedidos = await resultRequest.Content.ReadFromJsonAsync<List<Pedido>>();
+				StateHasChanged();
+			}
+			catch (Exception)
+			{
+				Pedidos = new List<Pedido>();
+			}
+		}
+		StateHasChanged();
+	}
+	
 
-    protected void VerPedido(string urlPedido) => navigation.NavigateTo(urlPedido);
+	protected void DetallePedido(Guid urlDetalle)
+	{
+		_navigation.NavigateTo("/Pedidos/Ver/" + urlDetalle);
+	}
 }

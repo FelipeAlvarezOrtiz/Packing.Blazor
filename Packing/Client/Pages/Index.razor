@@ -127,6 +127,7 @@
             try
             {
                 PedidosPendientes = await resultRequest.Content.ReadFromJsonAsync<List<Pedido>>();
+	            PedidosPendientes = PedidosPendientes.Take(3).ToList();
                 StateHasChanged();
             }
             catch (Exception)
