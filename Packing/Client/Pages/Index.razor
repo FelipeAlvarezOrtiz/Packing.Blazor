@@ -3,148 +3,150 @@
 @inject HttpClient client
 @page "/"
 @using Packing.Shared.Pedidos
+@using Packing.Client.Pages.Usuarios.Componentes
+@using Packing.Client.Pages.Usuarios
 
 @attribute [Authorize]
 
 <AuthorizeView Roles="Administrador">
-    <h3>&nbsp;Accesos rápidos</h3>
-    <hr />
-    <div class="container-fluid">
-        <div class="row">
-            <h5>&nbsp;Pedidos</h5>
-        </div>
-        @if (PedidosPendientes is not null)
-        {
-            @if (PedidosPendientes.Count > 0)
-            {
-                <div class="row">
-                    @foreach (var pedido in PedidosPendientes)
-                    {
-                        <div class="col-sm-12 col-md-4 col-lg-4 mt-2">
-                            <DetallePedidoComponent PedidoBlock="pedido" VerPedido="VerPedido"></DetallePedidoComponent>
-                        </div>
-                    }
-                </div>
-            }
-            else
-            {
-                <div class="col-12 text-center alert alert-info"><h4><i class="fas fa-info-circle"></i>&nbsp;Ningún cliente ha ingresado pedidos en el sistema.</h4></div>
-            }
-            <br/>
-            <div class="row d-flex align-content-center">
-                <div class="col-12 text-center">
-                    <MudFab IconSize="Size.Medium" Label="Ver mas" OnClick="VerMasPedidos" Color="Color.Info" Icon="@Icons.Material.Filled.Search"></MudFab>
-                </div>
-            </div>
-        }
-        else
-        {
-            <MudSkeleton/>
-            <MudSkeleton Animation="Animation.False"/>
-            <MudSkeleton Animation="Animation.Wave"/>
-            <div class="row">
-                <div class="col d-flex justify-content-center">
-                    <p>Cargando información, espere por favor ...</p>
-                </div>
-            </div>
-        }
-        <hr/>
-        <div>
-
-        </div>
-    </div>
+	<h3>&nbsp;Accesos rápidos</h3>
+	<hr />
+	<div class="container-fluid">
+		<div class="row">
+			<h5>&nbsp;Pedidos</h5>
+		</div>
+		@if (PedidosPendientes is not null)
+		{
+			@if (PedidosPendientes.Count > 0)
+			{
+				<div class="row">
+					@foreach (var pedido in PedidosPendientes)
+					{
+						<div class="col-sm-12 col-md-4 col-lg-4 mt-2">
+							<DetallePedidoComponent PedidoBlock="pedido" VerPedido="VerPedido"></DetallePedidoComponent>
+						</div>
+					}
+				</div>
+			}
+			else
+			{
+				<div class="col-12 text-center alert alert-info"><h4><i class="fas fa-info-circle"></i>&nbsp;Ningún cliente ha ingresado pedidos en el sistema.</h4></div>
+			}
+			<br />
+			<div class="row d-flex align-content-center">
+				<div class="col-12 text-center">
+					<MudFab IconSize="Size.Medium" Label="Ver mas" OnClick="VerMasPedidos" Color="Color.Info" Icon="@Icons.Material.Filled.Search"></MudFab>
+				</div>
+			</div>
+		}
+		else
+		{
+			<MudSkeleton />
+			<MudSkeleton Animation="Animation.False" />
+			<MudSkeleton Animation="Animation.Wave" />
+			<div class="row">
+				<div class="col d-flex justify-content-center">
+					<p>Cargando información, espere por favor ...</p>
+				</div>
+			</div>
+		}
+		<hr />
+		<UsuariosInternos />
+		<br />
+	</div>
 
 </AuthorizeView>
 <AuthorizeView Roles="Cliente">
-    <h3>&nbsp;Accesos rápidos</h3>
-    <hr />
-    <div class="container-fluid">
-        <!-- Tus pedidos -->
-        <div class="row">
-            @if (PedidosPendientes is not null)
-            {
-                @if (PedidosPendientes.Count > 0)
-                {
-                    @foreach (var pedido in PedidosPendientes)
-                    {
-                        <div class="col-md-4 mt-2">
-                            <DetallePedidoComponent PedidoBlock="pedido" VerPedido="VerPedido"></DetallePedidoComponent>
-                        </div>
-                    }
-                }
-                else
-                {
-                    <div class="col-12 text-center alert alert-info">&nbsp;No hay pedidos en el sistema.</div>
-                }
-            }
-            else
-            {
-	            <div class="col-12">
-		            <MudSkeleton />
-		            <MudSkeleton Animation="Animation.False" />
-		            <MudSkeleton Animation="Animation.Wave" />
-		            <div class="row">
-			            <div class="col d-flex justify-content-center">
-				            <p>Cargando pedidos, espere por favor ...</p>
-			            </div>
-		            </div>
-	            </div>
-            }
-        </div>
-        <br />
-        <MudDivider></MudDivider>
-        <br />
-        <div class="row text-center d-flex align-content-center justify-content-center">
-            <div class="col-12">
-                <MudFab OnClick="@(()=> navigator.NavigateTo("/Pedidos/CrearPedido"))" Label="Crear un pedido" Color="Color.Success" Icon="@Icons.Material.Filled.Add" IconSize="Size.Medium"></MudFab>
-            </div>
-        </div>
-    </div>
+	<h3>&nbsp;Accesos rápidos</h3>
+	<hr />
+	<div class="container-fluid">
+		<!-- Tus pedidos -->
+		<div class="row">
+			@if (PedidosPendientes is not null)
+			{
+				@if (PedidosPendientes.Count > 0)
+				{
+					@foreach (var pedido in PedidosPendientes)
+					{
+						<div class="col-md-4 mt-2">
+							<DetallePedidoComponent PedidoBlock="pedido" VerPedido="VerPedido"></DetallePedidoComponent>
+						</div>
+					}
+				}
+				else
+				{
+					<div class="col-12 text-center alert alert-info">&nbsp;No hay pedidos en el sistema.</div>
+				}
+			}
+			else
+			{
+				<div class="col-12">
+					<MudSkeleton />
+					<MudSkeleton Animation="Animation.False" />
+					<MudSkeleton Animation="Animation.Wave" />
+					<div class="row">
+						<div class="col d-flex justify-content-center">
+							<p>Cargando pedidos, espere por favor ...</p>
+						</div>
+					</div>
+				</div>
+			}
+		</div>
+		<br />
+		<MudDivider></MudDivider>
+		<br />
+		<div class="row text-center d-flex align-content-center justify-content-center">
+			<div class="col-12">
+				<MudFab OnClick="@(()=> navigator.NavigateTo("/Pedidos/CrearPedido"))" Label="Crear un pedido" Color="Color.Success" Icon="@Icons.Material.Filled.Add" IconSize="Size.Medium"></MudFab>
+			</div>
+		</div>
+	</div>
 </AuthorizeView>
 
 @code
 {
-    protected string IdUsuarioLoggeado { get; set; }
-    protected List<Pedido> PedidosPendientes;
-    protected List<AppUser> UsuariosEnSistema;
-    public List<GrupoProducto> GruposEnSistema;
+	protected string IdUsuarioLoggeado { get; set; }
+	protected List<Pedido> PedidosPendientes;
+	protected List<AppUser> UsuariosEnSistema;
+	public List<GrupoProducto> GruposEnSistema;
 
-    protected override async Task OnInitializedAsync()
-    {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-        if (authState.User.Identity != null) IdUsuarioLoggeado = authState.User.Identity.Name;
-        GruposEnSistema = await client.GetFromJsonAsync<List<GrupoProducto>>("api/Grupos/ObtenerGrupos");
-        var dtoRequest = new ObtenerPedidosPorEmpresaDto()
-        {
-            FechaDesde = null,
-            FechaHasta = null,
-            NombreUsuario = IdUsuarioLoggeado
-        };
-        var resultRequest = await client.PostAsJsonAsync("api/Pedidos/ObtenerPedidosDeEmpresa", dtoRequest);
-        if (resultRequest.IsSuccessStatusCode)
-        {
-            try
-            {
-                PedidosPendientes = await resultRequest.Content.ReadFromJsonAsync<List<Pedido>>();
-	            PedidosPendientes = PedidosPendientes.Take(3).ToList();
-                StateHasChanged();
-            }
-            catch (Exception)
-            {
-                PedidosPendientes = new List<Pedido>();
-            }
-        }
-        StateHasChanged();
-    }
+	protected override async Task OnInitializedAsync()
+	{
+		var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+		var user = authState.User;
+		if (authState.User.Identity != null) IdUsuarioLoggeado = authState.User.Identity.Name;
+		GruposEnSistema = await client.GetFromJsonAsync<List<GrupoProducto>>("api/Grupos/ObtenerGrupos");
+		var dtoRequest = new ObtenerPedidosPorEmpresaDto()
+			{
+				FechaDesde = null,
+				FechaHasta = null,
+				NombreUsuario = IdUsuarioLoggeado
+			};
+		var resultRequest = await client.PostAsJsonAsync("api/Pedidos/ObtenerPedidosDeEmpresa", dtoRequest);
+		if (resultRequest.IsSuccessStatusCode)
+		{
+			try
+			{
+				PedidosPendientes = await resultRequest.Content.ReadFromJsonAsync<List<Pedido>>();
+				PedidosPendientes = PedidosPendientes.Take(3).ToList();
+				StateHasChanged();
+			}
+			catch (Exception)
+			{
+				PedidosPendientes = new List<Pedido>();
+			}
+		}
+		StateHasChanged();
+	}
 
-    protected void VerMasPedidos() => navigator.NavigateTo("/Reporteria/Indice");
+	protected void VerMasPedidos() => navigator.NavigateTo("/Reporteria/Indice");
 
-    protected void VerMasUsuarios() => navigator.NavigateTo("");
+	protected void VerMasUsuarios() => navigator.NavigateTo("");
 
-    protected void CrearUsuario() => navigator.NavigateTo("");
+	protected void CrearUsuario() => navigator.NavigateTo("");
 
-    protected void CrearPedido() => navigator.NavigateTo("/Pedidos/CrearPedido");
+	protected void CrearPedido() => navigator.NavigateTo("/Pedidos/CrearPedido");
 
-    protected void VerPedido(string urlPath) => navigator.NavigateTo(urlPath);
+	protected void VerPedido(string urlPath) => navigator.NavigateTo(urlPath);
+
 }
