@@ -74,5 +74,11 @@ namespace Packing.Server.Controllers.Pedidos
         {
             return await Mediator.Send(request);
         }
+
+        [HttpPost("ProcesarMasivamente"), Authorize(Roles = "Administrador")]
+        public async Task<ActionResult<Unit>> ProcesarMasivamente(ProcesarDetallesMasivoDto request)
+        {
+            return await Mediator.Send(request);
+        }
     }
 }

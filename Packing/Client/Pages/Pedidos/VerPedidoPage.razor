@@ -28,30 +28,41 @@ else if (ListaDetalles is null && PedidoInterno is null)
 }
 else
 {
-<div class="row">
-    <div class="col-sm-12 col-md-4 col-lg-4">
-        <MudTextField @bind-Value="PedidoInterno.EmpresaMandante.NombreEmpresa" ReadOnly="true" Label="Empresa"></MudTextField>
-    </div>
-    <div class="col-sm-12 col-md-4 col-lg-4">
-        <MudTextField @bind-Value="PedidoInterno.FechaPedido" ReadOnly="true" Class="col-sm-12 col-md-4" Label="Fecha del pedido"></MudTextField>
-    </div>
-    <div class="col-sm-12 col-md-4 col-lg-4">
-        <MudTextField @bind-Value="PedidoInterno.FechaUltimaActualizacion" ReadOnly="true" Class="col-sm-12 col-md-4" Label="Última actualización"></MudTextField>
-    </div>
-    <div class="col-sm-12 col-md-6 col-lg-6">
-        <MudTextField @bind-Value="PedidoInterno.EmpresaMandante.PersonaContacto" ReadOnly="true" Class="col-sm-12 col-md-4" Label="Persona contacto"></MudTextField>
-    </div>
-    <div class="col-sm-12 col-md-6 col-lg-6">
-        <MudTextField @bind-Value="PedidoInterno.EmpresaMandante.Direccion" ReadOnly="true" Class="col-sm-12 col-md-4" Label="Dirección"></MudTextField>
-    </div>
-</div>
-    <hr />
+	<div class="row">
+		<div class="col-sm-12 col-md-4 col-lg-4">
+			<MudTextField @bind-Value="PedidoInterno.EmpresaMandante.NombreEmpresa" ReadOnly="true" Label="Empresa"></MudTextField>
+		</div>
+		<div class="col-sm-12 col-md-4 col-lg-4">
+			<MudTextField @bind-Value="PedidoInterno.FechaPedido" ReadOnly="true" Class="col-sm-12 col-md-4" Label="Fecha del pedido"></MudTextField>
+		</div>
+		<div class="col-sm-12 col-md-4 col-lg-4">
+			<MudTextField @bind-Value="PedidoInterno.FechaUltimaActualizacion" ReadOnly="true" Class="col-sm-12 col-md-4" Label="Última actualización"></MudTextField>
+		</div>
+		<div class="col-sm-12 col-md-4 col-lg-6">
+			<MudTextField @bind-Value="PedidoInterno.EmpresaMandante.PersonaContacto" ReadOnly="true" Class="col-sm-12 col-md-4" Label="Persona contacto"></MudTextField>
+		</div>
+		<div class="col-sm-12 col-md-4 col-lg-6">
+			<MudTextField @bind-Value="PedidoInterno.EmpresaMandante.Direccion" ReadOnly="true" Class="col-sm-12 col-md-4" Label="Dirección"></MudTextField>
+		</div>
+	</div>
+	<AuthorizeView Roles="Administrador">
+        @if (ListaDetalles.Where(x => x.Estado.IdEstadoPedido == 1).ToList().Count > 0)
+        {
+	        <hr/>
+	        <div class="row d-flex justify-content-end text-center">
+		        <div class="col-sm-12 col-md-4 col-lg-6 m-2">
+			        <MudFab OnClick="ProcesarDetalles" Size="Size.Small" Icon="@Icons.Material.Filled.SystemUpdate" Label="Procesar todos los productos" Color="Color.Primary"></MudFab>
+		        </div>
+	        </div>
+        }
+	</AuthorizeView>
+	<hr />
     <h5><i class="fas fa-boxes"></i>&nbsp;Productos en el pedido</h5>
-    <br />
-    <div class="row">
+	<br />
+	<div class="row">
         @foreach (var detalle in ListaDetalles)
         {
-            <div class="col-sm-12 col-md-4">
+            <div class="col-sm-12 col-md-6 col-lg-4">
                 <DetalleComponent ListaEstados="Estados" ActualizarEstado="ActualizarDetalle" Detalle="detalle"
                                    CabeceraId="Guid.Parse(IdPedido)" BorrarDetalle="BorrarDetalle"></DetalleComponent>
                 <br/>
@@ -69,11 +80,13 @@ else
     protected ObtenerDetallesDelPedidoDto requestDetalles;
     protected List<EstadoPedido> Estados;
     protected IJSObjectReference Modulo;
+	protected ProcesarDetallesMasivoDto procesarMasivoRequest;
 
     protected override async Task OnInitializedAsync()
     {
         var pedidoInternoId = Guid.Parse(IdPedido);
-        requestDetalles = new ObtenerDetallesDelPedidoDto()
+	    Modulo = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utilidades.js");
+	    requestDetalles = new ObtenerDetallesDelPedidoDto()
         {
             PedidoCabecera = pedidoInternoId
         };
@@ -93,13 +106,14 @@ else
             }
             catch (Exception error)
             {
-                Console.WriteLine(error.Message);
+	            await Modulo.InvokeVoidAsync("ErrorGeneral", error.Message);
                 ListaDetalles = new();
             }
         }
         else
         {
-            Console.WriteLine("Error");
+	        var contenido = await result.Content.ReadAsStringAsync();
+	        await Modulo.InvokeVoidAsync("ErrorGeneral", contenido);
         }
     }
 
@@ -113,19 +127,16 @@ else
 
     protected void ActualizarCantidad(DetallePedido detalle, int nuevaCantidad)
     {
-        if (ProductosEnPedido.ContainsKey(detalle.ProductoInterno.IdProducto))
-        {
-            detalle.Cantidad = (uint)nuevaCantidad;
-            detalle.CantidadTotales = (uint)nuevaCantidad * (uint)detalle.ProductoInterno.Formato.UnidadPorFormato;
-            detalle.FechaActualizacion = DateTime.Now;
-            ProductosEnPedido[detalle.ProductoInterno.IdProducto] = detalle;
-        }
+	    if (!ProductosEnPedido.ContainsKey(detalle.ProductoInterno.IdProducto)) return;
+	    detalle.Cantidad = (uint)nuevaCantidad;
+	    detalle.CantidadTotales = (uint)nuevaCantidad * (uint)detalle.ProductoInterno.Formato.UnidadPorFormato;
+	    detalle.FechaActualizacion = DateTime.Now;
+	    ProductosEnPedido[detalle.ProductoInterno.IdProducto] = detalle;
     }
 
     protected async void ActualizarDetalle(Tuple<Guid,Guid,int> requestActualizar)
     {
         //pegarle al cliente para borrar la wea
-        Modulo = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utilidades.js");
 	    var (item1, item2, item3) = requestActualizar;
 	    var actualizarEstado = new ActualizarEstadoPedido()
         {
@@ -171,7 +182,35 @@ else
         catch (Exception error)
         {
             Console.WriteLine(error.Message);
+	        await Modulo.InvokeVoidAsync("ErrorGeneral", error.Message);
             ListaDetalles = new();
         }
     }
+
+	protected async void ProcesarDetalles()
+	{
+		try
+		{
+			procesarMasivoRequest = new ProcesarDetallesMasivoDto
+			{
+				IdPedido = this.PedidoInterno.GuidPedido
+			};
+			var result = await Cliente.PostAsJsonAsync("api/Pedidos/ProcesarMasivamente", procesarMasivoRequest);
+			if (result.IsSuccessStatusCode)
+			{
+				await Modulo.InvokeVoidAsync("Exito");
+                BuscarDetalles();
+			}
+			else
+			{
+				var resultado = await result.Content.ReadAsStringAsync();
+				await Modulo.InvokeVoidAsync("ErrorGeneral", resultado);
+			}
+		}
+		catch (Exception error)
+		{
+			await Modulo.InvokeVoidAsync("ErrorGeneral", error.Message);
+		}
+
+	}
 }

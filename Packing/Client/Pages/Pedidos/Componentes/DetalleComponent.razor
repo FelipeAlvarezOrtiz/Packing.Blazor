@@ -25,33 +25,37 @@
 		        </AuthorizeView>
 	        </div>
         </div>
-        <MudDivider></MudDivider>
+	    <MudDivider></MudDivider>
+	    <div class="row text-center d-flex align-content-center">
+		    @if (Detalle.Estado.IdEstadoPedido < 4)
+		    {
+			    <div class="col-sm-6 col-md-6 mt-2">
+				    @if (Detalle.Estado.IdEstadoPedido == 1)
+				    {
+					    <MudTooltip Text="Eliminar">
+						    <MudFab Icon="@Icons.Outlined.Delete" Size="Size.Small" Color="Color.Error"
+						            OnClick="@(async () => await BorrarDetalle.InvokeAsync(Detalle.IdDetalle))"></MudFab>
+					    </MudTooltip>
+					    
+				    }
+			    </div>
+			    <div class="col-sm-6 col-md-6 mt-2">
+				    <AuthorizeView Roles="Administrador">
+						<MudTooltip Text="Actualizar">
+							<MudFab Icon="@Icons.Outlined.Update" Size="Size.Small" Color="Color.Info"
+					            OnClick="@(async () => await ActualizarEstado.InvokeAsync(Tuple.Create(CabeceraId, Detalle.IdDetalle, IdEstadoSeleccionado)))"></MudFab>
+						</MudTooltip>
+				    </AuthorizeView>
+			    </div>
+		    }
+		    else
+		    {
+			    <div class="col-12 mt-2">
+				    <MudAlert Severity="Severity.Success">Este producto ya se ha procesado completamente.</MudAlert>
+			    </div>
+		    }
+	    </div>
     </MudCardContent>
-    <MudCardActions>
-        <div class="row text-center d-flex align-content-center">
-            @if (Detalle.Estado.IdEstadoPedido < 4)
-            {
-                <div class="col-sm-12 col-md-6 mt-2">
-                    @if (Detalle.Estado.IdEstadoPedido == 1)
-                    {
-                        <MudFab Label="Eliminar" Icon="@Icons.Outlined.Delete" Size="Size.Medium" Color="Color.Error"
-                                OnClick="@(async () => await BorrarDetalle.InvokeAsync(Detalle.IdDetalle))"></MudFab>
-                    }
-                </div>
-	            <div class="col-sm-12 col-md-6 mt-2">
-		            <AuthorizeView Roles="Administrador">
-			            <MudFab Label="Actualizar" Icon="@Icons.Outlined.Update" Size="Size.Medium" Color="Color.Info"
-			                    OnClick="@(async () => await ActualizarEstado.InvokeAsync(Tuple.Create(CabeceraId, Detalle.IdDetalle, IdEstadoSeleccionado)))"></MudFab>
-		            </AuthorizeView>
-	            </div>
-            }
-            else
-            {
-                <MudAlert Severity="Severity.Success">Este producto ya se ha procesado completamente.</MudAlert>
-            }
-        </div>
-        
-    </MudCardActions>
 </MudCard>
 
 @code {

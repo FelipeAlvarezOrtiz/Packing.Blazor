@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Packing.Negocio.Mailing;
 using Packing.Persistencia.Repositorios;
 
@@ -16,14 +17,14 @@ namespace Packing.Negocio.Pedidos
     public class CrearPedido : IRequestHandler<PedidoRequestDto>
     {
         private readonly ApplicationDbContext _context;
-        private readonly IMediator _mediator;
-        private readonly PedidosRepository _pedidosRepository = new();
         private readonly EnviadorCorreos _enviadorCorreos;
-        public CrearPedido(IMediator mediator, ApplicationDbContext context, EnviadorCorreos enviadorCorreos)
+        private readonly IConfiguration _configuration;
+
+        public CrearPedido(IMediator mediator, ApplicationDbContext context, EnviadorCorreos enviadorCorreos, IConfiguration configuration)
         {
-            _mediator = mediator;
             _context = context;
             _enviadorCorreos = enviadorCorreos;
+            _configuration = configuration;
         }
 
         public async Task<Unit> Handle(PedidoRequestDto request, CancellationToken cancellationToken)
@@ -70,8 +71,10 @@ namespace Packing.Negocio.Pedidos
             }
             pedidoCabecera.ProductosEnPedido = listaProductosEnPedido;
             await _context.Pedidos.AddAsync(pedidoCabecera, cancellationToken);
-            //await _pedidosRepository.CrearPedido(pedidoCabecera);
-            _enviadorCorreos.EnviarEmail("falvarezortiz@hotmail.com",
+
+            var correoGerente = _configuration.GetValue<string>("EmailSender:CorreoGerente");
+            
+            _enviadorCorreos.EnviarEmail(correoGerente,
                 "Nuevo pedido ingresado",
                 ReemplazaTextoHtml(empresaMandante.NombreEmpresa,pedidoCabecera.GuidPedido.ToString()));
             return await _context.SaveChangesAsync(cancellationToken) > 0
