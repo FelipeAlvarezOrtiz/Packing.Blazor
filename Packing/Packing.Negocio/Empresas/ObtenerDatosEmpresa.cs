@@ -24,4 +24,20 @@ namespace Packing.Negocio.Empresas
                 .FirstOrDefaultAsync(cancellationToken);
         }
     }
+
+    public class ObtenerDatosEmpresaPorRut : IRequestHandler<ObtenerEmpresaQueryPorRut, Empresa>
+    {
+        private readonly ApplicationDbContext _context;
+
+        public ObtenerDatosEmpresaPorRut(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+        public async Task<Empresa> Handle(ObtenerEmpresaQueryPorRut request, CancellationToken cancellationToken)
+        {
+            return await _context.Empresas.Where(x => x.RutEmpresa == request.RutEmpresa)
+                .Include(x => x.ProductosVisibles).ThenInclude(x => x.Producto)
+                .FirstOrDefaultAsync(cancellationToken);
+        }
+    }
 }

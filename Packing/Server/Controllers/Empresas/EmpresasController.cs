@@ -24,6 +24,7 @@ namespace Packing.Server.Controllers.Empresas
             return await Mediator.Send(new ObtenerEmpresaQuery {IdEmpresa = idEmpresa});
         }
 
+
         [HttpDelete("DeshabilitarEmpresa/{idEmpresa:int}"),Authorize(Roles = "Administrador")]
         public async Task<ActionResult<Unit>> DeshabilitarEmpresa(int idEmpresa)
         {
@@ -48,6 +49,12 @@ namespace Packing.Server.Controllers.Empresas
             {
                 return BadRequest(error.Message);
             }
+        }
+
+        [HttpGet("ObtenerInfo/{rutEmpresa}")]
+        public async Task<ActionResult<Empresa>> ObtenerInfo(string rutEmpresa)
+        {
+            return await Mediator.Send(new ObtenerEmpresaQueryPorRut{RutEmpresa = rutEmpresa});
         }
     }
 }

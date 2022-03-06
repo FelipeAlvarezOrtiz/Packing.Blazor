@@ -1,6 +1,7 @@
 ﻿@page "/Empresas/Crear"
 @using Microsoft.AspNetCore.Components
 @using Packing.Shared.Usuarios
+@inject ISnackbar Snackbar
 @inject NavigationManager navigator
 @inject HttpClient cliente
 @inject IJSRuntime JsRuntime
@@ -14,19 +15,25 @@
     <EditForm Model="NuevoUsuario" OnValidSubmit="CrearUsuario">
         <DataAnnotationsValidator></DataAnnotationsValidator>
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-sm-12 col-md-6">
                 <div class="form-group">
                     <MudTextField Label="Nombre del usuario" Variant="Variant.Outlined" @bind-Value="NuevoUsuario.NombreUsuario" />
                     <ValidationMessage For="@(()=>NuevoUsuario.NombreUsuario)"></ValidationMessage>
                 </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-sm-12 col-md-6">
                 <div class="form-group">
                     <MudTextField Label="Email del usuario" Variant="Variant.Outlined" @bind-Value="NuevoUsuario.EmailUsuario" Placeholder="Con este dato se iniciará sesión" />
                     <ValidationMessage For="@(()=>NuevoUsuario.EmailUsuario)"></ValidationMessage>
                 </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-sm-12 col-md-6">
+                <div class="form-group">
+                    <MudTextField Label="Número teléfonico" Variant="Variant.Outlined" @bind-Value="NuevoUsuario.Telefono" />
+                    <ValidationMessage For="@(()=> NuevoUsuario.Telefono)"></ValidationMessage>
+                </div>
+            </div>
+            <div class="col-sm-12 col-md-6">
                 <div class="form-group">
                     <MudSelect T="string" @bind-Value="NuevoUsuario.RolUsuario" Label="Rol del usuario" Strict="true" Variant="Variant.Outlined" Format="F2" AnchorOrigin="Origin.BottomCenter">
                         @foreach (var rol in Roles)
@@ -45,9 +52,9 @@
             <div class="col-md-6">
                 <div class="form-group">
                     <div class="input-group">
-                        <MudTextField id="nuevoRutEmpresa" Label="Rut de la empresa" Variant="Variant.Outlined" @bind-Value="NuevoUsuario.RutEmpresa" />
+                        <MudTextField id="nuevoRutEmpresa" Label="Rut de la empresa" Variant="Variant.Outlined" @bind-Value="NuevoUsuario.RutEmpresa" Placeholder="R.U.T de empresa sin puntos y con guión." />
                         <MudTooltip Text="Buscar">
-                            <MudFab Class="mt-3 ml-3" Color="Color.Primary" Size="Size.Small" Icon="@Icons.Material.Filled.Search" />
+                            <MudFab Class="mt-3 ml-3" Color="Color.Primary" Size="Size.Small" OnClick="BuscarDatosEmpresa" Icon="@Icons.Material.Filled.Search" />
                         </MudTooltip>
                         <ValidationMessage For="@(() => NuevoUsuario.RutEmpresa)"></ValidationMessage>
                     </div>
@@ -88,12 +95,6 @@
                 <div class="form-group">
                     <MudTextField Label="Email" Variant="Variant.Outlined" @bind-Value="NuevoUsuario.EmailEmpresa" />
                     <ValidationMessage For="@(()=> NuevoUsuario.EmailEmpresa)"></ValidationMessage>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <MudTextField Label="Número teléfonico" Variant="Variant.Outlined" @bind-Value="NuevoUsuario.Telefono" />
-                    <ValidationMessage For="@(()=> NuevoUsuario.Telefono)"></ValidationMessage>
                 </div>
             </div>
         </div>
@@ -144,7 +145,7 @@ else
         }
         else
         {
-            await Modulo.InvokeVoidAsync("Error");
+            await Modulo.InvokeVoidAsync("ErrorGeneral",result.ReasonPhrase);
             Console.WriteLine("Error ha ocurrido con " + result.ReasonPhrase);
         }
     }
@@ -156,4 +157,33 @@ else
     }
 
     protected void VolverAtras() => navigator.NavigateTo("/Empresas/Indice");
+
+    protected async Task BuscarDatosEmpresa()
+    {
+        if (string.IsNullOrEmpty(NuevoUsuario.RutEmpresa)) return;
+        Modulo = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utilidades.js");
+        try
+        {
+            var resultEmpresa = await cliente.GetFromJsonAsync<Empresa>("api/Empresas/ObtenerInfo/" + NuevoUsuario.RutEmpresa);
+            if (resultEmpresa is null || string.IsNullOrEmpty(resultEmpresa.RutEmpresa))
+            {
+                await Modulo.InvokeVoidAsync("Error");
+                return;
+            }
+            NuevoUsuario.RutEmpresa = resultEmpresa.RutEmpresa;
+            NuevoUsuario.Direccion = resultEmpresa.Direccion;
+            NuevoUsuario.PersonaContacto = resultEmpresa.PersonaContacto;
+            NuevoUsuario.RazonSocial = resultEmpresa.RazonSocial;
+            NuevoUsuario.NombreEmpresa = resultEmpresa.NombreEmpresa;
+            Snackbar.Clear();
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomEnd;
+            Snackbar.Add("Datos cargados.", Severity.Success);
+        }
+        catch
+        {
+            Snackbar.Clear();
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomEnd;
+            Snackbar.Add("El R.U.T no está asociado a ninguna empresa.", Severity.Info);
+        }
+    }
 }

@@ -16,7 +16,7 @@ namespace Packing.Shared.Usuarios
         public string RazonSocial { get; set; }
         [Required(ErrorMessage = "Este dato es requerido")]
         public string Direccion { get; set; }
-        [EmailAddress(ErrorMessage = "Formato de correo inválido"),Required(ErrorMessage = "Este dato es requerido")]
+        [EmailAddress(ErrorMessage = "Formato de correo inválido")]
         public string EmailEmpresa { get; set; }
         [Required(ErrorMessage = "Este dato es requerido")]
         public string Telefono { get; set; }

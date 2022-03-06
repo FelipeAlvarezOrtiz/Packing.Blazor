@@ -7,4 +7,10 @@ namespace Packing.Shared.EmpresaDto
     {
         public int IdEmpresa { get; set; }
     }
+
+    public class ObtenerEmpresaQueryPorRut : IRequest<Empresa>
+    {
+        public string RutEmpresa { get; set; }
+    }
+
 }
