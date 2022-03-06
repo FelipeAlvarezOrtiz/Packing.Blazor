@@ -17,9 +17,9 @@
 <hr />
 @if (EmpresasEnSistema is null)
 {
-    <MudSkeleton/>
-    <MudSkeleton Animation="Animation.False"/>
-    <MudSkeleton Animation="Animation.Wave"/>
+    <MudSkeleton />
+    <MudSkeleton Animation="Animation.False" />
+    <MudSkeleton Animation="Animation.Wave" />
     <div class="row">
         <div class="col d-flex justify-content-center">
             <p>Cargando información, espere por favor ...</p>
@@ -42,7 +42,7 @@ else
             <div class="form-group">
                 <div class="input-group">
                     <MudSelect T="int" Label="Empresas" @bind-Value="IdEmpresaSeleccionada" Placeholder="Selecciona una empresa"
-                               AdornmentIcon="@Icons.Material.Filled.BusinessCenter" AdornmentColor="MudBlazor.Color.Primary">
+                           AdornmentIcon="@Icons.Material.Filled.BusinessCenter" AdornmentColor="MudBlazor.Color.Primary">
                         <MudSelectItem T="int" Value="0">Todas las empresas</MudSelectItem>
                         @foreach (var empresa in EmpresasEnSistema)
                         {
@@ -50,7 +50,7 @@ else
                         }
                     </MudSelect>&nbsp;
                     <MudTooltip Text="Buscar">
-                        <MudFab Color="MudBlazor.Color.Primary" Icon="@Icons.Material.Filled.Search" OnClick="BuscarPedidos"/>
+                        <MudFab Color="MudBlazor.Color.Primary" Icon="@Icons.Material.Filled.Search" OnClick="BuscarPedidos" />
                     </MudTooltip>
                 </div>
             </div>
@@ -60,77 +60,93 @@ else
     <MudDivider></MudDivider>
     <br />
     <h4>&nbsp; Pedidos encontrados</h4>
-    <hr/>
+    <hr />
     <div class="row">
-        @if (PedidosEncontrados is null)
+        @if (Buscando)
         {
             <div class="col-12">
-                <MudAlert Severity="Severity.Normal" Elevation="3" ContentAlignment="HorizontalAlignment.Center">Presione buscar para ver resultados.</MudAlert>
-            </div>
-        }
-        else if (PedidosEncontrados.Count == 0)
-        {
-            <div class="col-12">
-                <MudAlert Severity="Severity.Info" Elevation="3" ContentAlignment="HorizontalAlignment.Center">No existe información para los criterios seleccionados.</MudAlert>
+                <MudSkeleton />
+                <MudSkeleton Animation="Animation.False" />
+                <MudSkeleton Animation="Animation.Wave" />
+                <div class="row">
+                    <div class="col d-flex justify-content-center">
+                        <p>Cargando información, espere por favor ...</p>
+                    </div>
+                </div>
             </div>
         }
         else
         {
-            <div class="col-12">
-                <div class="row">
-	                <div class="col-12">
-                        @if (UsuariosInternos is null || UsuariosInternos.Count == 0)
-                        {
-	                        <MudAlert Severity="Severity.Warning" Elevation="3" ContentAlignment="HorizontalAlignment.Center">No existen usuarios internos creados para enviar reportes.</MudAlert>
-	                        <br />
-                        }
-                        else
-                        {
-	                        <h6><i class="fas fa-file-export"></i>&nbsp;Reportes</h6>
-	                        <div class="row text-center d-flex align-content-center justify-content-center">
-		                        <div class="col-sm-12 col-md-6 mt-2">
-			                        <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.PictureAsPdf" Color="MudBlazor.Color.Primary">Exportar a Jefe de packing</MudButton>
-		                        </div>
-		                        <div class="col-sm-12 col-md-6 mt-2">
-			                        <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.PictureAsPdf" Color="MudBlazor.Color.Primary">Exportar a cosecheros</MudButton>
-		                        </div>
-	                        </div>
-                        }
-	                </div>
+            @if (PedidosEncontrados is null)
+            {
+                <div class="col-12">
+                    <MudAlert Severity="Severity.Normal" Elevation="3" ContentAlignment="HorizontalAlignment.Center">Presione buscar para ver resultados.</MudAlert>
                 </div>
-            </div>
-            <br />
-            <hr />
-            <br />
-            <div class="col-12">
-                <div class="row">
-                    <div class="col-12 mt-2">
-                        <MudSimpleTable Dense="true" Hover="true" Bordered="true" Striped="true" Style="overflow-x: auto;">
-                            <thead>
-                            <tr>
-                                <th>Empresa</th>
-                                <th>Fecha</th>
-                                <th>Detalles</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @foreach (var pedido in PedidosEncontrados)
+            }
+            else if (PedidosEncontrados.Count == 0)
+            {
+                <div class="col-12">
+                    <MudAlert Severity="Severity.Info" Elevation="3" ContentAlignment="HorizontalAlignment.Center">No existe información para los criterios seleccionados.</MudAlert>
+                </div>
+            }
+            else
+            {
+                <div class="col-12">
+                    <div class="row">
+                        <div class="col-12">
+                            @if (UsuariosInternos is null || UsuariosInternos.Count == 0)
                             {
-                                <tr>
-                                    <td>@pedido.EmpresaMandante.NombreEmpresa</td>
-                                    <td>@pedido.FechaPedido</td>
-                                    <td>
-                                        <MudTooltip Text="Ver">
-                                            <MudFab Class="mt-2 ml-3" Color="MudBlazor.Color.Primary" Size="MudBlazor.Size.Medium" Icon="@Icons.Material.Filled.NavigateNext" OnClick="() => DetallePedido(pedido.GuidPedido)" />
-                                        </MudTooltip>
-                                    </td>
-                                </tr>
+                                <MudAlert Severity="Severity.Warning" Elevation="3" ContentAlignment="HorizontalAlignment.Center">No existen usuarios internos creados para enviar reportes.</MudAlert>
+                                <br />
                             }
-                            </tbody>
-                        </MudSimpleTable>
+                            else
+                            {
+                                <h6><i class="fas fa-file-export"></i>&nbsp;Reportes</h6>
+                                <div class="row text-center d-flex align-content-center justify-content-center">
+                                    <div class="col-sm-12 col-md-6 mt-2">
+                                        <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.PictureAsPdf" Color="MudBlazor.Color.Primary">Exportar a Jefe de packing</MudButton>
+                                    </div>
+                                    <div class="col-sm-12 col-md-6 mt-2">
+                                        <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.PictureAsPdf" Color="MudBlazor.Color.Primary">Exportar a cosecheros</MudButton>
+                                    </div>
+                                </div>
+                            }
+                        </div>
                     </div>
                 </div>
-            </div>
+                <br />
+                <hr />
+                <br />
+                <div class="col-12">
+                    <div class="row">
+                        <div class="col-12 mt-2">
+                            <MudSimpleTable Dense="true" Hover="true" Bordered="true" Striped="true" Style="overflow-x: auto;">
+                                <thead>
+                                    <tr>
+                                        <th>Empresa</th>
+                                        <th>Fecha</th>
+                                        <th>Detalles</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var pedido in PedidosEncontrados)
+                                    {
+                                        <tr>
+                                            <td>@pedido.EmpresaMandante.NombreEmpresa</td>
+                                            <td>@pedido.FechaPedido</td>
+                                            <td>
+                                                <MudTooltip Text="Ver">
+                                                    <MudFab Class="mt-2 ml-3" Color="MudBlazor.Color.Primary" Size="MudBlazor.Size.Medium" Icon="@Icons.Material.Filled.NavigateNext" OnClick="() => DetallePedido(pedido.GuidPedido)" />
+                                                </MudTooltip>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </MudSimpleTable>
+                        </div>
+                    </div>
+                </div>
+            }
         }
     </div>
 }
@@ -146,40 +162,43 @@ else
     protected ReporteCosecheroQuery RequestCosechero = new();
     protected ReporteJefePackingQuery RequestJefePacking = new();
     protected int IdEmpresaSeleccionada = 0;
-	protected List<UsuarioInterno> UsuariosInternos;
+    protected List<UsuarioInterno> UsuariosInternos;
+    protected bool Buscando;
 
-	public record ExportDataHelper
-	{
-		public string NombreGrupo { get; set; }
+    public record ExportDataHelper
+    {
+        public string NombreGrupo { get; set; }
         public int Cantidad { get; set; }
-	}
+    }
 
     protected override async Task OnInitializedAsync()
     {
         EmpresasEnSistema = await _cliente.GetFromJsonAsync<List<Empresa>>("api/Empresas/ObtenerEmpresas");
         UsuariosInternos = await _cliente.GetFromJsonAsync<List<UsuarioInterno>>("api/Usuarios/ObtenerUsuariosInternos");
-	    UsuariosInternos = UsuariosInternos.Where(x => x.UsuarioActivo).ToList();
-	    StateHasChanged();
+        UsuariosInternos = UsuariosInternos.Where(x => x.UsuarioActivo).ToList();
+        StateHasChanged();
     }
 
     protected async void BuscarPedidos()
     {
+        Buscando = true;
+        StateHasChanged();
         var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
         if (authState.User.Identity != null) IdUsuarioLoggeado = authState.User.Identity.Name;
 
-	    var dtoRequest = new BuscarPedidosReporteQuery()
-        {
-            FechaDesde = DateTime.TryParse(FechaDesde.ToString(),out var resultDesde) ? resultDesde : DateTime.Today,
-            FechaHasta = DateTime.TryParse(FechaHasta.ToString(),out var resultHasta) ? resultHasta.AddHours(23).AddMinutes(59) : DateTime.Today,
-            IdEmpresa = IdEmpresaSeleccionada
-        };
-	    var reporteJefe = new ReporteCosecheroQuery()
-	    {
-		    FechaDesde = resultDesde,
-		    FechaHasta = resultHasta.AddHours(23).AddMinutes(59),
-		    IdEmpresa = IdEmpresaSeleccionada,
-            UsuarioSolicitante = "SYSTEM"
-	    };
+        var dtoRequest = new BuscarPedidosReporteQuery()
+            {
+                FechaDesde = DateTime.TryParse(FechaDesde.ToString(), out var resultDesde) ? resultDesde : DateTime.Today,
+                FechaHasta = DateTime.TryParse(FechaHasta.ToString(), out var resultHasta) ? resultHasta.AddHours(23).AddMinutes(59) : DateTime.Today,
+                IdEmpresa = IdEmpresaSeleccionada
+            };
+        var reporteJefe = new ReporteCosecheroQuery()
+            {
+                FechaDesde = resultDesde,
+                FechaHasta = resultHasta.AddHours(23).AddMinutes(59),
+                IdEmpresa = IdEmpresaSeleccionada,
+                UsuarioSolicitante = "SYSTEM"
+            };
         var resultRequest = await _cliente.PostAsJsonAsync("api/Pedidos/ObtenerPedidosParaReporte", dtoRequest);
         var resultRequestPedidos = await _cliente.PostAsJsonAsync("api/Pedidos/ObtenerReporteCosecheros", reporteJefe);
         if (resultRequest.IsSuccessStatusCode)
@@ -197,6 +216,7 @@ else
                 PedidosEncontrados = new List<Pedido>();
             }
         }
+        Buscando = false;
         StateHasChanged();
     }
 
@@ -207,65 +227,66 @@ else
 
     void ExportToPdf(ReporteCosechero reporte)
     {
-	    try
-	    {
-		    const int paragraphAfterSpacing = 8;
-		    const int cellMargin = 8;
-		    var pdfDocument = new PdfDocument();
-			//Add Page to the PDF document.
-		    var page = pdfDocument.Pages.Add();
+        try
+        {
+            const int paragraphAfterSpacing = 8;
+            const int cellMargin = 8;
+            var pdfDocument = new PdfDocument();
+            //Add Page to the PDF document.
+            var page = pdfDocument.Pages.Add();
 
-			//Create a new font.
-		    var font = new PdfStandardFont(PdfFontFamily.TimesRoman, 16);
+            //Create a new font.
+            var font = new PdfStandardFont(PdfFontFamily.TimesRoman, 16);
 
-			//Create a text element to draw a text in PDF page.
-		    var title = new PdfTextElement("Información de pedidos", font, PdfBrushes.Black);
-		    var result = title.Draw(page, new PointF(0, 0));
+            //Create a text element to draw a text in PDF page.
+            var title = new PdfTextElement("Información de pedidos", font, PdfBrushes.Black);
+            var result = title.Draw(page, new PointF(0, 0));
 
 
-		    var contentFont = new PdfStandardFont(PdfFontFamily.TimesRoman, 12);
-		    var content = new PdfTextElement($"Información solicitada por el usuario {reporte.UsuarioSolicitante} válida para pedidos entre {reporte.RangoFechasConsideradas.Item1.ToShortDateString()}.- {reporte.RangoFechasConsideradas.Item2.ToShortDateString()}", contentFont, PdfBrushes.Black);
-		    var format = new PdfLayoutFormat();
-		    format.Layout = PdfLayoutType.Paginate;
+            var contentFont = new PdfStandardFont(PdfFontFamily.TimesRoman, 12);
+            var content = new PdfTextElement($"Información solicitada por el usuario {reporte.UsuarioSolicitante} válida para pedidos entre {reporte.RangoFechasConsideradas.Item1.ToShortDateString()}.- {reporte.RangoFechasConsideradas.Item2.ToShortDateString()}", contentFont, PdfBrushes.Black);
+            var format = new PdfLayoutFormat();
+            format.Layout = PdfLayoutType.Paginate;
 
-			//Draw a text to the PDF document.
-		    result = content.Draw(page, new RectangleF(0, result.Bounds.Bottom + paragraphAfterSpacing, page.GetClientSize().Width, page.GetClientSize().Height), format);
+            //Draw a text to the PDF document.
+            result = content.Draw(page, new RectangleF(0, result.Bounds.Bottom + paragraphAfterSpacing, page.GetClientSize().Width, page.GetClientSize().Height), format);
 
-			//Create a PdfGrid.
-		    var pdfGrid = new PdfGrid();
-		    pdfGrid.Style.CellPadding.Left = cellMargin;
-		    pdfGrid.Style.CellPadding.Right = cellMargin;
+            //Create a PdfGrid.
+            var pdfGrid = new PdfGrid();
+            pdfGrid.Style.CellPadding.Left = cellMargin;
+            pdfGrid.Style.CellPadding.Right = cellMargin;
 
-			//Applying built-in style to the PDF grid
-		    pdfGrid.ApplyBuiltinStyle(PdfGridBuiltinStyle.GridTable4Accent1);
-		    var listaExport = new List<ExportDataHelper>();
-		    listaExport = reporte.Grupos.Select(key => new ExportDataHelper()
-		    {
-			    Cantidad = key.Value.Item2, NombreGrupo = key.Value.Item1.NombreGrupo
-		    }).ToList();
+            //Applying built-in style to the PDF grid
+            pdfGrid.ApplyBuiltinStyle(PdfGridBuiltinStyle.GridTable4Accent1);
+            var listaExport = new List<ExportDataHelper>();
+            listaExport = reporte.Grupos.Select(key => new ExportDataHelper()
+                {
+                    Cantidad = key.Value.Item2,
+                    NombreGrupo = key.Value.Item1.NombreGrupo
+                }).ToList();
 
-			//formar la lista final
-			//Assign data source.
-		    pdfGrid.DataSource = listaExport;
+            //formar la lista final
+            //Assign data source.
+            pdfGrid.DataSource = listaExport;
 
-		    pdfGrid.Style.Font = contentFont;
+            pdfGrid.Style.Font = contentFont;
 
-			//Draw PDF grid into the PDF page.
-		    pdfGrid.Draw(page, new Syncfusion.Drawing.PointF(0, result.Bounds.Bottom + paragraphAfterSpacing));
+            //Draw PDF grid into the PDF page.
+            pdfGrid.Draw(page, new Syncfusion.Drawing.PointF(0, result.Bounds.Bottom + paragraphAfterSpacing));
 
-		    var memoryStream = new MemoryStream();
+            var memoryStream = new MemoryStream();
 
-			// Save the PDF document.
-		    pdfDocument.Save(memoryStream);
+            // Save the PDF document.
+            pdfDocument.Save(memoryStream);
 
-			// Download the PDF document
-		    _jsRuntime.SaveAs("Pedidos info.pdf", memoryStream.ToArray());
-	    }
-	    catch (Exception error)
-	    {
+            // Download the PDF document
+            _jsRuntime.SaveAs("Pedidos info.pdf", memoryStream.ToArray());
+        }
+        catch (Exception error)
+        {
             Console.WriteLine(error.Message);
-		    throw;
-	    }
+            throw;
+        }
     }
 
 }
