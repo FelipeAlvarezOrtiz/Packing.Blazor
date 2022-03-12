@@ -122,7 +122,7 @@ else
         </MudText>
     </TitleContent>
     <DialogContent>
-        <EditForm Model="NuevoFormato" OnValidSubmit="GuardarFormato">
+        <EditForm Model="NuevoFormato">
             <DataAnnotationsValidator></DataAnnotationsValidator>
             <div class="container-fluid">
                 <div class="row form-group">
@@ -148,7 +148,7 @@ else
     </DialogContent>
     <DialogActions>
         <MudFab Size="Size.Medium" Icon="@Icons.Material.Filled.Cancel" Label="Cerrar" OnClick="CerrarNuevoFormato"></MudFab>
-        <MudFab Size="Size.Medium" Icon="@Icons.Material.Filled.Save" Color="Color.Success" OnClick="GuardarFormato" Label="Guardar"></MudFab>
+        <MudFab Size="Size.Medium" Icon="@Icons.Material.Filled.Save" Color="Color.Success" OnClick="@(async () => await GuardarFormato())" Label="Guardar"></MudFab>
     </DialogActions>
 </MudDialog>
 
@@ -159,7 +159,7 @@ else
         </MudText>
     </TitleContent>
     <DialogContent>
-        <EditForm Model="NuevaPresentacion" OnValidSubmit="GuardarPresentacion">
+        <EditForm Model="NuevaPresentacion">
             <DataAnnotationsValidator></DataAnnotationsValidator>
             <div class="container-fluid">
                 <div class="row form-group">
@@ -177,7 +177,7 @@ else
     </DialogContent>
     <DialogActions>
         <MudFab Size="Size.Medium" Icon="@Icons.Material.Filled.Cancel" Label="Cerrar" OnClick="CerrarNuevaPresentacion"></MudFab>
-        <MudFab Size="Size.Medium" Icon="@Icons.Material.Filled.Save" Color="Color.Success" OnClick="GuardarFormato" Label="Guardar"></MudFab>
+        <MudFab Size="Size.Medium" Icon="@Icons.Material.Filled.Save" Color="Color.Success" OnClick="@(async () => await GuardarPresentacion())" Label="Guardar"></MudFab>
     </DialogActions>
 </MudDialog>
 
@@ -188,7 +188,7 @@ else
         </MudText>
     </TitleContent>
     <DialogContent>
-        <EditForm Model="NuevoGrupo" OnValidSubmit="SubirGrupo">
+        <EditForm Model="NuevoGrupo">
             <DataAnnotationsValidator></DataAnnotationsValidator>
             <div class="container-fluid">
                 <div class="row form-group">
@@ -213,7 +213,7 @@ else
     </DialogContent>
     <DialogActions>
         <MudFab Size="Size.Medium" Icon="@Icons.Material.Filled.Cancel" Label="Cerrar" OnClick="CerrarNuevoGrupo"></MudFab>
-        <MudFab Size="Size.Medium" Icon="@Icons.Material.Filled.Save" Label="Guardar" Color="Color.Success" OnClick="SubirGrupo"></MudFab>
+        <MudFab Size="Size.Medium" Icon="@Icons.Material.Filled.Save" Label="Guardar" Color="Color.Success" OnClick="@(async () => await SubirGrupo() )"></MudFab>
     </DialogActions>
 </MudDialog>
 
@@ -274,12 +274,22 @@ else
     protected void CerrarNuevoGrupo() => NuevoGrupoVisible = false;
     protected void CerrarNuevaPresentacion() => NuevaPresentacionVisible = false;
 
-    protected async void GuardarFormato()
+    protected async Task GuardarFormato()
     {
+        Modulo = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utilidades.js");
         try
         {
-            Modulo = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utilidades.js");
-            await Modulo.InvokeVoidAsync("Exito");
+            var result = await _cliente.PostAsJsonAsync("api/Formatos/CrearFormato", NuevoFormato);
+            if (result.IsSuccessStatusCode)
+            {
+                CerrarNuevoFormato();
+                NuevoFormato.NombreFormato = string.Empty;
+                Formatos = await _cliente.GetFromJsonAsync<List<Formato>>("api/Formatos/ObtenerFormatos");
+                StateHasChanged();
+                await Modulo.InvokeVoidAsync("Exito");
+                return;
+            }
+            await Modulo.InvokeVoidAsync("Error");
         }
         catch (Exception error)
         {
@@ -288,16 +298,26 @@ else
         }
     }
 
-    protected async void GuardarPresentacion()
+    protected async Task GuardarPresentacion()
     {
+        Modulo = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utilidades.js");
         try
         {
-            Modulo = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utilidades.js");
-            await Modulo.InvokeVoidAsync("Exito");
+            var result = await _cliente.PostAsJsonAsync("api/Presentaciones/CrearPresentacion", NuevaPresentacion);
+            if (result.IsSuccessStatusCode)
+            {
+                CerrarNuevaPresentacion();
+                NuevaPresentacion.NombrePresentacion = string.Empty;
+                Presentaciones = await _cliente.GetFromJsonAsync<List<Presentacion>>("api/Presentaciones/ObtenerPresentaciones");
+                await Modulo.InvokeVoidAsync("Exito");
+                StateHasChanged();
+                return;
+            }
+            await Modulo.InvokeVoidAsync("Error");
+
         }
         catch (Exception error)
-        {
-            Console.WriteLine(error.Message);
+        { 
             await Modulo.InvokeVoidAsync("Error");
         }
     }
@@ -316,11 +336,11 @@ else
         }
     }
 
-    private async void SubirGrupo()
+    private async Task SubirGrupo()
     {
+        Modulo = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utilidades.js");
         try
         {
-            Modulo = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utilidades.js");
             var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/grupos/");
             var fs = File.Create(Path.Combine(path, NuevoGrupo.FileName));
 
@@ -334,7 +354,6 @@ else
         catch (Exception error)
         {
             await Modulo.InvokeVoidAsync("Error");
-            Console.WriteLine(error.Message);
         }
     }
 
